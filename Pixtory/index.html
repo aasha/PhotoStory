@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <title>Pixtory</title>
+        
+        <link rel="stylesheet" href="assets/css/main.css">
+        <link rel="stylesheet" href="assets/css/fonts.css">
+        <link rel="stylesheet" href="assets/css/responsive.css">
+        <link rel="stylesheet" href="assets/css/owl.carousel.css">
+        <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"> </script>
+
+        <script src="assets/js/owl.carousel.min.js"> </script>
+        <script src="assets/js/jquery.actual.min.js"> </script>
+        <script src="assets/js/jquery.scrollTo.min.js"> </script>
+
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <div id="main-content">
+            <div class="content-block" id="header">
+                <img src="assets/img/logo_grey.png" id="logo">
+                <span id="banner">
+                    <h1>
+                        EVERY <br>
+                        <b>PICTURE</b> HAS <br>
+                        A <b>STORY</b>
+                    </h1>
+                </span>
+                <span class="bottom">
+                    <img src="assets/img/arrow_down.png" id="scrollToContent">
+                </span>
+            </div>
+
+            <div class="content-block" id="info">
+                <div class="center-block">
+                    <h5>WHAT'S A PIXTORY?</h5>
+
+                    <p>Pixtory was born out of the philosophy that <b><i>"All great photographs have a story
+                        behind them and the Story itself is as important as the photograph"</i></b>.</p>
+
+                    <p>The <i>'Story'</i> - whether it's the reason, an emotion, the inspiration, some facts about or the
+                    thought behind the photograph, plays an important role in defining the character of any picture.</p>
+
+                    <p><b><i>Pixtory = Picture + Story</i></b></p>
+                    <hr width="500px" color="#d5d5d5" style="margin-top: 50px; max-width: 100%;">
+                </div>
+            </div>
+
+            <div class="content-block" id="gallery">
+                <div class="content-block container" style="background: #F3F4F4" id="gallery-title">
+                    <h1>
+                        DISCOVER THE <br> <b>UNTOLD STORIES</b> <br> OF MOMENTS CAPTURED
+                    </h1>
+                </div>
+                <div class="content-block container" id="gallery-content">
+                    <div class="gallery-list" id="owl-demo">
+                        <div class="gallery-items item">
+                            <div class="gallery-img">
+                                <img src="assets/img/story-1-image.png" alt="Story 1">
+                            </div>
+                        </div>
+                        <div class="gallery-items item">
+                            <div class="gallery-img">
+                                <img src="assets/img/story-2-image.png" alt="img">
+                            </div>
+                        </div>
+                        <div class="gallery-items item">
+                            <div class="gallery-img">
+                                <img src="assets/img/story-3-image.png" alt="img">
+                            </div>
+                        </div>
+                        <div class="gallery-items item">
+                            <div class="gallery-img">
+                                <img src="assets/img/story-4-image.png" alt="img">
+                            </div>
+                        </div>
+                        <div class="gallery-items item">
+                            <div class="gallery-img">
+                                <img src="assets/img/story-5-image.png" alt="img">
+                            </div>
+                        </div>
+                    </div>
+                    <span style="font-family: 'Open Sans'; font-weight: 300; text-shadow: none; color: #333; letter-spacing: 0px; font-size: 17px;">(Hover over the image to read the story)
+                </div>
+            </div>
+
+            <div class="content-block" id="contact">
+                <div class="content-block container" id="contact-container-left" style="background: rgb(50, 30, 60);">
+                    <div class="form">
+                        <img src="assets/img/contact-image-1.png" height = "80">
+                        <h5>BE AMONGST THE FIRST TO USE THE PIXTORY APP. SIGN UP FOR EARLY ACCESS!</h5>
+                        <div class="input-button">
+                            <input type="email" name="email" placeholder="Email Id"><input type="submit" name="user" value="" onclick="openPopup(1)">
+                        </div>
+                    </div>
+                </div>
+                <div class="content-block container" id="contact-container-right" style="background: rgb(65, 75, 110);">
+                    <div class="form">
+                        <img src="assets/img/contact-image-2.png" height = "80">
+                        <h5>GOT GREAT PHOTO-STORIES? JOIN OUR CURATED LIST OF CONTRIBUTORS & GET FEATURED.</h5>
+                        <div class="input-button">
+                            <input type="email" name="contributor" placeholder="Email Id"><input type="submit" name="user" value="" onclick="openPopup(2)">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="footer">
+                    <div class="container" style="background: rgb(50, 30, 60);">
+                        <div style="display: inline;"><i class="fa fa-envelope" aria-hidden="true"></i> contact@pixtory.in</div>
+
+                        <a href="https://www.facebook.com/pixtoryapp/" target="_blank" class="redirect">
+                            <img src="assets/img/fb.ico">
+                        </a>
+                        <a href="https://www.instagram.com/pixtoryapp/" target="_blank" class="redirect">
+                            <img src="assets/img/insta.png">
+                        </a>
+
+                    </div>
+                    <div class="container" style="background: rgb(65, 75, 110);">
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="popup1" class="overlay">
+                <div class="popup">
+                    <h2>Yaay! You're on the list</h2>
+                    <div class="close" onclick="closePopup(1)">&times;</div>
+                    <div class="content">
+                        We'll let you know soon :)
+                    </div>
+                </div>
+            </div>
+            <div id="popup2" class="overlay">
+                <div class="popup">
+                    <h2>Thanks!</h2>
+                    <div class="close" onclick="closePopup(2)">&times;</div>
+                    <div class="content">
+                        We'll reach out to you soon :)
+                    </div>
+                </div>
+            </div>
+
+            <script src="assets/js/main.js"> </script>
+        </div>
+    </body>
+</html>

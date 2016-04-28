@@ -1,0 +1,74 @@
+@media only screen and (max-width: 940px) {
+    input {
+        display: block;
+        margin: 10px 0px;
+    }
+}
+
+@media only screen and (max-width: 790px) {
+
+    #header h1 {
+        font-size: 7.5vw;
+    }
+
+    #info h5 {
+        font-size: 18px;
+    }
+
+    #info p {
+        font-size: 14px;
+    }
+
+    .center-block {
+        width: 90%;
+    }
+    .container {
+        float: none;
+        width: calc(100% - 40px);
+        height: 50%;
+    }
+
+    #gallery-title {
+        height: 100px;
+        padding: 50px 2.5%;
+    }
+
+    #gallery-content {
+        background: white;
+        padding: 50px 0;
+        width: 100%;
+    }
+
+    #contact .content-block img {
+        margin: 30px 0 15px 0;
+    }
+
+    #contact h5 {
+        font-size: 11px;
+    }
+
+    .input-button input {
+        height: 30px;
+        padding: 5px 20px;
+        font-size: 14px;
+    }
+
+    #footer {
+        position: relative;
+        height: 50px;
+    }
+    #footer span {
+        line-height: 50px;
+    }
+
+}
+
+@media only screen and (max-width: 790px) {
+    #contact .content-block img {
+        height: 50px;
+    }
+
+    #header h1 {
+        font-size: 10vw;
+    }
+}
