@@ -1,6 +1,36 @@
 <resources>
-    <string name="app_name">PhotoStory</string>
+    <string name="app_name">pixtory</string>
+    <string name="title_activity_app">pixtory</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_home">Home Activity</string>
+    <string name="title_activity_pdpread">PDPReadActivity</string>
+    <string name="title_activity_webview">WebviewActivity</string>
+    <string name="title_activity_home_feed">HomeFeedActivity</string>
+
+    <string name="app_id">1084755038244044</string>
+
+    <string-array name="feedback_array">
+        <item>I liked this</item>
+        <item>I disliked this</item>
+        <item>I am reporting a problem</item>
+    </string-array>
+    <string-array name="category_array">
+        <item>Onboarding flow</item>
+        <item>Main feed of full screen images</item>
+        <item>Video playing full screen</item>
+        <item>Video playing smaller screen</item>
+        <item>Product details</item>
+        <item>Profile screen</item>
+    </string-array>
+    <string-array name="subcategory_array">
+        <item>Video buffering or not playing</item>
+        <item>Images not loading</item>
+        <item>App sluggish while scrolling</item>
+        <item>App not responding on action</item>
+        <item>Layout looks messed up</item>
+        <item>Other</item>
+
+    </string-array>
 </resources>

@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:layout_weight="1"
+    android:background="@drawable/gradient"
+    android:orientation="vertical"
+    android:visibility="visible">
+    <ImageButton
+            android:id="@+id/close_btn"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:background="@drawable/close_profile"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitCenter"
+            android:layout_margin="10dp"
+            />
+    <include
+            android:id="@+id/prd_detail_layout"
+            layout="@layout/product_liked_details_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="63dp"
+            android:layout_marginRight="63dp"
+            android:background="#00000000" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recom_recy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c4c8ce"
+        android:scrollbars="vertical"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/prd_detail_layout"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

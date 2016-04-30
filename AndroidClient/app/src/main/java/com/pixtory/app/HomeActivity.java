@@ -1,0 +1,543 @@
+package com.pixtory.app;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.*;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.*;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.network.connectionclass.*;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.pixtory.app.adapters.OpinionViewerAdapter;
+import com.pixtory.app.adapters.ProductRecommendationAdapter;
+import com.pixtory.app.app.App;
+import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.fragments.LastFragment;
+import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.fragments.UserProfileFragment;
+import com.pixtory.app.model.ContentData;
+import com.pixtory.app.model.Product;
+import com.pixtory.app.pushnotification.QuickstartPreferences;
+import com.pixtory.app.pushnotification.RegistrationIntentService;
+import com.pixtory.app.retrofit.AddCommentResponse;
+import com.pixtory.app.retrofit.GetMainFeedResponse;
+import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.typeface.Intro;
+import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by aasha.medhi on 12/23/15.
+ */
+public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener, LastFragment.OnFragmentInteractionListener, ProductRecommendationAdapter.ProductViewHolder.FollowClickListener,
+        UserProfileFragment.OnUserFragmentInteractionListener {
+
+    private static final String Get_Feed_Done = "Get_Feed_Done";
+    private static final String Get_Feed_Failed = "Get_Feed_Failed";
+    private final static String TAG = HomeActivity.class.getName();
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private ProgressDialog mProgress = null;
+    private Context mCtx = null;
+    private ContentResolver mResolver = null;
+
+    private ViewPager mPager = null;
+
+    private GestureDetector mGestureDetector = null;
+
+    // private ProgressDialog mProgress = null;
+    private int mCurrentFragmentPosition = 0;
+    LinearLayout mRecLayout = null;
+    private RecyclerView mRecomRecycle = null;
+    private LinearLayoutManager mLayoutManager = null;
+    private ProductRecommendationAdapter productRecommendationAdapter = null;
+    //Analytics
+    public static final String SCREEN_NAME = "Main_Feed";
+    private static final String MF_NextVideo_Swipe = "MF_NextVideo_Swipe";
+    private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
+    private static final String MF_Profile_Tap = "MF_Profile_Tap";
+
+    private static final String Reco_Card_Bkmrk = "Reco_Card_Bkmrk";
+    private static final String Reco_Card_UnBkmrk = "Reco_Card_UnBkmrk";
+    private static final String Reco_Card_CTAClick = "Reco_Card_CTAClick";
+
+    private static final String User_App_Entry = "User_App_Entry";
+    private static final String User_App_Exit = "User_App_Exit";
+
+    //Push notification
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
+    private OpinionViewerAdapter mCursorPagerAdapter = null;
+
+    LinearLayout mUserProfileFragmentLayout = null;
+    int previousPage = 0;
+    @Bind(R.id.profileIcon)
+    ImageView mImgUserProfile;
+
+    Tracker mTracker;
+    private ConnectionQuality mConnectionClass = ConnectionQuality.UNKNOWN;
+    private ConnectionClassManager mConnectionClassManager;
+    private DeviceBandwidthSampler mDeviceBandwidthSampler;
+    private ConnectionChangedListener mListener;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+        ButterKnife.bind(this);
+        mTracker = App.getmInstance().getDefaultTracker();
+        mCtx = this;
+        if (Utils.isConnectedViaWifi(mCtx) == false) {
+            showAlert();
+        }
+        mResolver = getContentResolver();
+        setUpRecomView();
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
+        mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (previousPage == 0)
+                    previousPage = position;
+                else
+                    previousPage = mCurrentFragmentPosition;
+                mCurrentFragmentPosition = position;
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_NextVideo_Swipe)
+                        .put(AppConstants.OPINION_ID, "" + App.getContentData().get(position).id)
+                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                        .build());
+                Fragment currentFragment = mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+                if ( currentFragment instanceof LastFragment) {
+                    mImgUserProfile.setVisibility(View.GONE);
+                } else {
+                    mImgUserProfile.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                //Log.d(TAG, "onPageScrollStateChanged = "+state);
+            }
+        });
+        //Measuring network condition
+        mConnectionClassManager = ConnectionClassManager.getInstance();
+        mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
+        mListener = new ConnectionChangedListener();
+        prepareFeed();
+
+        showShowcaseView();
+        //Register for push notifs
+        registerForPushNotification();
+        if (App.getContentData() != null && App.getContentData().size() > 0) {
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_NextVideo_Swipe)
+                    .put(AppConstants.OPINION_ID, "" + App.getContentData().get(0).id)
+                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                    .build());
+        }
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
+                .put("TIMESTAMP", System.currentTimeMillis() + "")
+                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                .build());
+    }
+
+
+    @OnClick(R.id.profileIcon)
+    public void onUserImageClick() {
+        mImgUserProfile.setVisibility(View.GONE);
+        onViewUserProfileScreen();
+    }
+
+    private void prepareFeed() {
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("pixtory coming up for you");
+        mProgress.setCanceledOnTouchOutside(false);
+        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, null, new NetworkApiCallback<GetMainFeedResponse>() {
+            @Override
+            public void success(GetMainFeedResponse o, Response response) {
+                mProgress.dismiss();
+                if (o.contentList != null) {
+                    App.setContentData(o.contentList);
+                    Utils.deleteOldVideos(o.contentList);
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Done)
+                            .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                            .build());
+                    mCursorPagerAdapter.setData(App.getContentData());
+                    mPager.setAdapter(mCursorPagerAdapter);
+                    Fragment currentFragment = mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+                    if (currentFragment instanceof LastFragment) {
+                        mImgUserProfile.setVisibility(View.GONE);
+                    } else {
+                        mImgUserProfile.setVisibility(View.VISIBLE);
+
+                    }
+                } else {
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
+                            .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                            .put("MESSAGE", "No Data")
+                            .build());
+                    Toast.makeText(HomeActivity.this, "No data!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(GetMainFeedResponse error) {
+                mProgress.dismiss();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
+                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                        .put("MESSAGE", error.errorMessage)
+                        .build());
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                mProgress.dismiss();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
+                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                        .put("MESSAGE", error.getMessage())
+                        .build());
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void setUpRecomView() {
+        LayoutInflater mLayoutInflater = LayoutInflater.from(this);
+        mRecLayout = (LinearLayout) mLayoutInflater.inflate(R.layout.recycler_view_layout, null);
+        TextView textRecomendation = (TextView) mRecLayout.findViewById(R.id.textRecomendation);
+        Intro.applyFont(this, textRecomendation);
+        // Set up recycler view
+        mRecomRecycle = (RecyclerView) mRecLayout.findViewById(R.id.recom_recy);
+        mRecomRecycle.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        //mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        mRecomRecycle.setLayoutManager(mLayoutManager);
+
+        productRecommendationAdapter = new ProductRecommendationAdapter(this);
+        productRecommendationAdapter.followClickListener = this;
+        mRecomRecycle.setAdapter(productRecommendationAdapter);
+    }
+
+    private void registerForPushNotification() {
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.e("AASHA", "Registered for push notifs");
+                } else {
+                    Log.e("AASHA", "Failed");
+                }
+            }
+        };
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
+    @Override
+    public void onDetachRecoView(Fragment ff, int position) {
+        final ViewGroup parent = (ViewGroup) mRecLayout.getParent();
+        if (parent != null) {
+            parent.removeAllViews();
+        }
+    }
+
+    @Override
+    public void onAttachRecoView(Fragment ff, int position) {
+        //mPager.isScrollingEnabled = false;
+        MainFragment f = (MainFragment) ff;
+        final ViewGroup parent = (ViewGroup) mRecLayout.getParent();
+        if (parent != null) {
+            parent.removeAllViews();
+        }
+        f.attachRecycerView(mRecLayout);
+        try {
+            productRecommendationAdapter.setData(App.getContentData().get(position).productList);
+            productRecommendationAdapter.setSelected(0);
+            mRecomRecycle.scrollToPosition(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onPDPPageSelected(Fragment f, int position) {
+        mRecomRecycle.scrollToPosition(position);
+        productRecommendationAdapter.setSelected(position);
+    }
+
+    @Override
+    public void onPDPPageBookMarked(Fragment f, int contentPosition, int positionOfProduct, boolean value) {
+        List<ContentData> cd = App.getContentData();
+        List<Product> pdList = cd.get(contentPosition).productList;
+        pdList.get(positionOfProduct).bookmarkedByUser = value;
+        App.setContentData((ArrayList<ContentData>) cd);
+        productRecommendationAdapter.setData(cd.get(contentPosition).productList);
+        productRecommendationAdapter.setBookMarked();
+        NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), pdList.get(positionOfProduct).productId, value, new NetworkApiCallback<AddCommentResponse>() {
+            @Override
+            public void success(AddCommentResponse o, Response response) {
+
+            }
+
+            @Override
+            public void failure(AddCommentResponse error) {
+
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+            }
+        });
+    }
+
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onFollowClick(View caller, int pos) {
+        MainFragment fr1 = (MainFragment) mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+        fr1.showFullScreenPDP(pos);
+        int pid = App.getContentData().get(mCurrentFragmentPosition).productList.get(pos).productId;
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Reco_Card_CTAClick)
+                .put(AppConstants.PRODUCT_ID, "" + pid)
+                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                .build());
+    }
+
+    @Override
+    public void onBookMarkClick(int pos, boolean value) {
+        MainFragment fr1 = (MainFragment) mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+        fr1.bookMarkInPDP(pos, value);
+        int pid = App.getContentData().get(mCurrentFragmentPosition).productList.get(pos).productId;
+        if (value == true) {
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( Reco_Card_Bkmrk)
+                    .put(AppConstants.PRODUCT_ID, "" + pid)
+                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                    .build());
+        } else {
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Reco_Card_UnBkmrk)
+                    .put(AppConstants.PRODUCT_ID, "" + pid)
+                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                    .build());
+        }
+    }
+
+    /*
+    User profile
+     */
+
+    UserProfileFragment mUserProfileFragment = null;
+
+    //   @Override
+    public void onCloseUserProfileScreen() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.remove(mUserProfileFragment).commit();
+        mUserProfileFragmentLayout.setVisibility(View.GONE);
+    }
+
+    //  @Override
+    public void onViewUserProfileScreen() {
+        MainFragment fr1 = (MainFragment) mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+        if (fr1 != null)
+            fr1.resetFragmentState();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        mUserProfileFragment = new UserProfileFragment();
+        fragmentTransaction.add(R.id.user_profile_fragment_layout, mUserProfileFragment).commit();
+        mUserProfileFragmentLayout.setVisibility(View.VISIBLE);
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Profile_Tap)
+                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                .build());
+    }
+
+    @Override
+    public void onClose(boolean interestModified) {
+        onCloseUserProfileScreen();
+
+        mImgUserProfile.setVisibility(View.VISIBLE);
+
+        if (interestModified == true) {
+            //Set last sync to 0. To resync feed
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong(AppConstants.LAST_SYNC, 0);
+            editor.commit();
+            //Get new feed interests changed
+            mProgress.setMessage("pixtory coming up for you");
+            mProgress.setCanceledOnTouchOutside(false);
+            prepareFeed();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Exit)
+                    .put("TIMESTAMP", System.currentTimeMillis() + "")
+                    .put(AppConstants.OPINION_ID, App.getContentData().get(mCurrentFragmentPosition).id + "")
+                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                    .build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        FeedbackOverlay.removeFullscreenOverlay();
+    }
+
+    /*
+   COACH MARK
+    */
+    private void showShowcaseView() {
+        if (!Utils.hasCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN)) {
+            final SimpleDraweeView coachMark = (SimpleDraweeView) findViewById(R.id.coach_mark);
+            coachMark.setBackgroundResource(R.drawable.coachmarks);
+            coachMark.setVisibility(View.VISIBLE);
+            // coachMark.setAlpha(0.8f);
+            Utils.setCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN);
+            coachMark.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    coachMark.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mConnectionClassManager.remove(mListener);
+        mDeviceBandwidthSampler.stopSampling();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTracker.setScreenName(SCREEN_NAME);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        mConnectionClassManager.register(mListener);
+        mDeviceBandwidthSampler.startSampling();
+        ConnectionQuality cq = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
+                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                .put(AppConstants.CONNECTION_QUALITY, cq.toString())
+                .build());
+        Log.e("AASHA", "Connection q " + cq.toString());
+    }
+
+    private void showAlert() {
+        new AlertDialog.Builder(mCtx)
+                .setTitle("Warning")
+                .setMessage("You are not on a Wi-fi connection. pixtory recommends a wi-fi environment for a better experience")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
+    }
+
+    private class ConnectionChangedListener
+            implements ConnectionClassManager.ConnectionClassStateChangeListener {
+
+        @Override
+        public void onBandwidthStateChange(ConnectionQuality bandwidthState) {
+            mConnectionClass = bandwidthState;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
+                            .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                            .put(AppConstants.CONNECTION_QUALITY, mConnectionClass.toString())
+                            .build());
+                }
+            });
+        }
+    }
+
+}
+

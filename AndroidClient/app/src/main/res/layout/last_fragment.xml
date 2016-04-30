@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bg"
+              android:orientation="vertical"
+              tools:context="com.pixtory.app.fragments.LastFragment">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Thats it for today !"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"/>
+    <LinearLayout android:id="@+id/video_layout" android:padding="0dp"
+                  android:layout_width="fill_parent" android:orientation="vertical" android:gravity="center"
+                  android:layout_height="fill_parent"
+                  android:background="@null"
+                  android:layout_margin="30dp"/>
+
+</LinearLayout>

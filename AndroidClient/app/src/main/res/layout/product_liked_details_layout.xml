@@ -1,0 +1,16 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:fresco="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_gravity="center"
+              android:background="@null"
+              android:gravity="center"
+              android:visibility="gone">
+    <include
+            android:id="@+id/product_detail"
+            layout="@layout/layout_liked_pdp_details"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#00000000" />
+</FrameLayout>

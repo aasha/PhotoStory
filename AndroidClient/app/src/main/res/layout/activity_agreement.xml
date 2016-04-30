@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#ffffff"
+              android:orientation="vertical"
+              tools:context=".MainActivity"
+              android:padding="10dp">
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="20sp"
+              android:textColor="#000"
+            android:id="@+id/textHeading"/>
+    <View android:layout_width="match_parent"
+          android:layout_height="1dp"
+            android:background="#000"></View>
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_below="@+id/layout_images"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:layout_marginBottom="10dp">
+        <TextView android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#000"
+                android:id="@+id/text"/>
+
+    </ScrollView>
+<LinearLayout android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+        android:gravity="center">
+    <Button
+            android:layout_height="120dp"
+            android:id="@+id/btnAccept"
+            android:layout_width="120dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/accept"
+            android:layout_marginRight="20dp"/>
+
+    <Button
+            android:layout_height="120dp"
+            android:id="@+id/btnReject"
+            android:layout_width="120dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/disagree"
+            android:layout_marginLeft="20dp"/>
+</LinearLayout>
+</LinearLayout>
