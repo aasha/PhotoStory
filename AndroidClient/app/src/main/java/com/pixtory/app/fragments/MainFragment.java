@@ -5,47 +5,30 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.*;
 import butterknife.*;
-import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.drm.UnsupportedDrmException;
-import com.google.android.exoplayer.util.Util;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.ContentData;
-import com.pixtory.app.player.BasePlayerTextureView;
-import com.pixtory.app.player.DemoPlayer;
-import com.pixtory.app.retrofit.AddCommentResponse;
 import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.utils.AmplitudeLog;
-import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.utils.Utils;
+import com.squareup.picasso.Picasso;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by aasha.medhi on 12/23/15.
@@ -67,12 +50,6 @@ public class MainFragment extends Fragment{
     private int mDeviceWidthInPx = 0;
     private int mDeviceHeightInPx = 0;
 
-    private boolean mIsControlsShown = false;
-    private boolean mIsControlsInteracted = false;
-
-    private boolean isBuffering = false;
-
-    private int playerState = 0;
     private OnMainFragmentInteractionListener mListener;
 
     private static final String SCREEN_NAME = "Video";
@@ -102,27 +79,10 @@ public class MainFragment extends Fragment{
     private boolean isSecondQuartileEventSent = false;
     private boolean isThirdQuartileEventSent = false;
 
-    /**********************************************
-     * Opinion & Profile Player
-     **********************************************/
-
-    BasePlayerTextureView mOpinionPlayer = null;
-
 
     /**********************************************
      *
      **********************************************/
-
-    @Bind(R.id.layout_complete)
-    FrameLayout mCompleteLayout = null;
-
-    @Bind(R.id.player_opinion)
-    LinearLayout mOpinionPlayerLayout = null;
-
-    @Bind(R.id.progressBarBuffer)
-    ProgressBar mProgressBar = null;
-
-    private boolean mHasVideoPlayedAtleastOnce = false;
 
     @Bind(R.id.rec_prd_layout)
     LinearLayout mPrdRecLayout = null;
@@ -130,57 +90,28 @@ public class MainFragment extends Fragment{
     @Bind(R.id.main_layout)
     FrameLayout mMainLayout = null;
 
-    @Bind(R.id.layout_cta)
-    LinearLayout mCTALayout = null;
+    @Bind(R.id.image_main)
+    ImageView mImageMain = null;
 
-    @Bind(R.id.layout_seek)
-    LinearLayout mLayoutSeek = null;
+    @Bind(R.id.layout_image_details)
+    RelativeLayout mImageDetailsLayout = null;
 
-    @Bind(R.id.layout_controls_opinion)
-    RelativeLayout mLayoutControlsOpinion = null;
+    @Bind(R.id.text_title)
+    TextView mTextTitle = null;
 
-    @Bind(R.id.layout_opinion)
-    RelativeLayout mOpinionLayout = null;
+    @Bind(R.id.text_place)
+    TextView mTextPlace = null;
 
-    @Bind(R.id.text_Opinion)
-    TextView mTextOpinion = null;
+    @Bind(R.id.text_expert)
+    TextView mTextExpert = null;
 
-    @Bind(R.id.text_Views)
-    TextView mTextNoOfViews = null;
-
-    @Bind(R.id.img_like)
+    @Bind(R.id.image_like)
     ImageView mImageLike = null;
-
-    @Bind(R.id.img_play)
-    ImageView mImagePlay = null;
-
-    @Bind(R.id.seekBar)
-    SeekBar mSeekBar = null;
-
-    @Bind(R.id.textStartLength)
-    TextView mTextStartLength = null;
-
-    @Bind(R.id.textMaxLength)
-    TextView mTextMaxLength = null;
 
     @Bind(R.id.img_up_arrow)
     ImageView mImgShowReco = null;
 
     private int mSoftBarHeight = 0;
-
-
-    private int mOpinionVideoState = OPINION_PLAYER_STATE_BEGIN;
-
-    private static int prevPopUpSelection = -1;
-
-    private static final int OPINION_PLAYER_STATE_BEGIN = 1;
-    private static final int OPINION_PLAYER_STATE_PLAYING = 2;
-    private static final int OPINION_PLAYER_STATE_PAUSED = 3;
-    private static final int OPINION_PLAYER_STATE_END = 4;
-    /**************************
-     * Recommendation List
-     *************************/
-    private int mMaxContentLength = 60;
 
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
@@ -273,8 +204,9 @@ public class MainFragment extends Fragment{
     }
 
     private void applyFonts() {
-        Dekar.applyFont(this.getActivity(), mTextNoOfViews);
-        Dekar.applyFont(this.getActivity(), mTextOpinion);
+        Dekar.applyFont(this.getActivity(), mTextPlace);
+        Dekar.applyFont(this.getActivity(), mTextTitle);
+        Dekar.applyFont(this.getActivity(), mTextExpert);
     }
 
     private void bindData() {
@@ -282,10 +214,10 @@ public class MainFragment extends Fragment{
             return;
         }
         final ContentData cd = mContentData;
-
-        mTextMaxLength.setText("00:" + mMaxContentLength);
-        mSeekBar.setMax(mMaxContentLength);
-        mTextOpinion.setText(cd.name);
+        mTextTitle.setText(cd.name);
+        mTextPlace.setText(cd.place);
+        mTextExpert.setText("By " + cd.personDetails.name);
+        Picasso.with(this.getContext()).load(cd.pictureUrl).fit().into(mImageMain);
         if (mContentData.likedByUser == true)
             mImageLike.setImageResource(R.drawable.liked);
         else
@@ -295,102 +227,7 @@ public class MainFragment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mSeekBar.getProgressDrawable().setColorFilter(new PorterDuffColorFilter(0xFFCC094F, PorterDuff.Mode.SRC_IN));
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mTextStartLength.setText("00:" + String.valueOf(progress));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                mIsControlsInteracted = true;
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                mOpinionPlayer.setPlayerPosition(seekBar.getProgress() * 1000);
-                if (mIsOpinionVideoPlaying)
-                    playOpinionVid(true);
-                else
-                    releaseOpinionVid();
-                mIsControlsInteracted = false;
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_SeekClick)
-                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                        .build());
-            }
-        });
-        // Set opinion player
-        mOpinionPlayer = new BasePlayerTextureView(getActivity(), "OPINION");
-        mOpinionPlayerLayout.addView(mOpinionPlayer.getVideoFrame());
-        mOpinionPlayer.setPlayerListener(mOpinionPlayerListener);
-        mImagePlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mIsOpinionVideoPlaying) {
-                    releaseOpinionVid();
-                    if (isFullscreenVideo == true) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Pause)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put("SOURCE", "Full Screen Video")
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                    } else {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Pause)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put("SOURCE", "Recomendation Page")
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                    }
-                } else {
-                    playOpinionVid(true);
-                    if (isFullscreenVideo == true) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Play)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put("SOURCE", "Full Screen Video")
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                    } else {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Play)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put("SOURCE", "Recomendation Page")
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                    }
-                }
-            }
-        });
-
-        mOpinionPlayer.setVideoOverlayTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (videoOverlaygesture.onTouchEvent(event)) {
-                    return true;
-                }
-                return false;
-            }
-        });
-        Log.d(TAG, "Instantiating OPINION & PROFILE player for fragement position = " + mContentIndex);
         bindData();
-        initPlayerData();
-    }
-
-    private void initPlayerData() {
-        Uri uri = null;
-        try {
-            playOpinionVid(false);
-            String img = "http://www.sdpb.org/s/photogallery/img/no-image-available.jpg";
-            Uri u;
-            if (mContentData.pictureUrl == null)
-                u = Uri.parse(img);
-            else
-                u = Uri.parse(mContentData.pictureUrl);
-            mOpinionPlayer.setYtPreviewPlayerView(u);
-            mOpinionPlayer.setYtPreviewVisibility(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -405,43 +242,10 @@ public class MainFragment extends Fragment{
         }
     }
 
-    // Dummy variable for testing .. replace it with proper logic post demo. might loose state
-    private boolean mWasOpinionPlaying = false;
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mIsOpinionVideoPlaying) {
-            mWasOpinionPlaying = true;
-            mOpinionPlayer.releasePlayer();
-            mIsOpinionVideoPlaying = false;
-        } else {
-            if (isFullscreenVideo == false)
-                mOpinionPlayer.setYtPreviewVisibility(true);
-            mWasOpinionPlaying = false;
-        }
-        Log.d(TAG, "{" + mContentIndex + "} " + mOpinionPlayer.getPlayerPosition() + " B | state " + mOpinionVideoState + "|" + mWasOpinionPlaying + " ||| was video playing = " + mIsOpinionVideoPlaying);
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mWasOpinionPlaying) {
-            playOpinionVid(true);
-            mIsOpinionVideoPlaying = true;
-        }
-    }
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         mListener = null;
-        if (mOpinionPlayer != null) {
-            mOpinionPlayer.releasePlayer();
-            mOpinionPlayer.setYtPreviewVisibility(true);
-        }
     }
 
     @Override
@@ -484,294 +288,12 @@ public class MainFragment extends Fragment{
         public void onPDPPageBookMarked(Fragment f, int contentPositon, int positionOfProduct, boolean value);
 
     }
-    private long bufferTime = 0;
-    private long totalBufferTime = 0;
-    private DemoPlayer.Listener mOpinionPlayerListener = new DemoPlayer.Listener() {
-        @Override
-        public void onStateChanged(boolean playWhenReady, int playbackState) {
-            String text = "playWhenReady=" + playWhenReady + ", playbackState=";
-            playerState = playbackState;
-            switch (playbackState) {
-                case ExoPlayer.STATE_BUFFERING:
-                    text += "buffering";
-                    isBuffering = true;
-                    bufferTime = System.currentTimeMillis();
-                    if (!mProgressBar.isShown()) {
-                        mProgressBar.setVisibility(View.VISIBLE);
-                    }
-                    break;
-                case ExoPlayer.STATE_ENDED:
-                    isBuffering = false;
-                    mOpinionPlayer.releasePlayer();
-                    mOpinionPlayer.setPlayerPosition(0);
-                    mSeekBar.setProgress(0);
-                    handler.removeCallbacksAndMessages(null);
-                    mIsOpinionVideoPlaying = false;
-                    mOpinionVideoState = OPINION_PLAYER_STATE_END;
-                    setUIForOpinionVideoStoppedState();
-                    text += "ended";
-                    if (mProgressBar.isShown()) {
-                        mProgressBar.setVisibility(View.GONE);
-                    }
-                    if(totalBufferTime != 0){
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Video_Buffering_Complete)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .put(BUFFER_LENGTH, "" + String.valueOf(totalBufferTime))
-                                .build());
-                    }
-                    break;
-                case ExoPlayer.STATE_IDLE:
-                    text += "idle";
-                    break;
-                case ExoPlayer.STATE_PREPARING:
-                    text += "preparing";
-                    break;
-                case ExoPlayer.STATE_READY:
-                    text += "ready";
-                    isBuffering = false;
-                    if (mProgressBar.isShown()) {
-                        mProgressBar.setVisibility(View.GONE);
-                    }
-                    if(bufferTime != 0) {
-                        bufferTime = System.currentTimeMillis() - bufferTime;
-                        Log.e("AASHA", "Buffer time" + bufferTime);
-                        totalBufferTime += bufferTime;
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Video_Buffering_Unit)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .put(BUFFER_LENGTH, "" + String.valueOf(bufferTime))
-                                .build());
-                        bufferTime = 0;
-                    }
-                    break;
-                default:
-                    text += "unknown";
-                    break;
-            }
-        }
 
-        @Override
-        public void onError(Exception e) {
-            if (e instanceof UnsupportedDrmException) {
-                // Special case DRM failures.
-                UnsupportedDrmException unsupportedDrmException = (UnsupportedDrmException) e;
-                int stringId = Util.SDK_INT < 18 ? R.string.drm_error_not_supported
-                        : unsupportedDrmException.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
-                        ? R.string.drm_error_unsupported_scheme : R.string.drm_error_unknown;
-            }
-            mOpinionPlayer.setPlayerNeedsPrepare(true);
-        }
-
-
-        @Override
-        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthAspectRatio) {
-            //shutterView.setVisibility(View.GONE);
-            mOpinionPlayer.getVideoFrame().setAspectRatio(
-                    height == 0 ? 1 : (width * pixelWidthAspectRatio) / height);
-        }
-    };
-
-    private boolean mIsOpinionVideoPlaying = false;
-    final Handler handler = new Handler();
-    Runnable r;
-
-    private void playOpinionVid(boolean playWhenReady) {
-        mImagePlay.setImageResource(R.drawable.pause);
-        mOpinionPlayer.mTextureView.setVisibility(View.VISIBLE);
-        Uri uri;
-            uri = Uri.parse("http://ono.inmobicdn.net/test/delivery/40/b6/40b61271-6b2a-41c0-9d5d-82aad138b789/testVideo708ad58f-735b-336d-2b70-8eae51c9c481.m3u8");
-            mOpinionPlayer.setContentUri(uri);
-            mOpinionPlayer.preparePlayer(playWhenReady, true);
-        if(playWhenReady == false)
-            return;
-        if (!mHasVideoPlayedAtleastOnce) {
-            mHasVideoPlayedAtleastOnce = true;
-            setUIForVideoStart();
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(MF_Video_Play)
-                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                    .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                    .build());
-        }
-        mIsOpinionVideoPlaying = true;
-        mOpinionVideoState = OPINION_PLAYER_STATE_PLAYING;
-        //Set timer to update seek bar
-
-        r = new Runnable() {
-            @Override
-            public void run() {
-                if (mOpinionPlayer != null) {
-                    int currentPosition = (int) mOpinionPlayer.getPlayerPosition() / 1000;
-                    mSeekBar.setProgress(currentPosition);
-                    mTextStartLength.setText("00:" + String.valueOf(currentPosition));
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Video_Play_Time)
-                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                            .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                            .put(PLAY_POSITION, "" + String.valueOf(currentPosition))
-                            .build());
-                    if (currentPosition >= mMaxContentLength * 3 / 4 && (isThirdQuartileEventSent == false)) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Complete_Q3)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                        isThirdQuartileEventSent = true;
-                    } else if (currentPosition >= mMaxContentLength / 2 && (isSecondQuartileEventSent == false)) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Complete_Q2)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                        isSecondQuartileEventSent = true;
-                    } else if (currentPosition >= mMaxContentLength / 4 && (isFirstQuartileEventSent == false)) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Complete_Q1)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                        isFirstQuartileEventSent = true;
-                    }
-                }
-                handler.postDelayed(this, 1000);
-            }
-        };
-        handler.postDelayed(r, 1000);
-        //mExpertOverlay.setVisibility(View.GONE);
-    }
-
-    private void releaseOpinionVid() {
-        mImagePlay.setImageResource(R.drawable.play);
-        mOpinionPlayer.releasePlayer();
-        mIsOpinionVideoPlaying = false;
-        handler.removeCallbacksAndMessages(null);
-    }
-
-    private void setUIForVideoStart() {
-        if (isFullscreenVideo == true) {
-            final Animation animationFadeIn = AnimationUtils.loadAnimation(this.getActivity(), R.anim.fade_in);
-            animationFadeIn.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    mImgShowReco.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    showControlsAndDismiss();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            mImgShowReco.startAnimation(animationFadeIn);
-        }
-    }
-
-    private void showControls() {
-        final Animation animationFadeIn = AnimationUtils.loadAnimation(this.getActivity(), R.anim.fade_in);
-        animationFadeIn.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                showAllControls();
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mLayoutControlsOpinion.startAnimation(animationFadeIn);
-        mIsControlsShown = true;
-    }
-
-    private void hideControls() {
-        final Animation animationFadeOut = AnimationUtils.loadAnimation(this.getActivity(), R.anim.fade_out);
-        mLayoutControlsOpinion.startAnimation(animationFadeOut);
-        animationFadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                hideAllControls();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mIsControlsShown = false;
-    }
-
-    private void hideAllControls() {
-        if (isBuffering == true)
-            mProgressBar.setVisibility(View.VISIBLE);
-        else
-            mProgressBar.setVisibility(View.GONE);
-        mLayoutControlsOpinion.setBackgroundResource(R.drawable.transparent_gradient);
-        mOpinionLayout.setVisibility(View.INVISIBLE);
-        mImagePlay.setVisibility(View.INVISIBLE);
-        mCTALayout.setVisibility(View.INVISIBLE);
-        mLayoutSeek.setVisibility(View.INVISIBLE);
-    }
-
-    private void showAllControls() {
-        mLayoutControlsOpinion.setVisibility(View.VISIBLE);
-        mLayoutControlsOpinion.setBackgroundResource(R.drawable.gray_gradient);
-        if (isBuffering == true)
-            mProgressBar.setVisibility(View.VISIBLE);
-        else
-            mProgressBar.setVisibility(View.GONE);
-        if (isFullscreenVideo == true)
-            mOpinionLayout.setVisibility(View.VISIBLE);
-        mImagePlay.setVisibility(View.VISIBLE);
-        mCTALayout.setVisibility(View.VISIBLE);
-        mLayoutSeek.setVisibility(View.VISIBLE);
-    }
-
-
-    private void setUIForOpinionVideoStoppedState() {
-        mHasVideoPlayedAtleastOnce = false;
-        mOpinionPlayer.mTextureView.setVisibility(View.GONE);
-        mOpinionPlayer.setYtPreviewAlpha(1.0f);
-        mOpinionPlayer.setYtPreviewVisibility(true);
-        mProgressBar.setVisibility(View.GONE);
-        if (isFullscreenVideo == true) {
-            //mOpinionPlayer.setYtPreviewAlpha(1.0f);
-            //mExpertOverlay.setVisibility(View.VISIBLE);
-            mImgShowReco.setVisibility(View.GONE);
-        }
-        mLayoutControlsOpinion.setVisibility(View.GONE);
-        mIsControlsShown = false;
-    }
 
     public void resetFragmentState() {
         isRecoViewAdded = false;
-        mOpinionPlayerLayout.setVisibility(View.VISIBLE);
         mListener.onDetachRecoView(this, mContentIndex);
-        if (mOpinionPlayer != null) {
-            mOpinionPlayer.releasePlayer();
-            mOpinionPlayer.setPlayerPosition(0);
-        }
-        mIsOpinionVideoPlaying = false;
-        mOpinionVideoState = OPINION_PLAYER_STATE_BEGIN;
-        setUIForOpinionVideoStoppedState();
         showFullScreen();
-        handler.removeCallbacksAndMessages(null);
-        if(totalBufferTime != 0){
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Video_Buffering_Complete)
-                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                    .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                    .put(BUFFER_LENGTH, "" + String.valueOf(totalBufferTime))
-                    .build());
-        }
     }
 
     public void attachRecycerView(View v) {
@@ -814,28 +336,6 @@ public class MainFragment extends Fragment{
             new GestureDetector.SimpleOnGestureListener() {
 
                 @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    mOpinionPlayer.setYtPreviewVisibility(false);
-                    if (mIsControlsShown == true) {
-                        hideAllControls();
-                        mIsControlsShown = false;
-                        mHandler.removeCallbacksAndMessages(null);
-                    } else {
-                        if (mHasVideoPlayedAtleastOnce == true) {
-                            showControlsAndDismiss();
-                        } else {
-                            playOpinionVid(true);
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Play)
-                                    .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                    .put("SOURCE", "Full Screen Video")
-                                    .build());
-                        }
-                    }
-                    return super.onSingleTapConfirmed(e);
-                }
-
-                @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                        float velocityY) {
                     final int SWIPE_MIN_DISTANCE = 50;
@@ -870,24 +370,6 @@ public class MainFragment extends Fragment{
 
     final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    if (isFullscreenVideo == true) {
-                        scaleUpProdRecoView();
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_Tap)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .put("META", "Tap")
-                                .build());
-                    } else {
-                        scaleDownProductRecoView();
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
-                                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                .build());
-                    }
-                    return super.onSingleTapConfirmed(e);
-                }
 
                 @Override
                 public boolean onDown(MotionEvent e) {
@@ -899,13 +381,12 @@ public class MainFragment extends Fragment{
 //                    if (isFullscreenVideo == true && mExpertOverlay.getVisibility() == View.VISIBLE) {
 //                        return super.onScroll(e1, e2, distanceX, distanceY);
 //                    }
-                    if (isFullscreenVideo == true && mIsOpinionVideoPlaying == false) {
+                    if (isFullscreenVideo == true) {
                         return super.onScroll(e1, e2, distanceX, distanceY);
                     }
                     if (distanceX < 5 && distanceX > -5) {
                         mIsScrolling = true;
                         mIsFling = false;
-                        mIsControlsInteracted = true;
                         modifyScreenHeight((int) e2.getRawY());
                         lastScrollPosition = (int) e2.getRawY();
                     }
@@ -921,28 +402,19 @@ public class MainFragment extends Fragment{
 //                        if (isFullscreenVideo == true && mExpertOverlay.getVisibility() == View.VISIBLE) {
 //                            return true;
 //                        }
-                        if (isFullscreenVideo == true && mIsOpinionVideoPlaying == false) {
+                        if (isFullscreenVideo == true) {
                             return true;
                         }
                         if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                             mIsFling = true;
-                            mIsControlsInteracted = true;
                             showHalfScreen();
                         } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                             mIsFling = true;
-                            mIsControlsInteracted = true;
                             showFullScreen();
-                            if (mIsOpinionVideoPlaying == false && playerState == ExoPlayer.STATE_ENDED)
-                                setUIForOpinionVideoStoppedState();
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
-                                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                    .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                    .build());
                         } else {
                             mIsFling = false;
-                            mIsControlsInteracted = false;
                         }
                     } catch (Exception e) {
                         // nothing
@@ -958,7 +430,6 @@ public class MainFragment extends Fragment{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            mIsControlsInteracted = false;
             if (mIsScrolling && !mIsFling) {
                 mIsScrolling = false;
                 mIsFling = false;
@@ -981,59 +452,15 @@ public class MainFragment extends Fragment{
         return false;
     }
 
-    final Handler mHandler = new Handler();
-
-    private void showControlsAndDismiss() {
-        //Set timer to hide controls
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (mIsOpinionVideoPlaying == false && playerState != ExoPlayer.STATE_ENDED) {
-                    mHandler.postDelayed(this, 4000);
-                    return;
-                }
-                if (mIsControlsInteracted == true) {
-                    mIsControlsInteracted = false;
-                    mHandler.postDelayed(this, 4000);
-                    return;
-                }
-                if (mIsControlsShown == true) {
-                    hideControls();
-                }
-            }
-        };
-        showControls();
-        mHandler.postDelayed(runnable, 4000);
-    }
-
-    public void showFullScreenPDP(int position) {
-        hideAllControls();
-        mProgressBar.setVisibility(View.GONE);
-        mIsControlsShown = false;
-        releaseOpinionVid();
-        mOpinionPlayerLayout.setVisibility(View.GONE);
-        int width = mOpinionPlayer.getVideoFrame().getWidth();
-        int height = mOpinionPlayer.getVideoFrame().getHeight();
-        mImgShowReco.setVisibility(View.GONE);
-    }
-
-    public void hideFullScreenPDP() {
-        mOpinionPlayerLayout.setVisibility(View.VISIBLE);
-        showControlsAndDismiss();
-        mImgShowReco.setVisibility(View.VISIBLE);
-    }
 
     private void setUpFullScreenUI() {
         isRecoViewAdded = false;
         mListener.onDetachRecoView(this, mContentIndex);
         isFullscreenVideo = true;
-        mLayoutControlsOpinion.setVisibility(View.GONE);
-        mIsControlsShown = false;
         mImgShowReco.setImageResource(R.drawable.up);
     }
 
     private void setUpHalfScreenUI() {
-        mOpinionLayout.setVisibility(View.GONE);
         mImgShowReco.setImageResource(R.drawable.down);
         isRecoViewAdded = true;
         isFullscreenVideo = false;
@@ -1051,8 +478,8 @@ public class MainFragment extends Fragment{
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mOpinionPlayerLayout.getLayoutParams();
-                mOpinionPlayerLayout.setPadding(val, val, val, val);
+                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
+                mImageMain.setPadding(val, val, val, val);
             }
         });
         mPad.start();
@@ -1067,9 +494,9 @@ public class MainFragment extends Fragment{
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mOpinionPlayerLayout.getLayoutParams();
+                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
 
-                mOpinionPlayerLayout.setPadding(val, val, val, val);
+                mImageMain.setPadding(val, val, val, val);
                 //mRecLayout.setLayoutParams(layoutParams);
             }
         });
@@ -1098,8 +525,6 @@ public class MainFragment extends Fragment{
     }
 
     public void scaleUpProdRecoView() {
-        //mYTPreview.setAlpha(0.0f);
-        mOpinionLayout.setVisibility(View.GONE);
         ValueAnimator mCon = ValueAnimator.ofInt(mDeviceHeightInPx, (int) (0.70 * mDeviceHeightInPx));
         if (isRecoViewAdded == false) {
             mListener.onAttachRecoView(this, mContentIndex);
@@ -1119,8 +544,8 @@ public class MainFragment extends Fragment{
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mOpinionPlayerLayout.getLayoutParams();
-                mOpinionPlayerLayout.setPadding(val, val, val, val);
+                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
+                mImageMain.setPadding(val, val, val, val);
             }
         });
         mPad.start();
@@ -1223,8 +648,8 @@ public class MainFragment extends Fragment{
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mOpinionPlayerLayout.getLayoutParams();
-                mOpinionPlayerLayout.setPadding(val, val, val, val);
+                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
+                mImageMain.setPadding(val, val, val, val);
             }
         });
         mPad.start();
@@ -1240,8 +665,6 @@ public class MainFragment extends Fragment{
             public void onAnimationEnd(Animator animation) {
                 //mYTPreview.setAlpha(1.0f);
                 setUpFullScreenUI();
-                if (mIsOpinionVideoPlaying == false && playerState == ExoPlayer.STATE_ENDED)
-                    setUIForOpinionVideoStoppedState();
             }
 
             @Override
@@ -1256,12 +679,7 @@ public class MainFragment extends Fragment{
         });
     }
 
-    @OnClick(R.id.img_share)
-    public void onShareClick(ImageView view) {
-        share(Uri.parse(mContentData.pictureUrl));
-    }
-
-    @OnClick(R.id.img_like)
+    @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {
         if (mContentData.likedByUser == false) {
             ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(getContext(), R.animator.flip_in);
