@@ -11,7 +11,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
-import com.pixtory.app.fragments.UserProfileFragment;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.typeface.BigNoodleTitling;
 import com.pixtory.app.typeface.Dekar;
@@ -46,11 +45,6 @@ public class VideoRecommendationAdapter extends RecyclerView.Adapter<VideoRecomm
         if(null != cd.personDetails) {
             holder.txtExpert.setText(cd.personDetails.name);
         }
-        holder.txtViews.setText(cd.viewCount + " views");
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( UserProfileFragment.Profile_VidCard_Scroll)
-                .put(AppConstants.USER_ID, Utils.getUserId(mCtx))
-                .put(AppConstants.OPINION_ID, "" + cd.id)
-                .build());
     }
 
     @Override

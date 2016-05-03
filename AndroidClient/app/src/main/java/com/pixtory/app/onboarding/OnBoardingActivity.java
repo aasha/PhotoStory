@@ -235,7 +235,7 @@ public class OnBoardingActivity  extends FragmentActivity {
             @Override
             public void onCompleted(JSONObject user, GraphResponse response) {
                 if (user != null) {
-                    final String fbId = user.optString("id");
+                    final String fbId = user.optString("userId");
                     final String name = user.optString("name");
                     final String email = user.optString("email");
                     String accessToken = AccessToken.getCurrentAccessToken().getToken();
@@ -248,7 +248,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             .put("NAME", name)
                             .put("FBID", fbId)
                             .build());
-                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl, fbId, new NetworkApiCallback<RegisterResponse>() {
+                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl, new NetworkApiCallback<RegisterResponse>() {
                         @Override
                         public void success(RegisterResponse regResp, Response response) {
                             closeDialog();
@@ -313,7 +313,7 @@ public class OnBoardingActivity  extends FragmentActivity {
         }
     }
     private void registerUserName(final String name){
-        NetworkApiHelper.getInstance().registerUser(name, null, null, null, new NetworkApiCallback<RegisterResponse>() {
+        NetworkApiHelper.getInstance().registerUser(name, null, null, new NetworkApiCallback<RegisterResponse>() {
             @Override
             public void success(RegisterResponse regResp, Response response) {
                 if(commentDialog.isShowing())

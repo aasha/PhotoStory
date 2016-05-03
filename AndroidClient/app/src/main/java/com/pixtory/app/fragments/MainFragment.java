@@ -26,15 +26,14 @@ import butterknife.*;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.drm.UnsupportedDrmException;
 import com.google.android.exoplayer.util.Util;
-import com.pixtory.app.FeedbackOverlay;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.ContentData;
-import com.pixtory.app.model.Product;
 import com.pixtory.app.player.BasePlayerTextureView;
 import com.pixtory.app.player.DemoPlayer;
 import com.pixtory.app.retrofit.AddCommentResponse;
+import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.typeface.Dekar;
@@ -51,7 +50,7 @@ import java.util.List;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class MainFragment extends Fragment implements ProductDataBinder.OnBookmarkListener {
+public class MainFragment extends Fragment{
 
     private static final String TAG = MainFragment.class.getName();
 
@@ -131,15 +130,6 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
     @Bind(R.id.main_layout)
     FrameLayout mMainLayout = null;
 
-    @Bind(R.id.prd_detail_layout)
-    FrameLayout mProdDetailsLayout = null;
-
-    @Bind(R.id.product_detail)
-    RelativeLayout mPDPDetailLayout = null;
-
-    @Bind(R.id.img_product_down_arrow)
-    ImageView mFullScreenPDPDownArrow = null;
-
     @Bind(R.id.layout_cta)
     LinearLayout mCTALayout = null;
 
@@ -191,7 +181,6 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
      * Recommendation List
      *************************/
     private int mMaxContentLength = 60;
-    ProductDataBinder mProductDataBinder;
 
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
@@ -294,10 +283,8 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
         }
         final ContentData cd = mContentData;
 
-        mMaxContentLength = cd.contentLength;
         mTextMaxLength.setText("00:" + mMaxContentLength);
         mSeekBar.setMax(mMaxContentLength);
-        mTextNoOfViews.setText(cd.viewCount + " views");
         mTextOpinion.setText(cd.name);
         if (mContentData.likedByUser == true)
             mImageLike.setImageResource(R.drawable.liked);
@@ -385,10 +372,7 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
             }
         });
         Log.d(TAG, "Instantiating OPINION & PROFILE player for fragement position = " + mContentIndex);
-        mProductDataBinder = new ProductDataBinder(getContext(), this);
         bindData();
-        CreateBlurredImage task = new CreateBlurredImage();
-        task.execute();
         initPlayerData();
     }
 
@@ -478,22 +462,6 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
         }
     }
 
-    @Override
-    public void onBookMarked(int positionOfProduct, boolean value) {
-        mListener.onPDPPageBookMarked(this, mContentIndex, positionOfProduct, value);
-        if (value == true) {
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(PDP_Card_Bkmrk)
-                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                    .put(AppConstants.PRODUCT_ID, "" + mContentData.productList.get(positionOfProduct).productId)
-                    .build());
-        } else {
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(PDP_Card_UnBkmrk)
-                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                    .put(AppConstants.PRODUCT_ID, "" + mContentData.productList.get(positionOfProduct).productId)
-                    .build());
-        }
-    }
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -545,8 +513,6 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
                     if (mProgressBar.isShown()) {
                         mProgressBar.setVisibility(View.GONE);
                     }
-
-                    reportCompleteVideoPlay();
                     if(totalBufferTime != 0){
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Video_Buffering_Complete)
                                 .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
@@ -788,9 +754,7 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
 
     public void resetFragmentState() {
         isRecoViewAdded = false;
-        mFullScreenPDPDownArrow.setVisibility(View.GONE);
         mOpinionPlayerLayout.setVisibility(View.VISIBLE);
-        mProdDetailsLayout.setVisibility(View.GONE);
         mListener.onDetachRecoView(this, mContentIndex);
         if (mOpinionPlayer != null) {
             mOpinionPlayer.releasePlayer();
@@ -848,11 +812,6 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
 
     final GestureDetector videoOverlaygesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    super.onLongPress(e);
-                    FeedbackOverlay.drawFullscreenOverlay(getContext());
-                }
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -908,39 +867,6 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
                     return true;
                 }
             });
-
-    private class CreateBlurredImage extends AsyncTask<Void, Void, Bitmap> {
-
-        @Override
-        protected void onPostExecute(Bitmap image) {
-            try {
-                Bitmap bluuredImage = BlurBuilder.blur(getActivity(), image);
-                mCompleteLayout.setBackground(new BitmapDrawable(getResources(), bluuredImage));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            try {
-                URL url = new URL(mContentData.pictureUrl);
-                Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                return image;
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
 
     final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
@@ -1088,54 +1014,13 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
         mOpinionPlayerLayout.setVisibility(View.GONE);
         int width = mOpinionPlayer.getVideoFrame().getWidth();
         int height = mOpinionPlayer.getVideoFrame().getHeight();
-        ViewGroup.LayoutParams params = mProdDetailsLayout.getLayoutParams();
-        params.width = width;
-        params.height = height;
-        mProdDetailsLayout.setLayoutParams(params);
         mImgShowReco.setVisibility(View.GONE);
-        mProdDetailsLayout.setVisibility(View.VISIBLE);
-        mFullScreenPDPDownArrow.setVisibility(View.VISIBLE);
-        mProductDataBinder.bindData(mContentData.productList.get(position), mPDPDetailLayout, position);
-    }
-
-    public void bookMarkInPDP(int position, boolean value) {
-        ContentData cd = App.getContentData().get(mContentIndex);
-        List<Product> products = cd.productList;
-        products.get(position).bookmarkedByUser = value;
-        mProductDataBinder.setBookMarked(products.get(position));
-        NetworkApiHelper.getInstance().addComment(Utils.getUserId(getActivity()), products.get(position).productId, value, new NetworkApiCallback<AddCommentResponse>() {
-            @Override
-            public void success(AddCommentResponse o, Response response) {
-
-            }
-
-            @Override
-            public void failure(AddCommentResponse error) {
-
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-            }
-        });
-        //mProductDetailsPager.setPageMargin(width/3);
     }
 
     public void hideFullScreenPDP() {
-        mFullScreenPDPDownArrow.setVisibility(View.GONE);
         mOpinionPlayerLayout.setVisibility(View.VISIBLE);
         showControlsAndDismiss();
-        mProdDetailsLayout.setVisibility(View.GONE);
         mImgShowReco.setVisibility(View.VISIBLE);
-    }
-
-    @OnClick(R.id.img_product_down_arrow)
-    public void onTouchImage(View view) {
-        hideFullScreenPDP();
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(PDP_ProdCard_Close)
-                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                .build());
     }
 
     private void setUpFullScreenUI() {
@@ -1445,57 +1330,23 @@ public class MainFragment extends Fragment implements ProductDataBinder.OnBookma
     }
 
     private void sendLikeToBackend(int contentId, boolean isLiked) {
-        NetworkApiHelper.getInstance().likeContent(Utils.getUserId(getActivity()), contentId, isLiked, new NetworkApiCallback<LikeContentResponse>() {
-            @Override
-            public void success(LikeContentResponse likeContentResponse, Response response) {
-            }
+        NetworkApiHelper.getInstance().likeContent(Utils.getUserId(getActivity()), contentId, isLiked, new NetworkApiCallback<BaseResponse>() {
 
             @Override
-            public void failure(LikeContentResponse error) {
-
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-            }
-        });
-    }
-
-    private void reportCompleteVideoPlay() {
-        isFirstQuartileEventSent = false;
-        isSecondQuartileEventSent = false;
-        isThirdQuartileEventSent = false;
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Complete_Q4)
-                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                .build());
-        List<ContentData> cdList = App.getContentData();
-        ContentData cd = cdList.get(mContentIndex);
-        cd.viewCount += 1;
-        App.setContentData((ArrayList<ContentData>) cdList);
-        mTextNoOfViews.setText(cd.viewCount + " views");
-        NetworkApiHelper.getInstance().deleteComment(mContentData.id, new NetworkApiCallback() {
-            @Override
-            public void success(Object o, Response response) {
+            public void success(BaseResponse baseResponse, Response response) {
 
             }
 
             @Override
-            public void failure(Object error) {
+            public void failure(BaseResponse baseResponse) {
 
             }
 
             @Override
             public void networkFailure(RetrofitError error) {
+
             }
         });
-    }
-
-
-    @OnLongClick(R.id.main_layout)
-    public boolean onLongClickMain(ViewGroup view) {
-        FeedbackOverlay.drawFullscreenOverlay(getContext());
-        return false;
     }
 
 }

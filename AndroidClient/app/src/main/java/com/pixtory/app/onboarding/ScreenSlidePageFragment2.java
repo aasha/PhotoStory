@@ -21,8 +21,8 @@ public class ScreenSlidePageFragment2 extends Fragment {
                              Bundle savedInstanceState) {
         rootView = (ViewGroup) inflater.inflate(
                 R.layout.onboarding_fragment_layout2, container, false);
-        //ImageView imageViewInt = (ImageView) rootView.findViewById(R.id.badge_view);
-        //ImageView imageViewExt = (ImageView) rootView.findViewById(R.id.badge_view_ext);
+        //ImageView imageViewInt = (ImageView) rootView.findViewById(R.userId.badge_view);
+        //ImageView imageViewExt = (ImageView) rootView.findViewById(R.userId.badge_view_ext);
         //com.inmobi.pixtory.ScaleAnimator.animate(/*imageViewInt, */imageViewExt);
 
         return rootView;
@@ -32,8 +32,8 @@ public class ScreenSlidePageFragment2 extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && rootView!=null) {
-            //ImageView imageViewInt = (ImageView) rootView.findViewById(R.id.badge_view);
-            //ImageView imageViewExt = (ImageView) rootView.findViewById(R.id.badge_view_ext);
+            //ImageView imageViewInt = (ImageView) rootView.findViewById(R.userId.badge_view);
+            //ImageView imageViewExt = (ImageView) rootView.findViewById(R.userId.badge_view_ext);
             //com.inmobi.pixtory.ScaleAnimator.animate(/*imageViewInt, */imageViewExt);
             ImageView imageViewExt = (ImageView) rootView.findViewById(R.id.badge_view_ext);
             ImageView imageViewMobile = (ImageView) rootView.findViewById(R.id.badge_view_mobile);

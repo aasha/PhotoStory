@@ -166,8 +166,9 @@ public class Utils {
     public static String getUserId(Context context) {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
                 AppConstants.APP_PREFS, 0);
+        //TODO AASHA remove
         return mSharedPrefs.getString(
-                "UID", "");
+                "UID", "1494617261");
     }
 
     public static void putUserName(Context context, String fname) {

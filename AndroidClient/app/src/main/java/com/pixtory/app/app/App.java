@@ -11,7 +11,6 @@ import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.pixtory.app.model.ContentData;
-import com.pixtory.app.model.Product;
 
 import java.util.ArrayList;
 
@@ -29,8 +28,6 @@ public class App extends Application implements AppConstants {
     private static ArrayList<ContentData> mCData = null;
 
     private static ArrayList<ContentData> mLikedContentData = null;
-
-    private static ArrayList<Product> mLikedProducts = null;
 
     private LayoutInflater mInfater = null;
 
@@ -88,14 +85,6 @@ public class App extends Application implements AppConstants {
 
     public static ArrayList<ContentData> getContentData() {
         return mCData;
-    }
-
-    public static ArrayList<Product> getLikedProducts() {
-        return mLikedProducts;
-    }
-
-    public static void setLikedProducts(ArrayList<Product> mLikedProducts) {
-        App.mLikedProducts = mLikedProducts;
     }
 
 

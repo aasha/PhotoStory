@@ -1,6 +1,7 @@
 package com.pixtory.app.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by aasha.medhi on 21/10/15.
@@ -15,4 +16,6 @@ public class ContentData {
     public String pictureDescription = null;
     public boolean likedByUser = false;
     public PersonInfo personDetails = null;
+    public List<CommentData> commentList = null;
+
 }

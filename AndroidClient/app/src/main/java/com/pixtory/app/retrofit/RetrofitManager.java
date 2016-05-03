@@ -10,7 +10,7 @@ import retrofit.client.OkClient;
  */
 public class RetrofitManager {
 
-    private static final String PUBLIC_URL = "http://appdemo.ops.ev1.inmobi.com:4001";
+    private static final String PUBLIC_URL = "http://appdemo.ops.ev1.inmobi.com:4050";
 
     private static final String APP_URL = PUBLIC_URL;
 

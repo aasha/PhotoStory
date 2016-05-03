@@ -29,14 +29,11 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
-import com.pixtory.app.adapters.ProductRecommendationAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
-import com.pixtory.app.fragments.LastFragment;
 import com.pixtory.app.fragments.MainFragment;
-import com.pixtory.app.fragments.UserProfileFragment;
+import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
-import com.pixtory.app.model.Product;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.AddCommentResponse;
@@ -55,8 +52,7 @@ import java.util.List;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener, LastFragment.OnFragmentInteractionListener, ProductRecommendationAdapter.ProductViewHolder.FollowClickListener,
-        UserProfileFragment.OnUserFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener {
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -75,7 +71,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     LinearLayout mRecLayout = null;
     private RecyclerView mRecomRecycle = null;
     private LinearLayoutManager mLayoutManager = null;
-    private ProductRecommendationAdapter productRecommendationAdapter = null;
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
     private static final String MF_NextVideo_Swipe = "MF_NextVideo_Swipe";
@@ -137,12 +132,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .build());
                 Fragment currentFragment = mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-                if ( currentFragment instanceof LastFragment) {
-                    mImgUserProfile.setVisibility(View.GONE);
-                } else {
-                    mImgUserProfile.setVisibility(View.VISIBLE);
-
-                }
+                mImgUserProfile.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -175,14 +165,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     @OnClick(R.id.profileIcon)
     public void onUserImageClick() {
         mImgUserProfile.setVisibility(View.GONE);
-        onViewUserProfileScreen();
     }
 
     private void prepareFeed() {
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("pixtory coming up for you");
         mProgress.setCanceledOnTouchOutside(false);
-        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, null, new NetworkApiCallback<GetMainFeedResponse>() {
+        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
                 mProgress.dismiss();
@@ -195,12 +184,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     mCursorPagerAdapter.setData(App.getContentData());
                     mPager.setAdapter(mCursorPagerAdapter);
                     Fragment currentFragment = mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-                    if (currentFragment instanceof LastFragment) {
-                        mImgUserProfile.setVisibility(View.GONE);
-                    } else {
-                        mImgUserProfile.setVisibility(View.VISIBLE);
-
-                    }
+                    mImgUserProfile.setVisibility(View.VISIBLE);
                 } else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
@@ -245,10 +229,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         //mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
         mRecomRecycle.setLayoutManager(mLayoutManager);
-
-        productRecommendationAdapter = new ProductRecommendationAdapter(this);
-        productRecommendationAdapter.followClickListener = this;
-        mRecomRecycle.setAdapter(productRecommendationAdapter);
     }
 
     private void registerForPushNotification() {
@@ -305,45 +285,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             parent.removeAllViews();
         }
         f.attachRecycerView(mRecLayout);
-        try {
-            productRecommendationAdapter.setData(App.getContentData().get(position).productList);
-            productRecommendationAdapter.setSelected(0);
-            mRecomRecycle.scrollToPosition(0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
     @Override
     public void onPDPPageSelected(Fragment f, int position) {
-        mRecomRecycle.scrollToPosition(position);
-        productRecommendationAdapter.setSelected(position);
+
     }
 
     @Override
-    public void onPDPPageBookMarked(Fragment f, int contentPosition, int positionOfProduct, boolean value) {
-        List<ContentData> cd = App.getContentData();
-        List<Product> pdList = cd.get(contentPosition).productList;
-        pdList.get(positionOfProduct).bookmarkedByUser = value;
-        App.setContentData((ArrayList<ContentData>) cd);
-        productRecommendationAdapter.setData(cd.get(contentPosition).productList);
-        productRecommendationAdapter.setBookMarked();
-        NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), pdList.get(positionOfProduct).productId, value, new NetworkApiCallback<AddCommentResponse>() {
-            @Override
-            public void success(AddCommentResponse o, Response response) {
+    public void onPDPPageBookMarked(Fragment f, int contentPositon, int positionOfProduct, boolean value) {
 
-            }
-
-            @Override
-            public void failure(AddCommentResponse error) {
-
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-            }
-        });
     }
 
 
@@ -363,88 +315,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         return true;
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
 
-    }
-
-    @Override
-    public void onFollowClick(View caller, int pos) {
-        MainFragment fr1 = (MainFragment) mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-        fr1.showFullScreenPDP(pos);
-        int pid = App.getContentData().get(mCurrentFragmentPosition).productList.get(pos).productId;
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Reco_Card_CTAClick)
-                .put(AppConstants.PRODUCT_ID, "" + pid)
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .build());
-    }
-
-    @Override
-    public void onBookMarkClick(int pos, boolean value) {
-        MainFragment fr1 = (MainFragment) mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-        fr1.bookMarkInPDP(pos, value);
-        int pid = App.getContentData().get(mCurrentFragmentPosition).productList.get(pos).productId;
-        if (value == true) {
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( Reco_Card_Bkmrk)
-                    .put(AppConstants.PRODUCT_ID, "" + pid)
-                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                    .build());
-        } else {
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Reco_Card_UnBkmrk)
-                    .put(AppConstants.PRODUCT_ID, "" + pid)
-                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                    .build());
-        }
-    }
-
-    /*
-    User profile
-     */
-
-    UserProfileFragment mUserProfileFragment = null;
-
-    //   @Override
-    public void onCloseUserProfileScreen() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.remove(mUserProfileFragment).commit();
-        mUserProfileFragmentLayout.setVisibility(View.GONE);
-    }
-
-    //  @Override
-    public void onViewUserProfileScreen() {
-        MainFragment fr1 = (MainFragment) mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-        if (fr1 != null)
-            fr1.resetFragmentState();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        mUserProfileFragment = new UserProfileFragment();
-        fragmentTransaction.add(R.id.user_profile_fragment_layout, mUserProfileFragment).commit();
-        mUserProfileFragmentLayout.setVisibility(View.VISIBLE);
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Profile_Tap)
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .build());
-    }
-
-    @Override
-    public void onClose(boolean interestModified) {
-        onCloseUserProfileScreen();
-
-        mImgUserProfile.setVisibility(View.VISIBLE);
-
-        if (interestModified == true) {
-            //Set last sync to 0. To resync feed
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putLong(AppConstants.LAST_SYNC, 0);
-            editor.commit();
-            //Get new feed interests changed
-            mProgress.setMessage("pixtory coming up for you");
-            mProgress.setCanceledOnTouchOutside(false);
-            prepareFeed();
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -460,11 +331,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        FeedbackOverlay.removeFullscreenOverlay();
-    }
 
     /*
    COACH MARK

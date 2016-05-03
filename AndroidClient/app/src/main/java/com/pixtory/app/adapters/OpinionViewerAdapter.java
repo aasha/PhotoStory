@@ -8,7 +8,6 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import com.pixtory.app.app.App;
-import com.pixtory.app.fragments.LastFragment;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.ContentData;
 
@@ -25,7 +24,6 @@ public class OpinionViewerAdapter extends PagerAdapter {
     private ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
     private Fragment mCurrentPrimaryItem = null;
     ArrayList<ContentData> mData = null;
-    LastFragment lastFragment;
     private Fragment mCurrentHexFragment = null;
 
     private HashMap<Integer, MainFragment> mFragmentPool = null;
@@ -45,16 +43,6 @@ public class OpinionViewerAdapter extends PagerAdapter {
             int pos = position % mData.size(); //  for testing.. needs to change once new content comes in
             int index = position % 4;
             MainFragment hf = null;
-            if (App.getContentData().get(position).name.contains("filler")) {
-                if (lastFragment == null) {
-                    lastFragment = LastFragment.newInstance("", "");
-                }
-                Bundle args = new Bundle();
-                args.putInt(MainFragment.ARG_PARAM1, pos);
-                args.putString(MainFragment.ARG_PARAM2, "" + position);
-                lastFragment.setArguments(args);
-                return lastFragment;
-            }
             if (mFragmentPool.get(index) == null) {
                 hf = MainFragment.newInstance(position);
                 mFragmentPool.put(index, hf);

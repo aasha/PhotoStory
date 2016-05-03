@@ -24,15 +24,6 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:visibility="visible"/>
-        <include
-                android:id="@+id/prd_detail_layout"
-                layout="@layout/product_details_layout"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                android:layout_marginRight="0dp"
-                android:layout_marginTop="8dp"/>
         <RelativeLayout android:id="@+id/layout_controls_opinion"
                 android:layout_width="match_parent"
                         android:layout_height="match_parent"
