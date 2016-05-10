@@ -108,7 +108,7 @@ function moveToInfo() {
 }
 
 var storyImageSrc;
-jQuery('.gallery-img img').hover(function() {
+jQuery('.gallery-img img').click(function() {
     storyImageSrc = this.src;
     var src = storyImageSrc.split('-');
     this.style.opacity = '0';
@@ -121,7 +121,15 @@ jQuery('.gallery-img img').hover(function() {
     this.style.opacity = '0';
     var y = this;
     setTimeout(function() {
-        y.src = storyImageSrc;
+        var src = y.src;
+        if( parseInt(obj.target.dataset.front)){
+            src =  src.replace('-image',"");
+            obj.target.dataset.front = 0
+        }else{
+            src =  src.replace('.png' ,'-image.png');
+            obj.target.dataset.front = 1;
+        }
+        y.src = src;
         y.style.opacity = '1';
     }, 300);
 });
