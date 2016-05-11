@@ -56,7 +56,27 @@ function setGallery() {
      });
 }
 
-function openPopup(x) {
+function openPopup(x,mode) {
+
+    //send email
+    jQuery.ajax({
+        url: mode==="signup"?"http://ec2-54-88-37-185.compute-1.amazonaws.com:8080/signup":"http://ec2-54-88-37-185.compute-1.amazonaws.com:8080/ea",
+        method:"post",
+        data: {
+            email: jQuery("#"+mode).val()
+        }, 
+        success: function() {
+            jQuery('#popup' + x).css('visibility', 'visible');
+            jQuery('#popup' + x).css('opacity', '1');
+            document.body.style.overflow = 'hidden';
+        },
+        error: function() {
+            jQuery('#popup' + x).css('visibility', 'visible');
+            jQuery('#popup' + x).css('opacity', '1');
+            document.body.style.overflow = 'hidden';
+        }
+    });
+
     jQuery('#popup' + x).css('visibility', 'visible');
     jQuery('#popup' + x).css('opacity', '1');
     document.body.style.overflow = 'hidden';
@@ -108,7 +128,7 @@ function moveToInfo() {
 }
 
 var storyImageSrc;
-jQuery('.gallery-img img').click(function() {
+jQuery('.gallery-img img').hover(function() {
     storyImageSrc = this.src;
     var src = storyImageSrc.split('-');
     this.style.opacity = '0';
@@ -121,15 +141,7 @@ jQuery('.gallery-img img').click(function() {
     this.style.opacity = '0';
     var y = this;
     setTimeout(function() {
-        var src = y.src;
-        if( parseInt(obj.target.dataset.front)){
-            src =  src.replace('-image',"");
-            obj.target.dataset.front = 0
-        }else{
-            src =  src.replace('.png' ,'-image.png');
-            obj.target.dataset.front = 1;
-        }
-        y.src = src;
+        y.src = storyImageSrc;
         y.style.opacity = '1';
     }, 300);
 });
