@@ -45,7 +45,6 @@ public class MainFragment extends Fragment{
 
     // TODO: Rename and change types of parameters
     private int mContentIndex;
-    private String mContentJson;
 
     private int mDeviceWidthInPx = 0;
     private int mDeviceHeightInPx = 0;
@@ -107,9 +106,6 @@ public class MainFragment extends Fragment{
 
     @Bind(R.id.image_like)
     ImageView mImageLike = null;
-
-    @Bind(R.id.img_up_arrow)
-    ImageView mImgShowReco = null;
 
     private int mSoftBarHeight = 0;
 
@@ -326,47 +322,9 @@ public class MainFragment extends Fragment{
     }
 
     boolean isRecoViewAdded = false;
-    boolean isFullscreenVideo = true;
     boolean mIsScrolling = false;
     boolean mIsFling = false;
     int lastScrollPosition = 0;
-
-
-    final GestureDetector videoOverlaygesture = new GestureDetector(getActivity(),
-            new GestureDetector.SimpleOnGestureListener() {
-
-                @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                                       float velocityY) {
-                    final int SWIPE_MIN_DISTANCE = 50;
-                    final int SWIPE_THRESHOLD_VELOCITY = 150;
-                    try {
-                        if (Math.abs(velocityX) > Math.abs(velocityY)) {
-                            return false;
-                        }
-                        if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                            if (isFullscreenVideo == false) {
-                                showFullScreen();
-                                isFullscreenVideo = true;
-                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
-                                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                                        .build());
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        // nothing
-                    }
-                    return false;
-                }
-
-                @Override
-                public boolean onDown(MotionEvent e) {
-                    return true;
-                }
-            });
 
     final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
@@ -381,10 +339,9 @@ public class MainFragment extends Fragment{
 //                    if (isFullscreenVideo == true && mExpertOverlay.getVisibility() == View.VISIBLE) {
 //                        return super.onScroll(e1, e2, distanceX, distanceY);
 //                    }
-                    if (isFullscreenVideo == true) {
-                        return super.onScroll(e1, e2, distanceX, distanceY);
-                    }
+                    Log.e("AASHA", "On scroll");
                     if (distanceX < 5 && distanceX > -5) {
+                        Log.e("AASHA", "On scroll 1");
                         mIsScrolling = true;
                         mIsFling = false;
                         modifyScreenHeight((int) e2.getRawY());
@@ -402,15 +359,15 @@ public class MainFragment extends Fragment{
 //                        if (isFullscreenVideo == true && mExpertOverlay.getVisibility() == View.VISIBLE) {
 //                            return true;
 //                        }
-                        if (isFullscreenVideo == true) {
-                            return true;
-                        }
+                        Log.e("AASHA", "On fling");
                         if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                            Log.e("AASHA", "On fling 2");
                             mIsFling = true;
                             showHalfScreen();
                         } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                            Log.e("AASHA", "On fling 3");
                             mIsFling = true;
                             showFullScreen();
                         } else {
@@ -423,17 +380,20 @@ public class MainFragment extends Fragment{
                 }
             });
 
-    @OnTouch(R.id.img_up_arrow)
+    @OnTouch(R.id.image_main)
     public boolean onTouch(ImageView view, MotionEvent me) {
         if (gesture.onTouchEvent(me)) {
+            Log.e("AASHA", "On touhc");
             return true;
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
             if (mIsScrolling && !mIsFling) {
+                Log.e("AASHA", "On touhc 1");
                 mIsScrolling = false;
                 mIsFling = false;
                 if (lastScrollPosition < (0.90 * mDeviceHeightInPx)) {
+                    Log.e("AASHA", "On touhc 2");
                     showHalfScreen();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_Tap)
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
@@ -441,6 +401,7 @@ public class MainFragment extends Fragment{
                             .put(AppConstants.OPINION_ID, "" + mContentData.id)
                             .build());
                 } else {
+                    Log.e("AASHA", "On touhc 3");
                     showFullScreen();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
@@ -456,14 +417,10 @@ public class MainFragment extends Fragment{
     private void setUpFullScreenUI() {
         isRecoViewAdded = false;
         mListener.onDetachRecoView(this, mContentIndex);
-        isFullscreenVideo = true;
-        mImgShowReco.setImageResource(R.drawable.up);
     }
 
     private void setUpHalfScreenUI() {
-        mImgShowReco.setImageResource(R.drawable.down);
         isRecoViewAdded = true;
-        isFullscreenVideo = false;
     }
 
     private void showFullScreen() {
@@ -487,27 +444,26 @@ public class MainFragment extends Fragment{
     }
 
     private void showHalfScreen() {
-        //mYTPreview.setAlpha(0.0f);
-        modifyScreenHeight((int) (0.70 * mDeviceHeightInPx));
-        final ValueAnimator mPad = ValueAnimator.ofInt(0, 30);
-        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-
-                mImageMain.setPadding(val, val, val, val);
-                //mRecLayout.setLayoutParams(layoutParams);
-            }
-        });
-        mPad.start();
+        Log.e("AASHA", "Show half screen");
+        modifyScreenHeight((int) (0.30 * mDeviceHeightInPx));
+        Picasso.with(this.getContext()).load(mContentData.pictureUrl).centerCrop().into(mImageMain);
+//        final ValueAnimator mPad = ValueAnimator.ofInt(0, 30);
+//        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
+//
+//                mImageMain.setPadding(val, val, val, val);
+//            }
+//        });
+//        mPad.start();
         setUpHalfScreenUI();
     }
 
     private boolean modifyScreenHeight(int newHeight) {
         //mYTPreview.setAlpha(0.0f);
-        if (newHeight < (0.70 * mDeviceHeightInPx)) {
-            isFullscreenVideo = false;
+        if (newHeight < (0.30 * mDeviceHeightInPx)) {
             return true;
         }
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mMainLayout.getLayoutParams();
