@@ -173,11 +173,11 @@ function preload(arrayOfImages) {
 }
 
 preload([
-    '../img/story-1.png',
-    '../img/story-2.png',
-    '../img/story-3.png',
-    '../img/story-4.png',
-    '../img/story-5.png'
+    './assets/img/story-1.png',
+    './assets/img/story-2.png',
+    './assets/img/story-3.png',
+    './assets/img/story-4.png',
+    './assets/img/story-5.png'
 ]);
 
 $(document).ready(function() {
