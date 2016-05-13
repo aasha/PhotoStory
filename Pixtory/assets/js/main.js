@@ -151,7 +151,7 @@ jQuery('.gallery-img img').click(function() {
         }
         y.src = src;
         y.style.opacity = '1';
-    }, 300);
+    }, 0);
 });
 
 jQuery(window).scroll(function() {
