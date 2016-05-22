@@ -274,52 +274,23 @@ public class MainFragment extends Fragment{
      */
     public interface OnMainFragmentInteractionListener {
 
-        public void onDetachRecoView(Fragment f, int pos);
+        public void onDetachStoryView(Fragment f, int pos);
 
-        public void onAttachRecoView(Fragment f, int pos);
-
-        public void onPDPPageSelected(Fragment f, int position);
-
-        public void onPDPPageBookMarked(Fragment f, int contentPositon, int positionOfProduct, boolean value);
-
+        public void onAttachStoryView(Fragment f, int pos);
     }
 
 
     public void resetFragmentState() {
         isRecoViewAdded = false;
-        mListener.onDetachRecoView(this, mContentIndex);
+        mListener.onDetachStoryView(this, mContentIndex);
         mStoryLayout.setVisibility(View.GONE);
         showFullScreen();
     }
 
-    public void attachRecycerView(View v) {
+    public void attachStoryView(View v) {
         mStoryLayout.setVisibility(View.VISIBLE);
         mStoryLayout.removeAllViews();
         mStoryLayout.addView(v);
-    }
-
-    private void share(Uri filepath) {
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Share)
-                .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                .build());
-        //Check if whats com.pixtory.app is installed
-        try {
-            getActivity().getPackageManager().getApplicationInfo("com.whatsapp", 0);
-        }
-        catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(getActivity(), "Whats com.pixtory.app not installed", Toast.LENGTH_LONG).show();
-            return;
-        }
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mContentData.pictureUrl);
-        shareIntent.setType("text/plain");
-        //shareIntent.putExtra(Intent.EXTRA_STREAM,Uri.parse("https://s3-ap-southeast-1.amazonaws.com/inmobi-mcom/expert_videos/10000.mp4"));
-        //shareIntent.putExtra(Intent.EXTRA_STREAM,filepath);
-        //shareIntent.setType("*/*");
-        shareIntent.setPackage("com.whatsapp");
-        startActivity(shareIntent);
     }
 
     boolean isRecoViewAdded = false;
@@ -403,7 +374,7 @@ public class MainFragment extends Fragment{
 
     private void setUpFullScreenUI() {
         isRecoViewAdded = false;
-        mListener.onDetachRecoView(this, mContentIndex);
+        mListener.onDetachStoryView(this, mContentIndex);
         mStoryLayout.setVisibility(View.GONE);
     }
 
@@ -448,7 +419,7 @@ public class MainFragment extends Fragment{
         recoScreenParams.height = mDeviceHeightInPx - newHeight;
         mStoryLayout.setLayoutParams(recoScreenParams);
         if (isRecoViewAdded == false) {
-            mListener.onAttachRecoView(this, mContentIndex);
+            mListener.onAttachStoryView(this, mContentIndex);
             isRecoViewAdded = true;
         }
         return true;
@@ -458,7 +429,7 @@ public class MainFragment extends Fragment{
     public void scaleUpProdRecoView() {
         ValueAnimator mCon = ValueAnimator.ofInt(mDeviceHeightInPx, (int) (0.70 * mDeviceHeightInPx));
         if (isRecoViewAdded == false) {
-            mListener.onAttachRecoView(this, mContentIndex);
+            mListener.onAttachStoryView(this, mContentIndex);
             isRecoViewAdded = true;
         }
         mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

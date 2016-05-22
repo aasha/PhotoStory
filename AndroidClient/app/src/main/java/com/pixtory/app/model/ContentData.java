@@ -14,6 +14,7 @@ public class ContentData {
     public String place = null;
     public String date = null;
     public String pictureDescription = null;
+    public String pictureFirstPara = null;
     public boolean likedByUser = false;
     public PersonInfo personDetails = null;
     public List<CommentData> commentList = null;

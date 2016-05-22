@@ -1,24 +1,87 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:background="#F00"
-    android:orientation="vertical"
-    android:visibility="visible">
+    android:background="#FFF"
+    android:visibility="visible"
+                android:paddingTop="20dp">
 
-    <TextView android:layout_width="match_parent"
-              android:text="Recommendations"
-              android:gravity="center"
+    <com.pixtory.app.views.CircularImageView
+            android:layout_width="50dp"
+                     android:layout_height="50dp"
+            android:id="@+id/imgProfile"
+            android:layout_marginLeft="20dp"/>
+    <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:textSize="14sp"
+            android:layout_toRightOf="@+id/imgProfile"
+              android:layout_marginTop="2dp"
+            android:text="Steve Johnson"
+            android:textColor="#31aef5"
+            android:id="@+id/txtName"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_toRightOf="@+id/imgProfile"
+              android:layout_below="@+id/txtName"
+              android:text="Travel Enthusiast"
+              android:layout_marginTop="3dp"
               android:textAllCaps="true"
-              android:textColor="#FFF"
-            android:background="#959595"
-            android:id="@+id/textRecomendation"/>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recom_recy"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#c4c8ce"
-        android:scrollbars="vertical" />
-</LinearLayout>
+            android:id="@+id/txtDesc"/>
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="07 Apr"
+            android:textColor="#31aef5"
+            android:id="@+id/txtDate"
+            android:layout_marginRight="20dp"/>
+    <View android:layout_width="match_parent"
+          android:layout_height="1dp"
+            android:background="#31aef5"
+            android:id="@+id/separator"
+            android:layout_below="@+id/imgProfile"
+            android:layout_marginTop="10dp"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"/>
+
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+            android:layout_below="@+id/separator"
+                android:fillViewport="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="40dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+            android:id="@+id/layout_story">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                android:orientation="vertical">
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Abc"
+                      android:textStyle="bold"
+                      android:id="@+id/txtMainPara"
+                    />
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Abc"
+                      android:id="@+id/txtDetailsPara"
+                    />
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+        <Button android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/btnComment"
+                android:text="Comment"/>
+        <Button android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/btnShare"
+                android:text="Share"/>
+    </LinearLayout>
+</RelativeLayout>

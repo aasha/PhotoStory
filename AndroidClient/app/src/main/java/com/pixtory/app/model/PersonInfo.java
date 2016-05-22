@@ -9,4 +9,5 @@ public class PersonInfo {
     public int userId = -1;
     public String name = null;
     public String imageUrl = null;
+    public String desc = null;
 }

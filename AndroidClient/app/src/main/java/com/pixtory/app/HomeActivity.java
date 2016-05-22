@@ -3,19 +3,17 @@ package com.pixtory.app;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.*;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -29,6 +27,7 @@ import com.pixtory.app.adapters.OpinionViewerAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.model.ContentData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
@@ -37,6 +36,7 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.squareup.picasso.Picasso;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -51,26 +51,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private ProgressDialog mProgress = null;
     private Context mCtx = null;
-    private ContentResolver mResolver = null;
 
     private ViewPager mPager = null;
-
-    private GestureDetector mGestureDetector = null;
-
-    // private ProgressDialog mProgress = null;
     private int mCurrentFragmentPosition = 0;
-    LinearLayout mRecLayout = null;
-    private RecyclerView mRecomRecycle = null;
-    private LinearLayoutManager mLayoutManager = null;
+    RelativeLayout mStoryLayout = null;
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
-    private static final String MF_NextVideo_Swipe = "MF_NextVideo_Swipe";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
-    private static final String MF_Profile_Tap = "MF_Profile_Tap";
-
-    private static final String Reco_Card_Bkmrk = "Reco_Card_Bkmrk";
-    private static final String Reco_Card_UnBkmrk = "Reco_Card_UnBkmrk";
-    private static final String Reco_Card_CTAClick = "Reco_Card_CTAClick";
 
     private static final String User_App_Entry = "User_App_Entry";
     private static final String User_App_Exit = "User_App_Exit";
@@ -101,7 +88,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
-        mResolver = getContentResolver();
         setUpRecomView();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
@@ -118,10 +104,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 else
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_NextVideo_Swipe)
-                        .put(AppConstants.OPINION_ID, "" + App.getContentData().get(position).id)
-                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                        .build());
             }
 
             @Override
@@ -138,12 +120,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         showShowcaseView();
         //Register for push notifs
         registerForPushNotification();
-        if (App.getContentData() != null && App.getContentData().size() > 0) {
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_NextVideo_Swipe)
-                    .put(AppConstants.OPINION_ID, "" + App.getContentData().get(0).id)
-                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                    .build());
-        }
         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
                 .put("TIMESTAMP", System.currentTimeMillis() + "")
                 .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
@@ -205,16 +181,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void setUpRecomView() {
         LayoutInflater mLayoutInflater = LayoutInflater.from(this);
-        mRecLayout = (LinearLayout) mLayoutInflater.inflate(R.layout.story_view_layout, null);
-        TextView textRecomendation = (TextView) mRecLayout.findViewById(R.id.textRecomendation);
-        Intro.applyFont(this, textRecomendation);
-        // Set up recycler view
-        mRecomRecycle = (RecyclerView) mRecLayout.findViewById(R.id.recom_recy);
-        mRecomRecycle.setHasFixedSize(true);
-
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        //mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-        mRecomRecycle.setLayoutManager(mLayoutManager);
+        mStoryLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_view_layout, null);
     }
 
     private void registerForPushNotification() {
@@ -255,35 +222,66 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     }
 
     @Override
-    public void onDetachRecoView(Fragment ff, int position) {
-        final ViewGroup parent = (ViewGroup) mRecLayout.getParent();
+    public void onDetachStoryView(Fragment ff, int position) {
+        final ViewGroup parent = (ViewGroup) mStoryLayout.getParent();
         if (parent != null) {
             parent.removeAllViews();
         }
     }
 
     @Override
-    public void onAttachRecoView(Fragment ff, int position) {
+    public void onAttachStoryView(Fragment ff, int position) {
         //mPager.isScrollingEnabled = false;
         MainFragment f = (MainFragment) ff;
-        final ViewGroup parent = (ViewGroup) mRecLayout.getParent();
+        final ViewGroup parent = (ViewGroup) mStoryLayout.getParent();
         if (parent != null) {
             parent.removeAllViews();
         }
-        f.attachRecycerView(mRecLayout);
+        bindStoryData();
+        f.attachStoryView(mStoryLayout);
 
     }
 
-    @Override
-    public void onPDPPageSelected(Fragment f, int position) {
-
+    private void bindStoryData() {
+        try {
+            final ContentData data = App.getContentData().get(mCurrentFragmentPosition);
+            ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
+            TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
+            TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
+            TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
+            TextView mTextStoryMainPara = (TextView) mStoryLayout.findViewById(R.id.txtMainPara);
+            TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
+            Button mBtnShare = (Button) mStoryLayout.findViewById(R.id.btnShare);
+            Button mBtnComment = (Button) mStoryLayout.findViewById(R.id.btnComment);
+            if (data != null) {
+                if (data.personDetails != null) {
+                    if (data.personDetails.imageUrl == null || data.personDetails.imageUrl.trim().equals("")){
+                        data.personDetails.imageUrl = "http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803";
+                    }
+                    Picasso.with(this).load(data.personDetails.imageUrl).fit().into(mProfileImage);
+                    mTextName.setText(data.personDetails.name);
+                    mTextDesc.setText(data.personDetails.desc);
+                }
+                mTextDate.setText(data.date);
+                mTextStoryMainPara.setText(data.pictureFirstPara);
+                mTextStoryDetails.setText(data.pictureDescription);
+            }
+            mBtnShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    share(Uri.parse(data.pictureUrl));
+                }
+            });
+            mBtnComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO add comment
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
-
-    @Override
-    public void onPDPPageBookMarked(Fragment f, int contentPositon, int positionOfProduct, boolean value) {
-
-    }
-
 
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -390,6 +388,15 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             });
         }
     }
+
+    private void share(Uri uriToImage) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uriToImage);
+        shareIntent.setType("image/jpeg");
+        startActivity(Intent.createChooser(shareIntent, "Share"));
+    }
+
 
 }
 
