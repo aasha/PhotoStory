@@ -3,12 +3,9 @@ package com.pixtory.app;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,11 +29,8 @@ import com.pixtory.app.adapters.OpinionViewerAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.MainFragment;
-import com.pixtory.app.model.CommentData;
-import com.pixtory.app.model.ContentData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
-import com.pixtory.app.retrofit.AddCommentResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
@@ -45,9 +39,6 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by aasha.medhi on 12/23/15.
@@ -214,7 +205,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void setUpRecomView() {
         LayoutInflater mLayoutInflater = LayoutInflater.from(this);
-        mRecLayout = (LinearLayout) mLayoutInflater.inflate(R.layout.recycler_view_layout, null);
+        mRecLayout = (LinearLayout) mLayoutInflater.inflate(R.layout.story_view_layout, null);
         TextView textRecomendation = (TextView) mRecLayout.findViewById(R.id.textRecomendation);
         Intro.applyFont(this, textRecomendation);
         // Set up recycler view

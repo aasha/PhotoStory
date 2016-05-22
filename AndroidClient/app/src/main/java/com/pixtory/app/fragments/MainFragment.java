@@ -82,8 +82,8 @@ public class MainFragment extends Fragment{
      *
      **********************************************/
 
-    @Bind(R.id.rec_prd_layout)
-    LinearLayout mPrdRecLayout = null;
+    @Bind(R.id.pic_story_layout)
+    LinearLayout mStoryLayout = null;
 
     @Bind(R.id.main_layout)
     FrameLayout mMainLayout = null;
@@ -288,12 +288,14 @@ public class MainFragment extends Fragment{
     public void resetFragmentState() {
         isRecoViewAdded = false;
         mListener.onDetachRecoView(this, mContentIndex);
+        mStoryLayout.setVisibility(View.GONE);
         showFullScreen();
     }
 
     public void attachRecycerView(View v) {
-        mPrdRecLayout.removeAllViews();
-        mPrdRecLayout.addView(v);
+        mStoryLayout.setVisibility(View.VISIBLE);
+        mStoryLayout.removeAllViews();
+        mStoryLayout.addView(v);
     }
 
     private void share(Uri filepath) {
@@ -402,6 +404,7 @@ public class MainFragment extends Fragment{
     private void setUpFullScreenUI() {
         isRecoViewAdded = false;
         mListener.onDetachRecoView(this, mContentIndex);
+        mStoryLayout.setVisibility(View.GONE);
     }
 
     private void setUpHalfScreenUI() {
@@ -412,9 +415,9 @@ public class MainFragment extends Fragment{
         //mYTPreview.setAlpha(1.0f);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         mMainLayout.setLayoutParams(params);
-        ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mPrdRecLayout.getLayoutParams();
+        ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mStoryLayout.getLayoutParams();
         recoScreenParams.height = 0;
-        mPrdRecLayout.setLayoutParams(recoScreenParams);
+        mStoryLayout.setLayoutParams(recoScreenParams);
         final ValueAnimator mPad = ValueAnimator.ofInt(0, 0);
         mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -441,9 +444,9 @@ public class MainFragment extends Fragment{
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mMainLayout.getLayoutParams();
         params.height = newHeight;
         mMainLayout.setLayoutParams(params);
-        ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mPrdRecLayout.getLayoutParams();
+        ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mStoryLayout.getLayoutParams();
         recoScreenParams.height = mDeviceHeightInPx - newHeight;
-        mPrdRecLayout.setLayoutParams(recoScreenParams);
+        mStoryLayout.setLayoutParams(recoScreenParams);
         if (isRecoViewAdded == false) {
             mListener.onAttachRecoView(this, mContentIndex);
             isRecoViewAdded = true;
@@ -482,9 +485,9 @@ public class MainFragment extends Fragment{
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mPrdRecLayout.getLayoutParams();
+                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
                 layoutParams.height = val;
-                mPrdRecLayout.setLayoutParams(layoutParams);
+                mStoryLayout.setLayoutParams(layoutParams);
             }
         });
         ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
@@ -559,9 +562,9 @@ public class MainFragment extends Fragment{
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mPrdRecLayout.getLayoutParams();
+                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
                 layoutParams.height = val;
-                mPrdRecLayout.setLayoutParams(layoutParams);
+                mStoryLayout.setLayoutParams(layoutParams);
             }
         });
         ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
