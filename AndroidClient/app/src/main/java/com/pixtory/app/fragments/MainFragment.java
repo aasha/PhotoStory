@@ -51,7 +51,6 @@ public class MainFragment extends Fragment{
 
     private OnMainFragmentInteractionListener mListener;
 
-    private static final String SCREEN_NAME = "Video";
     private static final String Vid_Tap_Like = "Vid_Tap_Like";
     private static final String Vid_Tap_Unlike = "Vid_Tap_Unlike";
     private static final String Vid_Tap_Share = "Vid_Tap_Share";
@@ -210,10 +209,10 @@ public class MainFragment extends Fragment{
             return;
         }
         final ContentData cd = mContentData;
+        Picasso.with(this.getContext()).load(mContentData.pictureUrl).fit().into(mImageMain);
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
         mTextExpert.setText("By " + cd.personDetails.name);
-        Picasso.with(this.getContext()).load(cd.pictureUrl).fit().into(mImageMain);
         if (mContentData.likedByUser == true)
             mImageLike.setImageResource(R.drawable.liked);
         else
@@ -336,12 +335,7 @@ public class MainFragment extends Fragment{
 
                 @Override
                 public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-//                    if (isFullscreenVideo == true && mExpertOverlay.getVisibility() == View.VISIBLE) {
-//                        return super.onScroll(e1, e2, distanceX, distanceY);
-//                    }
-                    Log.e("AASHA", "On scroll");
                     if (distanceX < 5 && distanceX > -5) {
-                        Log.e("AASHA", "On scroll 1");
                         mIsScrolling = true;
                         mIsFling = false;
                         modifyScreenHeight((int) e2.getRawY());
@@ -356,18 +350,12 @@ public class MainFragment extends Fragment{
                     final int SWIPE_MIN_DISTANCE = 50;
                     final int SWIPE_THRESHOLD_VELOCITY = 100;
                     try {
-//                        if (isFullscreenVideo == true && mExpertOverlay.getVisibility() == View.VISIBLE) {
-//                            return true;
-//                        }
-                        Log.e("AASHA", "On fling");
                         if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                            Log.e("AASHA", "On fling 2");
                             mIsFling = true;
                             showHalfScreen();
                         } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                            Log.e("AASHA", "On fling 3");
                             mIsFling = true;
                             showFullScreen();
                         } else {
@@ -375,6 +363,7 @@ public class MainFragment extends Fragment{
                         }
                     } catch (Exception e) {
                         // nothing
+                        e.printStackTrace();
                     }
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
@@ -383,17 +372,14 @@ public class MainFragment extends Fragment{
     @OnTouch(R.id.image_main)
     public boolean onTouch(ImageView view, MotionEvent me) {
         if (gesture.onTouchEvent(me)) {
-            Log.e("AASHA", "On touhc");
             return true;
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
             if (mIsScrolling && !mIsFling) {
-                Log.e("AASHA", "On touhc 1");
                 mIsScrolling = false;
                 mIsFling = false;
                 if (lastScrollPosition < (0.90 * mDeviceHeightInPx)) {
-                    Log.e("AASHA", "On touhc 2");
                     showHalfScreen();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_Tap)
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
@@ -401,7 +387,6 @@ public class MainFragment extends Fragment{
                             .put(AppConstants.OPINION_ID, "" + mContentData.id)
                             .build());
                 } else {
-                    Log.e("AASHA", "On touhc 3");
                     showFullScreen();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
@@ -444,20 +429,7 @@ public class MainFragment extends Fragment{
     }
 
     private void showHalfScreen() {
-        Log.e("AASHA", "Show half screen");
         modifyScreenHeight((int) (0.30 * mDeviceHeightInPx));
-        Picasso.with(this.getContext()).load(mContentData.pictureUrl).centerCrop().into(mImageMain);
-//        final ValueAnimator mPad = ValueAnimator.ofInt(0, 30);
-//        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-//
-//                mImageMain.setPadding(val, val, val, val);
-//            }
-//        });
-//        mPad.start();
         setUpHalfScreenUI();
     }
 

@@ -131,8 +131,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         .put(AppConstants.OPINION_ID, "" + App.getContentData().get(position).id)
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .build());
-                Fragment currentFragment = mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-                mImgUserProfile.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -164,7 +162,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     @OnClick(R.id.profileIcon)
     public void onUserImageClick() {
-        mImgUserProfile.setVisibility(View.GONE);
     }
 
     private void prepareFeed() {
@@ -183,8 +180,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             .build());
                     mCursorPagerAdapter.setData(App.getContentData());
                     mPager.setAdapter(mCursorPagerAdapter);
-                    Fragment currentFragment = mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-                    mImgUserProfile.setVisibility(View.VISIBLE);
                 } else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
