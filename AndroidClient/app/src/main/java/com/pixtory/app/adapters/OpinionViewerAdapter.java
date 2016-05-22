@@ -18,6 +18,7 @@ import java.util.HashMap;
  * Created by aasha.medhi on 12/30/15.
  */
 public class OpinionViewerAdapter extends PagerAdapter {
+
     private final FragmentManager mFragmentManager;
     private FragmentTransaction mCurTransaction = null;
     private ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
