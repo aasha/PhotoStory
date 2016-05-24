@@ -5,6 +5,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:src="@drawable/pixtory"
         android:id="@+id/card_img"/>
     <TextView
         android:layout_width="match_parent"
