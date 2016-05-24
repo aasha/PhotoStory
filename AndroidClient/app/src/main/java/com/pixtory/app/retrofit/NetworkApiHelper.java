@@ -193,4 +193,28 @@ public class NetworkApiHelper {
             }
         });
     }
+
+    /**
+     * ============================================================================================================================================================================================
+     */
+    public void getPersonInfo(String userId, final NetworkApiCallback cb) {
+        GetPersonInfoRequest req = new GetPersonInfoRequest();
+        req.userId = Integer.parseInt(userId);
+       // req.contentId = contentId;
+
+        sAPI.getPersonInfo(req, new Callback<GetPersonInfoResponse>() {
+            @Override
+            public void success(GetPersonInfoResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
 }
