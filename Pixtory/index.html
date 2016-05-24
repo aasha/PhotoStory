@@ -1,3 +1,4 @@
+
 <html>
     <head>
         <title>Pixtory</title>
@@ -36,10 +37,10 @@
                 <div class="center-block">
                     <h5>WHAT'S A PIXTORY?</h5>
 
-                    <p>Pixtory was born out of the philosophy that <b><i>"All great photographs have a story
+                    <p>Pixtory was born out of the philosophy  <b><i>"All great photographs have a story
                         behind them and the Story itself is as important as the photograph"</i></b>.</p>
 
-                    <p>The <i>'Story'</i> - whether it's the reason, an emotion, the inspiration, some facts about or the
+                    <p>The <i>'Story'</i> - whether it's the reason, an emotion, the inspiration, some facts about it or the
                     thought behind the photograph, plays an important role in defining the character of any picture.</p>
 
                     <p><b><i>Pixtory = Picture + Story</i></b></p>
@@ -57,31 +58,31 @@
                     <div class="gallery-list" id="owl-demo">
                         <div class="gallery-items item">
                             <div class="gallery-img">
-                                <img src="assets/img/story-1-image.png" alt="Story 1">
+                                <img src="assets/img/story-1-image.png" data-front="1"  alt="Story 1">
                             </div>
                         </div>
                         <div class="gallery-items item">
                             <div class="gallery-img">
-                                <img src="assets/img/story-2-image.png" alt="img">
+                                <img src="assets/img/story-2-image.png" data-front="1" alt="img">
                             </div>
                         </div>
                         <div class="gallery-items item">
                             <div class="gallery-img">
-                                <img src="assets/img/story-3-image.png" alt="img">
+                                <img src="assets/img/story-3-image.png" data-front="1" alt="img">
                             </div>
                         </div>
                         <div class="gallery-items item">
                             <div class="gallery-img">
-                                <img src="assets/img/story-4-image.png" alt="img">
+                                <img src="assets/img/story-4-image.png" data-front="1" alt="img">
                             </div>
                         </div>
                         <div class="gallery-items item">
                             <div class="gallery-img">
-                                <img src="assets/img/story-5-image.png" alt="img">
+                                <img src="assets/img/story-5-image.png"  data-front="1" alt="img">
                             </div>
                         </div>
                     </div>
-                    <span style="font-family: 'Open Sans'; font-weight: 300; text-shadow: none; color: #333; letter-spacing: 0px; font-size: 17px;">(Hover over the image to read the story)
+                    <span style="font-family: 'Open Sans'; font-weight: 300; text-shadow: none; color: #333; letter-spacing: 0px; font-size: 17px;">(Click on the image to read the story)</span>
                 </div>
             </div>
 
@@ -91,7 +92,7 @@
                         <img src="assets/img/contact-image-1.png" height = "80">
                         <h5>BE AMONGST THE FIRST TO USE THE PIXTORY APP. SIGN UP FOR EARLY ACCESS!</h5>
                         <div class="input-button">
-                            <input type="email" name="email" placeholder="Email Id"><input type="submit" name="user" value="" onclick="openPopup(1)">
+                            <input type="email" name="email" id="signup" placeholder="Email Id"><input type="submit" name="user" value="" onclick="openPopup(1,'signup')">
                         </div>
                     </div>
                 </div>
@@ -100,7 +101,7 @@
                         <img src="assets/img/contact-image-2.png" height = "80">
                         <h5>GOT GREAT PHOTO-STORIES? JOIN OUR CURATED LIST OF CONTRIBUTORS & GET FEATURED.</h5>
                         <div class="input-button">
-                            <input type="email" name="contributor" placeholder="Email Id"><input type="submit" name="user" value="" onclick="openPopup(2)">
+                            <input type="email" id="ea"  name="contributor" placeholder="Email Id"><input type="submit" name="user" value="" onclick="openPopup(2,'ea')">
                         </div>
                     </div>
                 </div>
