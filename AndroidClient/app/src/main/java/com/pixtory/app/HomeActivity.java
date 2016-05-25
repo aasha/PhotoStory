@@ -7,10 +7,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -23,10 +26,13 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
@@ -37,6 +43,9 @@ import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -55,6 +64,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ViewPager mPager = null;
     private int mCurrentFragmentPosition = 0;
     RelativeLayout mStoryLayout = null;
+    RelativeLayout mCommentsLayout = null;
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
@@ -118,6 +128,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         prepareFeed();
 
         showShowcaseView();
+
         //Register for push notifs
         registerForPushNotification();
         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
@@ -182,6 +193,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private void setUpRecomView() {
         LayoutInflater mLayoutInflater = LayoutInflater.from(this);
         mStoryLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_view_layout, null);
+        mCommentsLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_comment_layout , null);
     }
 
     private void registerForPushNotification() {
@@ -237,12 +249,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (parent != null) {
             parent.removeAllViews();
         }
-        bindStoryData();
+        bindStoryData(f);
         f.attachStoryView(mStoryLayout);
-
     }
 
-    private void bindStoryData() {
+    private void bindStoryData(final MainFragment mainFragment) {
         try {
             final ContentData data = App.getContentData().get(mCurrentFragmentPosition);
             ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
@@ -275,12 +286,50 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             mBtnComment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO add comment
+                    final ViewGroup parent = (ViewGroup) mCommentsLayout.getParent();
+                    if (parent != null) {
+                        parent.removeAllViews();
+                    }
+                    buildCommentsLayout(data.commentList);
+                    mainFragment.attachStoryView(mCommentsLayout);
+
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void buildCommentsLayout(List<CommentData> commentList){
+
+        Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
+        TextView mTVCommentCount = (TextView)mCommentsLayout.findViewById(R.id.tvCount);
+        RecyclerView mCommentsList = (RecyclerView)mCommentsLayout.findViewById(R.id.commentsList);
+
+        if(commentList!= null && commentList.size()>0 ){
+
+
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(HomeActivity.this);
+            RecyclerView.Adapter mCommentsListAdapter = new CommentsListAdapter(HomeActivity.this, commentList);
+            mCommentsList.setLayoutManager(mLayoutManager);
+            mCommentsList.setAdapter(mCommentsListAdapter);
+            mCommentsList.setVisibility(View.VISIBLE);
+
+            mTVCommentCount.setText(commentList.size() + " COMMENT");
+        }else{
+            mCommentsList.setVisibility(View.INVISIBLE);
+            mCommentsList.setVisibility(View.INVISIBLE);
+            mTVCommentCount.setText(" NO COMMENT YET ");
+        }
+
+        mPostComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getSupportFragmentManager();
+                CommentsDialogFragment commentsDialogFragment = CommentsDialogFragment.newInstance("Some title");
+                commentsDialogFragment.show(fm, "fragment_alert");
+            }
+        });
     }
 
     private boolean checkPlayServices() {

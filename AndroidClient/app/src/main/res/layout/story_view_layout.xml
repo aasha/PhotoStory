@@ -1,10 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="1"
     android:background="#FFF"
     android:visibility="visible"
                 android:paddingTop="20dp">
+
 
     <com.pixtory.app.views.CircularImageView
             android:layout_width="50dp"
@@ -31,7 +32,7 @@
               android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="07 Apr"
-            android:textColor="#31aef5"
+            android:textColor="@color/app_blue"
             android:id="@+id/txtDate"
             android:layout_marginRight="20dp"/>
     <View android:layout_width="match_parent"

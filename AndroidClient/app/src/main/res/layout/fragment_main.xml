@@ -27,7 +27,7 @@
                 android:orientation="horizontal"/>
         <RelativeLayout android:id="@+id/layout_image_details"
                 android:layout_width="match_parent"
-                        android:layout_height="100dp"
+                android:layout_height="100dp"
                 android:layout_gravity="bottom">
             <View android:layout_width="match_parent"
                   android:layout_height="1dp"

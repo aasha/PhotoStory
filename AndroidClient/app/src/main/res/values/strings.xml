@@ -33,4 +33,8 @@
         <item>Other</item>
 
     </string-array>
+
+    <string name="post_your_comment">POST YOUR COMMENT</string>
+    <string name="character_limit">250 CHARACTERS</string>
+    <string name="comment_textbox_hint">What do you have to say about this pixstory</string>
 </resources>
