@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,6 +12,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -88,6 +91,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private DeviceBandwidthSampler mDeviceBandwidthSampler;
     private ConnectionChangedListener mListener;
 
+
+    /** Naviagation Drawer Objects**/
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mDrawerListAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private ImageView mProfileIcon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,10 +109,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
+        setUpNavigationDrawer();
         setUpRecomView();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
+
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -446,6 +459,31 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         startActivity(Intent.createChooser(shareIntent, "Share"));
     }
 
+    /**
+     *
+     */
+    private void setUpNavigationDrawer() {
+
+        mProfileIcon = (ImageView)findViewById(R.id.profileIcon);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+
+        String[] arr = getResources().getStringArray(R.array.menu_items);
+        mDrawerListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arr);
+        mDrawerList.setAdapter(mDrawerListAdapter);
+
+        mProfileIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mDrawerLayout.isDrawerOpen(mDrawerList))
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                else
+                    mDrawerLayout.openDrawer(mDrawerList);
+            }
+        });
+    }
 
 }
+
+
 

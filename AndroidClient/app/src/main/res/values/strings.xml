@@ -34,7 +34,17 @@
 
     </string-array>
 
+    <string-array name="menu_items">
+        <item>My Profile</item>
+        <item>Feedback</item>
+        <item>Invite Friends</item>
+        <item>Settings</item>
+    </string-array>
+
+
     <string name="post_your_comment">POST YOUR COMMENT</string>
     <string name="character_limit">250 CHARACTERS</string>
     <string name="comment_textbox_hint">What do you have to say about this pixstory</string>
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
 </resources>
