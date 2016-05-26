@@ -1,5 +1,6 @@
 package com.pixtory.app.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.pixtory.app.R;
@@ -18,7 +20,9 @@ import com.pixtory.app.R;
 
 public class CommentsDialogFragment extends DialogFragment{
 
-    private EditText mEditText;
+    private EditText mCommentText;
+    private Button mPostCommentBtn;
+
     /**
      * Empty Constructor
      */
@@ -40,6 +44,11 @@ public class CommentsDialogFragment extends DialogFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NO_FRAME, R.style.CustomDialog);
+
+        if(!(getActivity() instanceof OnAddCommentButtonClickListener)){
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement OnAddCommentButtonClickListener");
+        }
     }
 
     @Override
@@ -58,18 +67,25 @@ public class CommentsDialogFragment extends DialogFragment{
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Get field from view
-        mEditText = (EditText) view.findViewById(R.id.et_comment);
 
+        mCommentText = (EditText) view.findViewById(R.id.et_comment);
 
         WindowManager.LayoutParams params = getDialog().getWindow()
                 .getAttributes();
         params.gravity = Gravity.BOTTOM;
-
         getDialog().getWindow().setAttributes(params);
-        // Show soft keyboard automatically and request focus to field
-        mEditText.requestFocus();
-//        getDialog().getWindow().setSoftInputMode(
-//                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        mCommentText.requestFocus();
+        mPostCommentBtn = (Button)view.findViewById(R.id.postCommentBtn);
+        mPostCommentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((OnAddCommentButtonClickListener)getActivity()).onAddCommentButtonClicked(mCommentText.getText().toString());
+            }
+        });
+    }
+
+    public interface OnAddCommentButtonClickListener{
+        public void onAddCommentButtonClicked(String str);
     }
 }

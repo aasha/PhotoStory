@@ -1,14 +1,14 @@
 package com.pixtory.app;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.*;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -39,6 +40,7 @@ import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
+import com.pixtory.app.retrofit.AddCommentResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
@@ -47,6 +49,7 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
+import java.util.Date;
 import java.util.List;
 
 import retrofit.RetrofitError;
@@ -55,7 +58,8 @@ import retrofit.client.Response;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements
+        MainFragment.OnMainFragmentInteractionListener,CommentsDialogFragment.OnAddCommentButtonClickListener {
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -159,6 +163,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("pixtory coming up for you");
         mProgress.setCanceledOnTouchOutside(false);
+
         NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
@@ -277,6 +282,23 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
             Button mBtnShare = (Button) mStoryLayout.findViewById(R.id.btnShare);
             Button mBtnComment = (Button) mStoryLayout.findViewById(R.id.btnComment);
+            int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
+            NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(HomeActivity.this), content_id, new NetworkApiCallback() {
+                @Override
+                public void success(Object o, Response response) {
+                    Log.i(TAG,o.toString());
+                }
+
+                @Override
+                public void failure(Object o) {
+
+                }
+
+                @Override
+                public void networkFailure(RetrofitError error) {
+
+                }
+            });
             if (data != null) {
                 if (data.personDetails != null) {
                     if (data.personDetails.imageUrl == null || data.personDetails.imageUrl.trim().equals("")){
@@ -290,6 +312,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mTextStoryMainPara.setText(data.pictureFirstPara);
                 mTextStoryDetails.setText(data.pictureDescription);
             }
+
+
             mBtnShare.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -321,7 +345,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         if(commentList!= null && commentList.size()>0 ){
 
-
+            Log.i(TAG,"Comment Count::"+commentList.size());
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(HomeActivity.this);
             RecyclerView.Adapter mCommentsListAdapter = new CommentsListAdapter(HomeActivity.this, commentList);
             mCommentsList.setLayoutManager(mLayoutManager);
@@ -330,6 +354,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
             mTVCommentCount.setText(commentList.size() + " COMMENT");
         }else{
+            Log.i(TAG,"No Comment Yet for this story");
             mCommentsList.setVisibility(View.INVISIBLE);
             mCommentsList.setVisibility(View.INVISIBLE);
             mTVCommentCount.setText(" NO COMMENT YET ");
@@ -343,6 +368,37 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 commentsDialogFragment.show(fm, "fragment_alert");
             }
         });
+    }
+
+    /**
+     * Method to post a new comment on the story
+     */
+    @Override
+    public void onAddCommentButtonClicked(String comment) {
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
+        NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
+
+            @Override
+            public void success(AddCommentResponse addCommentResponse, Response response) {
+                Log.i(TAG,"Add Comment Request Success");
+            }
+
+            @Override
+            public void failure(AddCommentResponse addCommentResponse) {
+                Log.i(TAG,"Add Comment Request Failure");
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Log.i(TAG,"Add Comment Request Network Failure, Error Type::"+error.getMessage());
+
+            }
+        });
+
+
     }
 
     private boolean checkPlayServices() {
@@ -479,6 +535,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     mDrawerLayout.closeDrawer(mDrawerList);
                 else
                     mDrawerLayout.openDrawer(mDrawerList);
+            }
+        });
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                switch (i){
+                    case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
+                            /**TODO: Add code to show My Profile Page**/
+                }
             }
         });
     }
