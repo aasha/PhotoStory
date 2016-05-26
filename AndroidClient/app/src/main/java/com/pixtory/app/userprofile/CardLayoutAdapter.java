@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.pixtory.app.R;
 import com.pixtory.app.model.ContentData;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -25,7 +24,6 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
 
     private ArrayList<ContentData> cDlist;
     private Context context;
-
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         public TextView cardTitle;
@@ -55,18 +53,12 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
     }
 
     public void onBindViewHolder(ViewHolder holder, int position){
-
-        //Picasso.with(context).load(cDlist.get(position).pictureUrl).fit().into(holder.cardImage);
-        //holder.cardTitle.setText(cDlist.get(position).name);
-
-        holder.cardTitle.setText("Pixtory");
-        //holder.cardPlace.setText(cDlist.get(position).place);
-        holder.cardPlace.setText("Bengaluru, India");
-        holder.cardImage.setImageResource(R.drawable.pixtory);
+        //holder.cardImage.setImageURI(cDlist.get(position).pictureUrl);
+        holder.cardTitle.setText(cDlist.get(position).name);
+        holder.cardPlace.setText(cDlist.get(position).place);
     }
 
     public int getItemCount(){
-
         return cDlist.size();
     }
 }
