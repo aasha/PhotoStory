@@ -27,7 +27,7 @@
                 android:orientation="horizontal"/>
         <RelativeLayout android:id="@+id/layout_image_details"
                 android:layout_width="match_parent"
-                        android:layout_height="100dp"
+                android:layout_height="90dp"
                 android:layout_gravity="bottom">
             <View android:layout_width="match_parent"
                   android:layout_height="1dp"
@@ -69,6 +69,15 @@
                        android:layout_marginTop="20dp"
                     android:layout_marginRight="50dp"/>
 
+            <com.pixtory.app.views.SlantView
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_below="@+id/image_like"
+                android:id="@+id/slant_view"
+                android:visibility="gone"
+                android:layout_gravity="bottom"/>
         </RelativeLayout>
+
+
     </FrameLayout>
 </FrameLayout>

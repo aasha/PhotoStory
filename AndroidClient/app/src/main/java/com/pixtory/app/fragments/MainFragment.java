@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.MediaMetadataCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
@@ -24,6 +25,7 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -105,6 +107,9 @@ public class MainFragment extends Fragment{
 
     @Bind(R.id.image_like)
     ImageView mImageLike = null;
+
+    @Bind(R.id.slant_view)
+    SlantView mSlantView = null;
 
     private int mSoftBarHeight = 0;
 
@@ -283,6 +288,7 @@ public class MainFragment extends Fragment{
     public void resetFragmentState() {
         isRecoViewAdded = false;
         mListener.onDetachStoryView(this, mContentIndex);
+        mSlantView.setVisibility(View.GONE);
         mStoryLayout.setVisibility(View.GONE);
         showFullScreen();
     }
@@ -375,6 +381,7 @@ public class MainFragment extends Fragment{
     private void setUpFullScreenUI() {
         isRecoViewAdded = false;
         mListener.onDetachStoryView(this, mContentIndex);
+        mSlantView.setVisibility(View.GONE);
         mStoryLayout.setVisibility(View.GONE);
     }
 
@@ -420,6 +427,7 @@ public class MainFragment extends Fragment{
         mStoryLayout.setLayoutParams(recoScreenParams);
         if (isRecoViewAdded == false) {
             mListener.onAttachStoryView(this, mContentIndex);
+            mSlantView.setVisibility(View.VISIBLE);
             isRecoViewAdded = true;
         }
         return true;
@@ -430,6 +438,7 @@ public class MainFragment extends Fragment{
         ValueAnimator mCon = ValueAnimator.ofInt(mDeviceHeightInPx, (int) (0.70 * mDeviceHeightInPx));
         if (isRecoViewAdded == false) {
             mListener.onAttachStoryView(this, mContentIndex);
+            mSlantView.setVisibility(View.VISIBLE);
             isRecoViewAdded = true;
         }
         mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

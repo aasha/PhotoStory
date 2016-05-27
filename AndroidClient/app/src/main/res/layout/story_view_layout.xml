@@ -1,10 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:background="#FFF"
     android:visibility="visible"
-                android:paddingTop="20dp">
+    android:background="@color/white"
+    android:paddingTop="5dp">
 
     <com.pixtory.app.views.CircularImageView
             android:layout_width="50dp"
@@ -16,6 +16,7 @@
             android:layout_toRightOf="@+id/imgProfile"
               android:layout_marginTop="2dp"
             android:text="Steve Johnson"
+
             android:textColor="#31aef5"
             android:id="@+id/txtName"/>
     <TextView android:layout_width="wrap_content"
@@ -31,7 +32,8 @@
               android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="07 Apr"
-            android:textColor="#31aef5"
+
+            android:textColor="@color/app_blue"
             android:id="@+id/txtDate"
             android:layout_marginRight="20dp"/>
     <View android:layout_width="match_parent"
@@ -84,4 +86,5 @@
                 android:id="@+id/btnShare"
                 android:text="Share"/>
     </LinearLayout>
+
 </RelativeLayout>

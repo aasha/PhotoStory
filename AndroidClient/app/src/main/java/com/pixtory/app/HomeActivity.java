@@ -1,18 +1,25 @@
 package com.pixtory.app;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.*;
-import android.content.pm.PackageManager;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.*;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,13 +30,17 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
+import com.pixtory.app.retrofit.AddCommentResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
@@ -37,13 +48,18 @@ import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
+
+import java.util.Date;
+import java.util.List;
+
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements
+        MainFragment.OnMainFragmentInteractionListener,CommentsDialogFragment.OnAddCommentButtonClickListener {
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -55,6 +71,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ViewPager mPager = null;
     private int mCurrentFragmentPosition = 0;
     RelativeLayout mStoryLayout = null;
+    RelativeLayout mCommentsLayout = null;
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
@@ -78,6 +95,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private DeviceBandwidthSampler mDeviceBandwidthSampler;
     private ConnectionChangedListener mListener;
 
+
+    /** Naviagation Drawer Objects**/
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mDrawerListAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private ImageView mProfileIcon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,10 +113,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
+        setUpNavigationDrawer();
         setUpRecomView();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
+
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -118,6 +145,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         prepareFeed();
 
         showShowcaseView();
+
         //Register for push notifs
         registerForPushNotification();
         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
@@ -135,6 +163,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("pixtory coming up for you");
         mProgress.setCanceledOnTouchOutside(false);
+
         NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
@@ -182,6 +211,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private void setUpRecomView() {
         LayoutInflater mLayoutInflater = LayoutInflater.from(this);
         mStoryLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_view_layout, null);
+        mCommentsLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_comment_layout , null);
     }
 
     private void registerForPushNotification() {
@@ -237,12 +267,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (parent != null) {
             parent.removeAllViews();
         }
-        bindStoryData();
+        bindStoryData(f);
         f.attachStoryView(mStoryLayout);
-
     }
 
-    private void bindStoryData() {
+    private void bindStoryData(final MainFragment mainFragment) {
         try {
             final ContentData data = App.getContentData().get(mCurrentFragmentPosition);
             ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
@@ -253,6 +282,23 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
             Button mBtnShare = (Button) mStoryLayout.findViewById(R.id.btnShare);
             Button mBtnComment = (Button) mStoryLayout.findViewById(R.id.btnComment);
+            int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
+            NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(HomeActivity.this), content_id, new NetworkApiCallback() {
+                @Override
+                public void success(Object o, Response response) {
+                    Log.i(TAG,o.toString());
+                }
+
+                @Override
+                public void failure(Object o) {
+
+                }
+
+                @Override
+                public void networkFailure(RetrofitError error) {
+
+                }
+            });
             if (data != null) {
                 if (data.personDetails != null) {
                     if (data.personDetails.imageUrl == null || data.personDetails.imageUrl.trim().equals("")){
@@ -266,6 +312,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mTextStoryMainPara.setText(data.pictureFirstPara);
                 mTextStoryDetails.setText(data.pictureDescription);
             }
+
+
             mBtnShare.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -275,12 +323,82 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             mBtnComment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO add comment
+                    final ViewGroup parent = (ViewGroup) mCommentsLayout.getParent();
+                    if (parent != null) {
+                        parent.removeAllViews();
+                    }
+                    buildCommentsLayout(data.commentList);
+                    mainFragment.attachStoryView(mCommentsLayout);
+
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void buildCommentsLayout(List<CommentData> commentList){
+
+        Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
+        TextView mTVCommentCount = (TextView)mCommentsLayout.findViewById(R.id.tvCount);
+        RecyclerView mCommentsList = (RecyclerView)mCommentsLayout.findViewById(R.id.commentsList);
+
+        if(commentList!= null && commentList.size()>0 ){
+
+            Log.i(TAG,"Comment Count::"+commentList.size());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(HomeActivity.this);
+            RecyclerView.Adapter mCommentsListAdapter = new CommentsListAdapter(HomeActivity.this, commentList);
+            mCommentsList.setLayoutManager(mLayoutManager);
+            mCommentsList.setAdapter(mCommentsListAdapter);
+            mCommentsList.setVisibility(View.VISIBLE);
+
+            mTVCommentCount.setText(commentList.size() + " COMMENT");
+        }else{
+            Log.i(TAG,"No Comment Yet for this story");
+            mCommentsList.setVisibility(View.INVISIBLE);
+            mCommentsList.setVisibility(View.INVISIBLE);
+            mTVCommentCount.setText(" NO COMMENT YET ");
+        }
+
+        mPostComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getSupportFragmentManager();
+                CommentsDialogFragment commentsDialogFragment = CommentsDialogFragment.newInstance("Some title");
+                commentsDialogFragment.show(fm, "fragment_alert");
+            }
+        });
+    }
+
+    /**
+     * Method to post a new comment on the story
+     */
+    @Override
+    public void onAddCommentButtonClicked(String comment) {
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
+        NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
+
+            @Override
+            public void success(AddCommentResponse addCommentResponse, Response response) {
+                Log.i(TAG,"Add Comment Request Success");
+            }
+
+            @Override
+            public void failure(AddCommentResponse addCommentResponse) {
+                Log.i(TAG,"Add Comment Request Failure");
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Log.i(TAG,"Add Comment Request Network Failure, Error Type::"+error.getMessage());
+
+            }
+        });
+
+
     }
 
     private boolean checkPlayServices() {
@@ -397,6 +515,42 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         startActivity(Intent.createChooser(shareIntent, "Share"));
     }
 
+    /**
+     *
+     */
+    private void setUpNavigationDrawer() {
+
+        mProfileIcon = (ImageView)findViewById(R.id.profileIcon);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+
+        String[] arr = getResources().getStringArray(R.array.menu_items);
+        mDrawerListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arr);
+        mDrawerList.setAdapter(mDrawerListAdapter);
+
+        mProfileIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mDrawerLayout.isDrawerOpen(mDrawerList))
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                else
+                    mDrawerLayout.openDrawer(mDrawerList);
+            }
+        });
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                switch (i){
+                    case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
+                            /**TODO: Add code to show My Profile Page**/
+                }
+            }
+        });
+    }
 
 }
+
+
 

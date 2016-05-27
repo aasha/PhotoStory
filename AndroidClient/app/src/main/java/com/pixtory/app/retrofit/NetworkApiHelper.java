@@ -27,6 +27,11 @@ public class NetworkApiHelper {
         return sInstance;
     }
 
+
+    private NetworkApiHelper(){
+        //Constructor is made private to ensure singelton behavior
+    }
+
     /**
      * ============================================================================================================================================================================================
      */
