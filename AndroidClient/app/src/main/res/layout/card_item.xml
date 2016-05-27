@@ -5,11 +5,23 @@
     android:layout_height="212dp"
     android:id="@+id/card_frame"
     android:background="#ffffff">
-    <ImageView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="145dp"
-        android:src="@drawable/pixtory"
-        android:id="@+id/card_img"/>
+        android:layout_height="145dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/pixtory"
+            android:id="@+id/card_img"/>
+        <com.pixtory.app.views.SlantView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@+id/person_desc"
+            android:id="@+id/slant_view_2"
+            android:layout_gravity="bottom"/>
+
+    </FrameLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

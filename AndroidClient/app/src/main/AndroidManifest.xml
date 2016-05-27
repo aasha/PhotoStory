@@ -50,6 +50,14 @@
 
         </activity>
         <activity
+            android:name=".userprofile.UserProfileActivity"
+            android:icon="@drawable/pixtory"
+            android:label="UserProfileActivity"
+            android:screenOrientation="portrait">
+
+
+        </activity>
+        <activity
                 android:name=".HomeActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
