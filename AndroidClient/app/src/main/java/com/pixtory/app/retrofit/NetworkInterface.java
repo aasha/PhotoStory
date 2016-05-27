@@ -28,4 +28,7 @@ public interface NetworkInterface {
 
     @POST("/getCommentDetailList")
     void getCommentDetailList(@Body GetCommentDetailsRequest req, Callback<BaseResponse> cd);
+
+    @POST("/getPersonDetails")
+    void getPersonDetails(@Body GetPersonDetailsRequest req, Callback<GetPersonDetailsResponse> cd);
 }
