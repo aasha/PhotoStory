@@ -27,5 +27,5 @@ public interface NetworkInterface {
     void addPushNotifsId(@Body AddPushNotifsIdRequest req, Callback<BaseResponse> cb);
 
     @POST("/getCommentDetailList")
-    void getCommentDetailList(@Body GetCommentDetailsRequest req, Callback<BaseResponse> cd);
+    void getCommentDetailList(@Body GetCommentDetailsRequest req, Callback<GetCommentDetailsResponse> cd);
 }

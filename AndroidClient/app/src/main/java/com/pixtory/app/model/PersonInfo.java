@@ -10,4 +10,5 @@ public class PersonInfo {
     public String name = null;
     public String imageUrl = null;
     public String desc = null;
+    public String description = null;
 }

@@ -3,8 +3,7 @@
     android:layout_height="wrap_content"
     android:layout_weight="1"
     android:background="#fff"
-    android:visibility="visible"
-    android:paddingTop="20dp">
+    android:visibility="visible">
 
         <TextView android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,6 +31,13 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"/>
 
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/comments_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/separator">
+
         <ImageView
             android:layout_width="20dp"
             android:id="@+id/comment_img"
@@ -40,7 +46,19 @@
             android:layout_marginLeft="20dp"
             android:layout_marginBottom="10dp"
             android:layout_height="20dp"
-            android:layout_below="@+id/separator"/>
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textStyle="bold"
+            android:id="@+id/tvCount"
+            android:layout_alignBottom="@+id/comment_img"
+            android:layout_toRightOf="@+id/comment_img"
+            android:layout_toEndOf="@+id/comment_img"
+            android:layout_marginLeft="38dp"
+            android:layout_marginStart="38dp" />
 
         <android.support.v7.widget.RecyclerView
            android:layout_width="match_parent"
@@ -50,9 +68,19 @@
            android:layout_marginLeft="20dp"
            android:layout_marginRight="20dp"
            android:layout_marginTop="10dp"
-           android:layout_above="@+id/postBtn_ll">
+           >
 
        </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/loading_comments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="visible"
+        android:text="Loading Comments..."/>
 
         <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,17 +102,5 @@
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="117 COMMENT"
-            android:textStyle="bold"
-            android:id="@+id/tvCount"
-            android:layout_marginLeft="18dp"
-            android:layout_marginStart="18dp"
-            android:layout_alignTop="@+id/comment_img"
-            android:layout_toRightOf="@+id/comment_img"
-            android:layout_toEndOf="@+id/comment_img" />
 
-
-    </RelativeLayout>
+</RelativeLayout>

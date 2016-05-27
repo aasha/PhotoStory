@@ -29,7 +29,7 @@ public class NetworkApiHelper {
 
 
     private NetworkApiHelper(){
-        //Constructor is made private to ensure singelton behavior
+        //Constructor is made private to ensure singleton behavior
     }
 
     /**
@@ -176,16 +176,16 @@ public class NetworkApiHelper {
     }
 
     /**
-     * ============================================================================================================================================================================================
+     * =============================================================================================================================================================
      */
     public void getCommentDetailList(String userId, int contentId, final NetworkApiCallback cb) {
         GetCommentDetailsRequest req = new GetCommentDetailsRequest();
         req.userId = Integer.parseInt(userId);
         req.contentId = contentId;
 
-        sAPI.getCommentDetailList(req, new Callback<BaseResponse>() {
+        sAPI.getCommentDetailList(req, new Callback<GetCommentDetailsResponse>() {
             @Override
-            public void success(BaseResponse resp, Response response) {
+            public void success(GetCommentDetailsResponse resp, Response response) {
                 if (resp.success == true)
                     cb.success(resp, response);
                 else

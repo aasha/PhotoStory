@@ -23,7 +23,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.network.connectionclass.*;
 import com.google.android.gms.analytics.HitBuilders;
@@ -41,6 +40,7 @@ import com.pixtory.app.model.ContentData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.AddCommentResponse;
+import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
@@ -49,9 +49,11 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.OnClick;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -95,12 +97,10 @@ public class HomeActivity extends AppCompatActivity implements
     private DeviceBandwidthSampler mDeviceBandwidthSampler;
     private ConnectionChangedListener mListener;
 
-
     /** Naviagation Drawer Objects**/
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ArrayAdapter<String> mDrawerListAdapter;
-    private ActionBarDrawerToggle mDrawerToggle;
     private ImageView mProfileIcon;
 
     @Override
@@ -272,7 +272,9 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     private void bindStoryData(final MainFragment mainFragment) {
+
         try {
+
             final ContentData data = App.getContentData().get(mCurrentFragmentPosition);
             ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
             TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
@@ -282,23 +284,8 @@ public class HomeActivity extends AppCompatActivity implements
             TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
             Button mBtnShare = (Button) mStoryLayout.findViewById(R.id.btnShare);
             Button mBtnComment = (Button) mStoryLayout.findViewById(R.id.btnComment);
-            int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
-            NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(HomeActivity.this), content_id, new NetworkApiCallback() {
-                @Override
-                public void success(Object o, Response response) {
-                    Log.i(TAG,o.toString());
-                }
+            final int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
-                @Override
-                public void failure(Object o) {
-
-                }
-
-                @Override
-                public void networkFailure(RetrofitError error) {
-
-                }
-            });
             if (data != null) {
                 if (data.personDetails != null) {
                     if (data.personDetails.imageUrl == null || data.personDetails.imageUrl.trim().equals("")){
@@ -327,7 +314,7 @@ public class HomeActivity extends AppCompatActivity implements
                     if (parent != null) {
                         parent.removeAllViews();
                     }
-                    buildCommentsLayout(data.commentList);
+                    buildCommentsLayout(content_id);
                     mainFragment.attachStoryView(mCommentsLayout);
 
                 }
@@ -337,28 +324,27 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
-    private void buildCommentsLayout(List<CommentData> commentList){
+    private ArrayList<CommentData> commentDataList;
+    private RecyclerView mCommentsRecyclerView;
+    private CommentsListAdapter mCommentsRecyclerViewAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private TextView mTVCommentCount;
+    private RelativeLayout mRLCommentList = null;
+    private TextView mTVLoading;
+
+
+    private void buildCommentsLayout(int content_id){
 
         Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
-        TextView mTVCommentCount = (TextView)mCommentsLayout.findViewById(R.id.tvCount);
-        RecyclerView mCommentsList = (RecyclerView)mCommentsLayout.findViewById(R.id.commentsList);
 
-        if(commentList!= null && commentList.size()>0 ){
+        mRLCommentList = (RelativeLayout)mCommentsLayout.findViewById(R.id.comments_layout);
+        mTVLoading = (TextView)mCommentsLayout.findViewById(R.id.loading_comments);
+        mTVCommentCount = (TextView)mCommentsLayout.findViewById(R.id.tvCount);
 
-            Log.i(TAG,"Comment Count::"+commentList.size());
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(HomeActivity.this);
-            RecyclerView.Adapter mCommentsListAdapter = new CommentsListAdapter(HomeActivity.this, commentList);
-            mCommentsList.setLayoutManager(mLayoutManager);
-            mCommentsList.setAdapter(mCommentsListAdapter);
-            mCommentsList.setVisibility(View.VISIBLE);
-
-            mTVCommentCount.setText(commentList.size() + " COMMENT");
-        }else{
-            Log.i(TAG,"No Comment Yet for this story");
-            mCommentsList.setVisibility(View.INVISIBLE);
-            mCommentsList.setVisibility(View.INVISIBLE);
-            mTVCommentCount.setText(" NO COMMENT YET ");
-        }
+        mCommentsRecyclerView = (RecyclerView)mCommentsLayout.findViewById(R.id.commentsList);
+        mLayoutManager = new LinearLayoutManager(HomeActivity.this);
+        mCommentsRecyclerView.setLayoutManager(mLayoutManager);
+        mCommentsRecyclerView.setHasFixedSize(true);
 
         mPostComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -368,10 +354,60 @@ public class HomeActivity extends AppCompatActivity implements
                 commentsDialogFragment.show(fm, "fragment_alert");
             }
         });
+
+        NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(HomeActivity.this), content_id, new NetworkApiCallback<GetCommentDetailsResponse>() {
+            @Override
+            public void success(GetCommentDetailsResponse getCommentDetailsResponse, Response response) {
+
+                Log.i(TAG , "GetCommentDetails Request Success");
+
+                commentDataList = getCommentDetailsResponse.getCommentList();
+                setCommentListVisibility();
+            }
+
+            @Override
+            public void failure(GetCommentDetailsResponse getCommentDetailsResponse) {
+                Log.i(TAG , "GetCommentDetails Request Failure::"+getCommentDetailsResponse.toString());
+
+                commentDataList = null;
+                setCommentListVisibility();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Log.i(TAG , "GetCommentDetails Request Network Failure Error::"+error.getMessage());
+
+                commentDataList = null;
+                setCommentListVisibility();
+            }
+        });
+
     }
 
     /**
-     * Method to post a new comment on the story
+     * Method to hide loading comments progressbar and show comments list
+     */
+    public void setCommentListVisibility(){
+
+        if(commentDataList!= null && commentDataList.size()>0){
+
+            Log.i(TAG,"Comment Count::"+commentDataList.size());
+            mTVCommentCount.setText(commentDataList.size() + " COMMENT");
+            mCommentsRecyclerViewAdapter = new CommentsListAdapter(HomeActivity.this);
+            mCommentsRecyclerViewAdapter.setData(commentDataList);
+            mCommentsRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
+
+        }else{
+            Log.i(TAG,"No Comment Yet for this story");
+            mTVCommentCount.setText(" NO COMMENT YET ");
+        }
+
+        mTVLoading.setVisibility(View.GONE);
+        mRLCommentList.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Method to post new comment on the story
      */
     @Override
     public void onAddCommentButtonClicked(String comment) {
@@ -397,8 +433,6 @@ public class HomeActivity extends AppCompatActivity implements
 
             }
         });
-
-
     }
 
     private boolean checkPlayServices() {

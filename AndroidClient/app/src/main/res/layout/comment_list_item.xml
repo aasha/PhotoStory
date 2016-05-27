@@ -2,19 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
+    android:layout_marginTop="20dp"
     >
 
     <com.pixtory.app.views.CircularImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/avatarImg"
-        android:layout_marginLeft="20dp"/>
+        android:id="@+id/avatarImg" />
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/avatarImg"
-        android:layout_marginTop="2dp"
-
         android:text="Steve Johnson"
         android:textColor="#31aef5"
         android:id="@+id/txtName"/>
@@ -26,6 +23,7 @@
         android:layout_marginTop="3dp"
         android:textAllCaps="true"
         android:textColor="@color/light_grey"
+
         android:id="@+id/txtDesc"/>
 
     <TextView android:layout_width="wrap_content"
@@ -34,7 +32,7 @@
         android:text="07 Apr"
         android:textColor="@color/light_grey"
         android:id="@+id/txtDate"
-        android:layout_marginRight="20dp"/>
+        />
 
     <TextView android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,15 +41,17 @@
         android:id="@+id/txtComment"
         android:layout_below="@+id/avatarImg"
         android:layout_toRightOf="@+id/avatarImg"
-        android:layout_toEndOf="@+id/avatarImg" />
+        android:layout_toEndOf="@+id/avatarImg"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"/>
 
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/grey_text_color"
+        android:background="@color/light_grey"
         android:id="@+id/separator"
+        android:layout_marginLeft="50dp"
         android:layout_below="@+id/txtComment"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        />
+        android:layout_alignRight="@+id/txtDate"
+        android:layout_alignEnd="@+id/txtComment" />
 
 </RelativeLayout>

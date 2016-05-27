@@ -10,6 +10,7 @@ import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.ContentData;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -217,5 +218,14 @@ public class Utils {
         SharedPreferences.Editor editor = mSharedPrefs.edit();
         editor.putBoolean(type, true);
         editor.apply(); // commit changes
+    }
+
+    public static String getFormattedDate(long date){
+
+        SimpleDateFormat dtFormat = new SimpleDateFormat("d MMM y");
+        String format = dtFormat.format(date);
+
+        return format;
+
     }
 }

@@ -18,11 +18,14 @@ import android.widget.RelativeLayout;
 public class SlantView extends View {
 
     private Context mContext;
+    Paint paint ;
+    Path path;
 
     public SlantView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         mContext = ctx;
         setWillNotDraw(false);
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 //
 //    @Override
@@ -37,7 +40,7 @@ public class SlantView extends View {
 
         int w = getWidth(), h = getHeight();
 
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
 
         paint.setStrokeWidth(2);
         paint.setColor(Color.WHITE);
@@ -45,7 +48,7 @@ public class SlantView extends View {
         paint.setAntiAlias(true);
 
 
-        Path path = new Path();
+        path = new Path();
         path.setFillType(Path.FillType.EVEN_ODD);
         path.moveTo(0,0);
         path.lineTo(0,h);

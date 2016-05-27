@@ -11,8 +11,10 @@ import android.widget.TextView;
 import com.pixtory.app.R;
 import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
+import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,11 +24,10 @@ import java.util.List;
 public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapter.CommentViewHolder> {
 
     private Context  mContext;
-    private List<CommentData> mDataSetList;
+    private ArrayList<CommentData> mDataSetList;
 
-    public CommentsListAdapter(Context context , List<CommentData> dataSetList){
+    public CommentsListAdapter(Context context){
         mContext = context;
-        mDataSetList = dataSetList;
     }
 
     public class CommentViewHolder extends RecyclerView.ViewHolder{
@@ -48,6 +49,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         }
     }
 
+
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -62,13 +64,18 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         holder.id = data.commentId;
         holder.mTVName.setText(data.personDetails.name);
         Picasso.with(mContext).load(data.personDetails.imageUrl).fit().into(holder.mImgAvatar);
-        holder.mTVShortDesc.setText(data.personDetails.desc);
-        holder.mTVDate.setText(data.ingestionTime);
+        holder.mTVShortDesc.setText(data.personDetails.description);
+        holder.mTVDate.setText(Utils.getFormattedDate(data.ingestionTime));
         holder.mTVCommentText.setText(data.comment);
     }
 
     @Override
     public int getItemCount() {
         return mDataSetList.size();
+    }
+
+    public void setData(ArrayList<CommentData> contentList) {
+        mDataSetList = contentList;
+        notifyDataSetChanged();
     }
 }

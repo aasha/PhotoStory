@@ -8,7 +8,7 @@ public class CommentData {
     public int commentId;
     public String comment;
     public PersonInfo personDetails;
-    public String ingestionTime;
+    public long ingestionTime;
     public int contentId;
 
     public int getCommentId() {
@@ -27,11 +27,11 @@ public class CommentData {
         this.contentId = contentId;
     }
 
-    public String getIngestionTime() {
+    public long getIngestionTime() {
         return ingestionTime;
     }
 
-    public void setIngestionTime(String ingestionTime) {
+    public void setIngestionTime(long ingestionTime) {
         this.ingestionTime = ingestionTime;
     }
 
