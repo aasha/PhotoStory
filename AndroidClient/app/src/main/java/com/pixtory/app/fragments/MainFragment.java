@@ -350,26 +350,43 @@ public class MainFragment extends Fragment{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            if (mIsScrolling && !mIsFling) {
-                mIsScrolling = false;
-                mIsFling = false;
-                if (lastScrollPosition < (0.90 * mDeviceHeightInPx)) {
-                    showHalfScreen();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_Tap)
-                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                            .put("META", "Swipe")
-                            .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                            .build());
-                } else {
-                    showFullScreen();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
-                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                            .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                            .build());
-                }
-            }
+            scrollScreen();
         }
         return false;
+    }
+
+    @OnTouch(R.id.pic_story_layout)
+    public boolean onTouchStory(LinearLayout view, MotionEvent me) {
+        if (gesture.onTouchEvent(me)) {
+            return true;
+        }
+
+        if (me.getAction() == MotionEvent.ACTION_UP) {
+            scrollScreen();
+        }
+        return false;
+    }
+
+
+    private void scrollScreen(){
+        if (mIsScrolling && !mIsFling) {
+            mIsScrolling = false;
+            mIsFling = false;
+            if (lastScrollPosition < (0.90 * mDeviceHeightInPx)) {
+                showHalfScreen();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_Tap)
+                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                        .put("META", "Swipe")
+                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
+                        .build());
+            } else {
+                showFullScreen();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
+                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
+                        .build());
+            }
+        }
     }
 
 
@@ -416,9 +433,13 @@ public class MainFragment extends Fragment{
         }
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mMainLayout.getLayoutParams();
         params.height = newHeight;
+        params.width = mDeviceWidthInPx;
+
         mMainLayout.setLayoutParams(params);
+
         ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mStoryLayout.getLayoutParams();
         recoScreenParams.height = mDeviceHeightInPx - newHeight;
+
         mStoryLayout.setLayoutParams(recoScreenParams);
         if (isRecoViewAdded == false) {
             mListener.onAttachStoryView(this, mContentIndex);

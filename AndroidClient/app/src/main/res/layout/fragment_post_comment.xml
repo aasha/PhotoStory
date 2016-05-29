@@ -44,7 +44,8 @@
         android:padding="15dp"
         android:gravity="top"
         android:scrollbars="vertical"
-        android:imeOptions="actionDone" />
+        android:imeOptions="actionDone"
+        android:maxLength="250"/>
 
     <TextView
         android:layout_below="@+id/et_comment"

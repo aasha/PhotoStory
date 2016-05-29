@@ -15,16 +15,17 @@
             android:visibility="gone"/>
 
     <FrameLayout android:id="@+id/main_layout" android:padding="0dp"
-                 android:layout_width="match_parent" android:gravity="center"
+                 android:layout_width="match_parent"
                  android:layout_height="match_parent"
             android:background="@null">
-        <ImageView
+
+            <ImageView
                 android:id="@+id/image_main"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="horizontal"/>
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
+
         <RelativeLayout android:id="@+id/layout_image_details"
                 android:layout_width="match_parent"
                 android:layout_height="90dp"
@@ -74,7 +75,7 @@
                 android:layout_height="30dp"
                 android:layout_below="@+id/image_like"
                 android:id="@+id/slant_view"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_gravity="bottom"/>
         </RelativeLayout>
 

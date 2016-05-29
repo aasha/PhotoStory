@@ -420,6 +420,7 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void success(AddCommentResponse addCommentResponse, Response response) {
                 Log.i(TAG,"Add Comment Request Success");
+
             }
 
             @Override

@@ -63,7 +63,11 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
         holder.id = data.commentId;
         holder.mTVName.setText(data.personDetails.name);
-        Picasso.with(mContext).load(data.personDetails.imageUrl).fit().into(holder.mImgAvatar);
+        if( data.personDetails.imageUrl != null)
+            Picasso.with(mContext).load(data.personDetails.imageUrl).fit().into(holder.mImgAvatar);
+        else
+            holder.mImgAvatar.setImageResource(R.drawable.hexagon_bg);
+
         holder.mTVShortDesc.setText(data.personDetails.description);
         holder.mTVDate.setText(Utils.getFormattedDate(data.ingestionTime));
         holder.mTVCommentText.setText(data.comment);
