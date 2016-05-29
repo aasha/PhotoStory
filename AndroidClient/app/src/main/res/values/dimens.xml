@@ -10,4 +10,6 @@
     <dimen name="showcase_radius_outer">60dp</dimen>
     <dimen name="card_insets">8dp</dimen>
 
+    <dimen name="story_content">17sp</dimen>
+
 </resources>

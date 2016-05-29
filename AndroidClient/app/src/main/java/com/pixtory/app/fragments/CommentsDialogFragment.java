@@ -1,6 +1,7 @@
 package com.pixtory.app.fragments;
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.pixtory.app.R;
 
@@ -22,6 +24,7 @@ public class CommentsDialogFragment extends DialogFragment{
 
     private EditText mCommentText;
     private Button mPostCommentBtn;
+    private ImageView mCloseBtn;
 
     /**
      * Empty Constructor
@@ -55,25 +58,34 @@ public class CommentsDialogFragment extends DialogFragment{
     public void onStart() {
         super.onStart();
         getDialog().getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        getDialog().setCanceledOnTouchOutside(true);
+        getDialog().setCanceledOnTouchOutside(false);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        getDialog().setCancelable(false);
         return inflater.inflate(R.layout.fragment_post_comment, container);
+
     }
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mCommentText = (EditText) view.findViewById(R.id.et_comment);
-
+        mCloseBtn = (ImageView)view.findViewById(R.id.closeBtn);
+        mCloseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDialog().dismiss();
+            }
+        });
         WindowManager.LayoutParams params = getDialog().getWindow()
                 .getAttributes();
         params.gravity = Gravity.BOTTOM;
         getDialog().getWindow().setAttributes(params);
+
 
         mCommentText.requestFocus();
         mPostCommentBtn = (Button)view.findViewById(R.id.postCommentBtn);
@@ -81,6 +93,7 @@ public class CommentsDialogFragment extends DialogFragment{
             @Override
             public void onClick(View view) {
                 ((OnAddCommentButtonClickListener)getActivity()).onAddCommentButtonClicked(mCommentText.getText().toString());
+                dismiss();
             }
         });
     }

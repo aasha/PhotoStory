@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/avatarImg"
         android:text="Steve Johnson"
+        android:textSize="13sp"
         android:textColor="#31aef5"
         android:id="@+id/txtName"/>
     <TextView android:layout_width="wrap_content"
@@ -21,34 +22,36 @@
         android:layout_toRightOf="@+id/avatarImg"
         android:layout_below="@+id/txtName"
         android:text="Travel Enthusiast"
-        android:layout_marginTop="3dp"
-        android:textAllCaps="true"
-        android:textColor="@color/light_grey"
 
+        android:textAllCaps="true"
+        android:textColor="@color/grey_3"
+        android:textSize="11sp"
         android:id="@+id/txtDesc"/>
 
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:text="07 Apr"
-        android:textColor="@color/light_grey"
+        android:textSize="12sp"
+        android:textColor="@color/grey_3"
         android:id="@+id/txtDate"
         />
 
     <TextView android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Abc"
-        android:textColor="@color/grey_text_color"
+        android:textColor="@color/grey_2"
         android:id="@+id/txtComment"
         android:layout_below="@+id/avatarImg"
         android:layout_toRightOf="@+id/avatarImg"
         android:layout_toEndOf="@+id/avatarImg"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"/>
 
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_grey"
+        android:background="@color/black"
         android:id="@+id/separator"
         android:layout_marginLeft="50dp"
         android:layout_below="@+id/txtComment"

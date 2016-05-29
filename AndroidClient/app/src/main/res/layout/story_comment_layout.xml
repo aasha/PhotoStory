@@ -5,28 +5,38 @@
     android:background="#fff"
     android:visibility="visible">
 
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="2dp"
-            android:text="Candolim Goa"
-            android:id="@+id/txtName"/>
-
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_below="@+id/txtName"
-            android:text="That's how you New Year's"
-            android:layout_marginTop="3dp"
-            android:textColor="#31aef5"
-            android:id="@+id/txtDesc"/>
+    <com.pixtory.app.views.CircularImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/imgProfile"
+        android:layout_marginLeft="20dp"/>
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/imgProfile"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="7dp"
+        android:text="Steve Johnson"
+        android:textColor="#31aef5"
+        android:textSize="14sp"
+        android:id="@+id/txtName"/>
+    <TextView android:layout_width="wrap_content"
+        android:layout_marginLeft="7dp"
+        android:textSize="12sp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/imgProfile"
+        android:layout_below="@+id/txtName"
+        android:text="Travel Enthusiast"
+        android:layout_marginTop="3dp"
+        android:textColor="@color/grey_3"
+        android:textAllCaps="true"
+        android:id="@+id/txtDesc"/>
 
 
         <View android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/app_blue"
+            android:background="@color/separator_color"
             android:id="@+id/separator"
-            android:layout_below="@+id/txtDesc"
+            android:layout_below="@+id/imgProfile"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"/>
@@ -36,12 +46,13 @@
         android:id="@+id/comments_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/postBtn_ll"
         android:layout_below="@+id/separator">
 
         <ImageView
             android:layout_width="20dp"
             android:id="@+id/comment_img"
-            android:src="@drawable/pixtory"
+            android:src="@drawable/comment"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginBottom="10dp"
@@ -50,15 +61,25 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textStyle="bold"
+            android:layout_height="20dp"
+            android:text="1"
+            android:textAllCaps="true"
             android:id="@+id/tvCount"
             android:layout_alignBottom="@+id/comment_img"
             android:layout_toRightOf="@+id/comment_img"
-            android:layout_toEndOf="@+id/comment_img"
-            android:layout_marginLeft="38dp"
-            android:layout_marginStart="38dp" />
+            android:layout_marginLeft="5dp"
+             />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="comments"
+            android:id="@+id/comment_text"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:layout_alignBottom="@+id/comment_img"
+            android:layout_toRightOf="@+id/tvCount"
+            android:layout_marginLeft="4dp"
+            />
 
         <android.support.v7.widget.RecyclerView
            android:layout_width="match_parent"
@@ -67,7 +88,8 @@
            android:layout_below="@+id/comment_img"
            android:layout_marginLeft="20dp"
            android:layout_marginRight="20dp"
-           android:layout_marginTop="10dp"
+
+            android:layout_marginBottom="10dp"
            >
 
        </android.support.v7.widget.RecyclerView>
@@ -92,6 +114,8 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:textSize="14sp"
                 android:layout_centerHorizontal="true"
                 android:background="@color/app_blue"
                 android:textColor="@color/white"

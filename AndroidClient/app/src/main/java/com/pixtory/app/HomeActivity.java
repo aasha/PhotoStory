@@ -44,6 +44,7 @@ import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
@@ -282,8 +283,14 @@ public class HomeActivity extends AppCompatActivity implements
             TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
             TextView mTextStoryMainPara = (TextView) mStoryLayout.findViewById(R.id.txtMainPara);
             TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
-            Button mBtnShare = (Button) mStoryLayout.findViewById(R.id.btnShare);
-            Button mBtnComment = (Button) mStoryLayout.findViewById(R.id.btnComment);
+            LinearLayout mBtnShare = (LinearLayout) mStoryLayout.findViewById(R.id.btnShare);
+            LinearLayout mBtnComment = (LinearLayout) mStoryLayout.findViewById(R.id.btnComment);
+
+            Dekar.applyFont(HomeActivity.this,mTextName,"fonts/Roboto-Regular.ttf");
+            Dekar.applyFont(HomeActivity.this,mTextDesc,"fonts/Roboto-Regular.ttf");
+            Dekar.applyFont(HomeActivity.this,mTextDate,"fonts/Roboto-Regular.ttf");
+            Dekar.applyFont(HomeActivity.this,mTextStoryDetails,"fonts/Roboto-Regular.ttf");
+
             final int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
             if (data != null) {
@@ -314,7 +321,7 @@ public class HomeActivity extends AppCompatActivity implements
                     if (parent != null) {
                         parent.removeAllViews();
                     }
-                    buildCommentsLayout(content_id);
+                    buildCommentsLayout(content_id , data);
                     mainFragment.attachStoryView(mCommentsLayout);
 
                 }
@@ -328,18 +335,26 @@ public class HomeActivity extends AppCompatActivity implements
     private RecyclerView mCommentsRecyclerView;
     private CommentsListAdapter mCommentsRecyclerViewAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private TextView mTVCommentCount;
+    private TextView mTVCommentCount , mCommentText;
     private RelativeLayout mRLCommentList = null;
     private TextView mTVLoading;
 
 
-    private void buildCommentsLayout(int content_id){
+    private void buildCommentsLayout(int content_id ,ContentData data){
 
         Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
+        ImageView mAvatarImgView = (ImageView)mCommentsLayout.findViewById(R.id.imgProfile);
+        TextView mName = (TextView)mCommentsLayout.findViewById(R.id.txtName);
+        TextView mDesc = (TextView)mCommentsLayout.findViewById(R.id.txtDesc);
+
+        Picasso.with(this).load(data.personDetails.imageUrl).fit().into(mAvatarImgView);
+        mName.setText(data.personDetails.name);
+        mDesc.setText(data.personDetails.desc);
 
         mRLCommentList = (RelativeLayout)mCommentsLayout.findViewById(R.id.comments_layout);
         mTVLoading = (TextView)mCommentsLayout.findViewById(R.id.loading_comments);
         mTVCommentCount = (TextView)mCommentsLayout.findViewById(R.id.tvCount);
+        mCommentText = (TextView)mCommentsLayout.findViewById(R.id.comment_text);
 
         mCommentsRecyclerView = (RecyclerView)mCommentsLayout.findViewById(R.id.commentsList);
         mLayoutManager = new LinearLayoutManager(HomeActivity.this);
@@ -392,7 +407,8 @@ public class HomeActivity extends AppCompatActivity implements
         if(commentDataList!= null && commentDataList.size()>0){
 
             Log.i(TAG,"Comment Count::"+commentDataList.size());
-            mTVCommentCount.setText(commentDataList.size() + " COMMENT");
+            mTVCommentCount.setText(String.valueOf(commentDataList.size()));
+            mCommentText.setVisibility(View.VISIBLE);
             mCommentsRecyclerViewAdapter = new CommentsListAdapter(HomeActivity.this);
             mCommentsRecyclerViewAdapter.setData(commentDataList);
             mCommentsRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
@@ -400,6 +416,7 @@ public class HomeActivity extends AppCompatActivity implements
         }else{
             Log.i(TAG,"No Comment Yet for this story");
             mTVCommentCount.setText(" NO COMMENT YET ");
+            mCommentText.setVisibility(View.GONE);
         }
 
         mTVLoading.setVisibility(View.GONE);
@@ -420,6 +437,8 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void success(AddCommentResponse addCommentResponse, Response response) {
                 Log.i(TAG,"Add Comment Request Success");
+                if(mCommentsRecyclerViewAdapter!=null)
+                    mCommentsRecyclerViewAdapter.notifyDataSetChanged();
 
             }
 

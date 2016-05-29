@@ -50,29 +50,10 @@ public class MainFragment extends Fragment{
 
     private static final String Vid_Tap_Like = "Vid_Tap_Like";
     private static final String Vid_Tap_Unlike = "Vid_Tap_Unlike";
-    private static final String Vid_Tap_Share = "Vid_Tap_Share";
-    private static final String Vid_Tap_SeekClick = "Vid_Tap_SeekClick";
-    private static final String Vid_Tap_Play = "Vid_Tap_Play";
-    private static final String Vid_Tap_Pause = "Vid_Tap_Pause";
     private static final String Vid_Reco_Tap = "Vid_Reco_Tap";
-    private static final String Vid_Complete_Q1 = "Vid_Complete_Q1";
-    private static final String Vid_Complete_Q2 = "Vid_Complete_Q2";
-    private static final String Vid_Complete_Q3 = "Vid_Complete_Q3";
-    private static final String Vid_Complete_Q4 = "Vid_Complete_Q4";
-    private static final String PDP_ProdCard_Close = "PDP_ProdCard_Close";
-    private static final String MF_Video_Play = "MF_Video_Play";
-    private static final String Video_Play_Time = "Video_Play_Time";
-    private static final String Video_Buffering_Unit = "Video_Buffering_Unit";
-    private static final String Video_Buffering_Complete = "Video_Buffering_Complete";
+
 
     public static final String Vid_Reco_VideoExpand = "Vid_Reco_VideoExpand";
-    private static final String PDP_Card_Bkmrk = "PDP_Card_Bkmrk";
-    private static final String PDP_Card_UnBkmrk = "PDP_Card_UnBkmrk";
-    private static final String PLAY_POSITION = "PLAY_POSITION";
-    private static final String BUFFER_LENGTH = "BUFFER_LENGTH";
-    private boolean isFirstQuartileEventSent = false;
-    private boolean isSecondQuartileEventSent = false;
-    private boolean isThirdQuartileEventSent = false;
 
 
     /**********************************************
@@ -97,14 +78,16 @@ public class MainFragment extends Fragment{
     @Bind(R.id.text_place)
     TextView mTextPlace = null;
 
-    @Bind(R.id.text_expert)
-    TextView mTextExpert = null;
-
     @Bind(R.id.image_like)
     ImageView mImageLike = null;
 
     @Bind(R.id.slant_view)
     SlantView mSlantView = null;
+
+    @Bind(R.id.like_count)
+    TextView mLikeCountTV = null;
+
+    ScrollView mStoryContentScrollView = null;
 
     private int mSoftBarHeight = 0;
 
@@ -192,16 +175,18 @@ public class MainFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+
         Log.d("TAG", "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
         applyFonts();
+
         return mRootView;
     }
 
     private void applyFonts() {
-        Dekar.applyFont(this.getActivity(), mTextPlace);
-        Dekar.applyFont(this.getActivity(), mTextTitle);
-        Dekar.applyFont(this.getActivity(), mTextExpert);
+        Dekar.applyFont(this.getActivity(), mTextPlace , "fonts/Roboto-Regular.ttf");
+        Dekar.applyFont(this.getActivity(), mTextTitle , "fonts/Roboto-Regular.ttf");
+        Dekar.applyFont(this.getActivity(), mLikeCountTV,"fonts/Roboto-Regular.ttf");
     }
 
     private void bindData() {
@@ -212,11 +197,13 @@ public class MainFragment extends Fragment{
         Picasso.with(this.getContext()).load(mContentData.pictureUrl).fit().into(mImageMain);
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
-        mTextExpert.setText("By " + cd.personDetails.name);
+
         if (mContentData.likedByUser == true)
             mImageLike.setImageResource(R.drawable.liked);
         else
             mImageLike.setImageResource(R.drawable.like);
+
+        mLikeCountTV.setText(String.valueOf(cd.likeCount));
     }
 
     @Override
