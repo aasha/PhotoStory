@@ -5,4 +5,5 @@ package com.pixtory.app.retrofit;
  */
 public class GetPersonDetailsRequest {
     public int userId;
+    public int personId;
 }

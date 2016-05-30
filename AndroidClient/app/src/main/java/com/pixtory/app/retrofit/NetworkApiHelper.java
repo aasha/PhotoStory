@@ -201,9 +201,10 @@ public class NetworkApiHelper {
     /**
      * ============================================================================================================================================================================================
      */
-    public void getPersonDetails(int userId, final NetworkApiCallback cb) {
+    public void getPersonDetails(int userId, int personId,final NetworkApiCallback cb) {
         GetPersonDetailsRequest req = new GetPersonDetailsRequest();
         req.userId = userId;
+        req.personId = personId;
 
 
         sAPI.getPersonDetails(req, new Callback<GetPersonDetailsResponse>() {

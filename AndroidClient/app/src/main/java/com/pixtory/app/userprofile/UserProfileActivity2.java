@@ -155,7 +155,7 @@ public class UserProfileActivity2 extends Activity{
             super.onPostExecute(bitmap);
             ImageView blurrimage = (ImageView)findViewById(R.id.blur_person_image);
             bitmap = BlurBuilder.blur(UserProfileActivity2.this, bitmap);
-            blurrimage.setScaleType(ImageView.ScaleType.FIT_XY);
+            blurrimage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             blurrimage.setImageBitmap(bitmap);
         }
     }
@@ -228,7 +228,7 @@ public class UserProfileActivity2 extends Activity{
                     if(personInfo.imageUrl!=null)
                         new GetBitmapFromUrl(personInfo.imageUrl).execute();
                     else
-                        new GetBitmapFromUrl("http://pixtory.in/assets/img/story-5-image.png").execute();
+                        new GetBitmapFromUrl("http://pixtory.in/assets/img/story-2-image.png").execute();
 
 
                     if(personInfo.imageUrl!=null)

@@ -2,6 +2,7 @@ package com.pixtory.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.*;
 
@@ -520,6 +521,39 @@ public class HomeActivity extends AppCompatActivity implements
     /**
      *
      */
+
+    private void feedBackActivity(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.setContentView(R.layout.feedback_dialog);
+        final EditText feedbackText = (EditText)findViewById(R.id.feedback_text);
+        Button feedbackCancel = (Button) findViewById(R.id.feedback_cancel);
+        Button feedbackSend =(Button)findViewById(R.id.feedback_send);
+
+        dialog.show();
+
+      /*  feedbackCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        feedbackSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+                _Intent.setType("text/email");
+                _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+                _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+                _Intent.putExtra(android.content.Intent.EXTRA_TEXT, feedbackText.getText());
+                startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+                dialog.dismiss();
+            }
+        });*/
+
+
+    }
+
     private void sendFeedback() {
         final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
         _Intent.setType("text/email");
@@ -564,6 +598,7 @@ public class HomeActivity extends AppCompatActivity implements
                         break;
                     case 1: Toast.makeText(HomeActivity.this,"Feedback screen to be shown",Toast.LENGTH_SHORT).show();
                             sendFeedback();
+                            //feedBackActivity();
                             break;
                         //TO DO : Add code to send feedback
 
