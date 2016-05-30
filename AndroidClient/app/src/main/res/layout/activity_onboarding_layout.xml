@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/onboarding_bg">
+
+    <ImageView
+        android:layout_width="300dp"
+        android:id="@+id/pixtory_img"
+        android:layout_height="100dp"
+        android:layout_marginTop="200dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/pixtory_1"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textAllCaps="true"
+
+        android:textColor="#B900efff"
+        android:layout_below="@+id/pixtory_img"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:textSize="20sp"
+        android:text="Every Picture has a story"
+        android:id="@+id/pixtory_txt"
+        android:layout_centerInParent="true"/>
+
+    <LinearLayout
+    android:layout_width="300dp"
+    android:layout_centerInParent="true"
+    android:id="@+id/fb_sign_btn"
+    android:layout_height="60dp"
+        android:layout_below="@+id/pixtory_txt"
+    android:background="@drawable/fb_btn_bg">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_gravity="center"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:src="@drawable/fb_icon"/>
+        <View
+            android:layout_width="1px"
+            android:background="@drawable/sap"
+            android:layout_height="match_parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textAllCaps="false"
+
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_in_fb"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:paddingLeft="20dp"
+
+
+        />
+</LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fb_sign_btn"
+        android:textColor="@color/app_blue_light"
+        android:textAllCaps="true"
+        android:id="@+id/skipLogin"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        android:padding="20dp"
+        android:layout_centerInParent="true"
+        android:text="@string/skip_login"/>
+
+    
+</RelativeLayout>

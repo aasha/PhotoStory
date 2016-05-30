@@ -25,6 +25,7 @@ public class CommentsDialogFragment extends DialogFragment{
     private EditText mCommentText;
     private Button mPostCommentBtn;
     private ImageView mCloseBtn;
+    private OnAddCommentButtonClickListener mAddCommentListener;
 
     /**
      * Empty Constructor
@@ -48,10 +49,13 @@ public class CommentsDialogFragment extends DialogFragment{
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NO_FRAME, R.style.CustomDialog);
 
+
         if(!(getActivity() instanceof OnAddCommentButtonClickListener)){
             throw new ClassCastException(getActivity().toString()
                     + " must implement OnAddCommentButtonClickListener");
         }
+
+        mAddCommentListener = (OnAddCommentButtonClickListener)getActivity();
     }
 
     @Override
@@ -92,7 +96,7 @@ public class CommentsDialogFragment extends DialogFragment{
         mPostCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((OnAddCommentButtonClickListener)getActivity()).onAddCommentButtonClicked(mCommentText.getText().toString());
+                mAddCommentListener.onAddCommentButtonClicked(mCommentText.getText().toString());
                 dismiss();
             }
         });

@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.ContentData;
@@ -55,14 +57,14 @@ public class Utils {
         return mWifi.isConnected();
     }
 
-    public static boolean nextVideosReceived() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        if (hours > 19)
-            return true;
-        return false;
-    }
+//    public static boolean nextVideosReceived() {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(new Date());
+//        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+//        if (hours > 19)
+//            return true;
+//        return false;
+//    }
 
     public static void deleteOldVideos(List<ContentData> newVideoList) {
         List<String> paths = new ArrayList<String>();
@@ -128,26 +130,26 @@ public class Utils {
     }
     private static void updateShreadPrefs(Context context, String key, String val) {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
-                AppConstants.APP_PREFS, 0);
+                AppConstants.APP_PREFS, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
         editor.putString(key, val);
         editor.commit(); // commit changes
     }
 
-    public static boolean isNDAAccepted(Context context) {
-        SharedPreferences mSharedPrefs = context.getSharedPreferences(
-                AppConstants.APP_PREFS, 0);
-        SharedPreferences.Editor editor = mSharedPrefs.edit();
-        return mSharedPrefs.getBoolean(AppConstants.IS_NDA_ACCEPTED, false);
-    }
-
-    public static void setNDAAccepted(Context context) {
-        SharedPreferences mSharedPrefs = context.getSharedPreferences(
-                AppConstants.APP_PREFS, 0);
-        SharedPreferences.Editor editor = mSharedPrefs.edit();
-        editor.putBoolean(AppConstants.IS_NDA_ACCEPTED, true);
-                editor.apply(); // commit changes
-    }
+//    public static boolean isNDAAccepted(Context context) {
+//        SharedPreferences mSharedPrefs = context.getSharedPreferences(
+//                AppConstants.APP_PREFS, 0);
+//        SharedPreferences.Editor editor = mSharedPrefs.edit();
+//        return mSharedPrefs.getBoolean(AppConstants.IS_NDA_ACCEPTED, false);
+//    }
+//
+//    public static void setNDAAccepted(Context context) {
+//        SharedPreferences mSharedPrefs = context.getSharedPreferences(
+//                AppConstants.APP_PREFS, 0);
+//        SharedPreferences.Editor editor = mSharedPrefs.edit();
+//        editor.putBoolean(AppConstants.IS_NDA_ACCEPTED, true);
+//                editor.apply(); // commit changes
+//    }
 
     public static void putFbId(Context context, String val) {
         updateShreadPrefs(context, "FB_ID", val);
@@ -166,10 +168,12 @@ public class Utils {
 
     public static String getUserId(Context context) {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
-                AppConstants.APP_PREFS, 0);
-        //TODO AASHA remove
-        return mSharedPrefs.getString(
-                "UID", "1494617261");
+                AppConstants.APP_PREFS, Context.MODE_PRIVATE);
+
+//        if(mSharedPrefs.getString("UID","") != null || m)
+//        return mSharedPrefs.getString("UID", "1494617261");
+        Log.i("Utils class->UserId::",mSharedPrefs.getString("UID", ""));
+        return mSharedPrefs.getString("UID", "");
     }
 
     public static void putUserName(Context context, String fname) {
@@ -178,7 +182,7 @@ public class Utils {
 
     public static String getUserName(Context context) {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
-                AppConstants.APP_PREFS, 0);
+                AppConstants.APP_PREFS, Context.MODE_PRIVATE);
         return mSharedPrefs.getString(
                 "USERNAME", "");
     }
@@ -227,5 +231,12 @@ public class Utils {
 
         return format;
 
+    }
+
+    public static boolean isEmpty(String str){
+        if(str == null || str.equals(""))
+            return false;
+
+        return true;
     }
 }

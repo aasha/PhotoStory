@@ -3,6 +3,7 @@ package com.pixtory.app.fragments;
 import android.animation.*;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import butterknife.*;
+
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
@@ -54,6 +57,8 @@ public class MainFragment extends Fragment{
 
 
     public static final String Vid_Reco_VideoExpand = "Vid_Reco_VideoExpand";
+
+    private Context mContext;
 
 
     /**********************************************
@@ -147,6 +152,7 @@ public class MainFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getActivity();
         if (getArguments() != null) {
             try {
                 mContentIndex = getArguments().getInt(ARG_PARAM1);
@@ -194,7 +200,7 @@ public class MainFragment extends Fragment{
             return;
         }
         final ContentData cd = mContentData;
-        Picasso.with(this.getContext()).load(mContentData.pictureUrl).fit().into(mImageMain);
+        Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain);
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
 
@@ -595,70 +601,76 @@ public class MainFragment extends Fragment{
 
     @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {
-        if (mContentData.likedByUser == false) {
-            ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(getContext(), R.animator.flip_in);
-            anim.setTarget(mImageLike);
-            anim.setDuration(200);
-            anim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
+        if(Utils.isEmpty(Utils.getUserId(mContext))) {
+            if (mContentData.likedByUser == false) {
+                ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_in);
+                anim.setTarget(mImageLike);
+                anim.setDuration(200);
+                anim.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
 
-                }
+                    }
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mImageLike.setImageResource(R.drawable.liked);
-                }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mImageLike.setImageResource(R.drawable.liked);
+                    }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
 
-                }
+                    }
 
-                @Override
-                public void onAnimationRepeat(Animator animation) {
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
 
-                }
-            });
-            mContentData.likedByUser = true;
-            anim.start();
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Like)
-                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                    .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                    .build());
-        } else {
-            ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(getContext(), R.animator.flip_out);
-            anim.setTarget(mImageLike);
-            anim.setDuration(200);
-            anim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
+                    }
+                });
+                mContentData.likedByUser = true;
+                anim.start();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Like)
+                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
+                        .build());
+            } else {
+                ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_out);
+                anim.setTarget(mImageLike);
+                anim.setDuration(200);
+                anim.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
 
-                }
+                    }
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mImageLike.setImageResource(R.drawable.like);
-                }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mImageLike.setImageResource(R.drawable.like);
+                    }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
 
-                }
+                    }
 
-                @Override
-                public void onAnimationRepeat(Animator animation) {
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
 
-                }
-            });
-            anim.start();
-            mContentData.likedByUser = false;
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Unlike)
-                    .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                    .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                    .build());
+                    }
+                });
+                anim.start();
+                mContentData.likedByUser = false;
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Unlike)
+                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
+                        .build());
+            }
+            sendLikeToBackend(mContentData.id, mContentData.likedByUser);
         }
-        sendLikeToBackend(mContentData.id, mContentData.likedByUser);
+        else {
+            //TODO: Redirect user to login
+            Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT);
+        }
     }
 
     private void sendLikeToBackend(int contentId, boolean isLiked) {

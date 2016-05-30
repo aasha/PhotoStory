@@ -47,4 +47,6 @@
     <string name="comment_textbox_hint">What do you have to say about this pixstory</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
+    <string name="skip_login">skip login</string>
+    <string name="sign_in_fb">Sign in with Facebook</string>
 </resources>

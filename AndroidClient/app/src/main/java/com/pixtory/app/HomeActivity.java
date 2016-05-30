@@ -25,6 +25,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.network.connectionclass.*;
+import com.google.android.exoplayer.util.Util;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
@@ -432,27 +433,33 @@ public class HomeActivity extends AppCompatActivity implements
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
-        NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
 
-            @Override
-            public void success(AddCommentResponse addCommentResponse, Response response) {
-                Log.i(TAG,"Add Comment Request Success");
-                if(mCommentsRecyclerViewAdapter!=null)
-                    mCommentsRecyclerViewAdapter.notifyDataSetChanged();
+        if(!(Utils.getUserId(HomeActivity.this)).equals("")) {
+            //User is allowed to comment only if loggedIn
+            NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
 
-            }
+                @Override
+                public void success(AddCommentResponse addCommentResponse, Response response) {
+                    Log.i(TAG, "Add Comment Request Success");
+                    if (mCommentsRecyclerViewAdapter != null)
+                        mCommentsRecyclerViewAdapter.notifyDataSetChanged();
+                }
 
-            @Override
-            public void failure(AddCommentResponse addCommentResponse) {
-                Log.i(TAG,"Add Comment Request Failure");
-            }
+                @Override
+                public void failure(AddCommentResponse addCommentResponse) {
+                    Log.i(TAG, "Add Comment Request Failure");
+                }
 
-            @Override
-            public void networkFailure(RetrofitError error) {
-                Log.i(TAG,"Add Comment Request Network Failure, Error Type::"+error.getMessage());
+                @Override
+                public void networkFailure(RetrofitError error) {
+                    Log.i(TAG, "Add Comment Request Network Failure, Error Type::" + error.getMessage());
 
-            }
-        });
+                }
+            });
+        }else{
+            //TODO: Redirect user to facebook login page
+            Toast.makeText(this,"Please login",Toast.LENGTH_SHORT);
+        }
     }
 
     private boolean checkPlayServices() {
