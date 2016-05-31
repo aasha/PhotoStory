@@ -16,6 +16,7 @@ import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.views.CircularImageView;
+import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class UserProfileActivity extends Activity{
 
         dummyFillData();
 
+        SlantView slantView = (SlantView)findViewById(R.id.slant_view);
         CircularImageView profileImage = (CircularImageView)findViewById(R.id.person_image);
         CircularImageView profileImageBorder = (CircularImageView)findViewById(R.id.person_image_boarder);
         TextView personName = (TextView)findViewById(R.id.person_name);

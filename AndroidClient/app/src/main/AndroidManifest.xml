@@ -43,21 +43,42 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+
             android:name=".onboarding.OnBoardingActivity"
             android:icon="@drawable/pixtory"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter></activity>
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+
+
         <activity
-            android:name=".HomeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+            android:name=".userprofile.UserProfileActivity"
+            android:icon="@drawable/pixtory"
+            android:label="UserProfileActivity"
+            android:screenOrientation="portrait">
 
         </activity>
+
+        <activity
+            android:name=".userprofile.UserProfileActivity2"
+            android:icon="@drawable/pixtory"
+            android:label="UserProfileActivity"
+            android:screenOrientation="portrait">
+
+
+        </activity>
+        <activity
+                android:name=".HomeActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+        </activity>
+
         <activity
             android:name=".WebviewActivity"
             android:label="@string/title_activity_webview"

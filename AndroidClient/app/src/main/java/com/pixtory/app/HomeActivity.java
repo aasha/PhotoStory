@@ -2,6 +2,7 @@ package com.pixtory.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.*;
 
@@ -47,6 +48,9 @@ import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 
+import com.pixtory.app.typeface.Intro;
+import com.pixtory.app.userprofile.UserProfileActivity;
+import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -574,6 +578,48 @@ public class HomeActivity extends AppCompatActivity implements
     /**
      *
      */
+
+//    private void feedBackActivity(){
+//        final Dialog dialog = new Dialog(HomeActivity.this);
+//        dialog.setContentView(R.layout.feedback_dialog);
+//        final EditText feedbackText = (EditText)findViewById(R.id.feedback_text);
+//        Button feedbackCancel = (Button) findViewById(R.id.feedback_cancel);
+//        Button feedbackSend =(Button)findViewById(R.id.feedback_send);
+//
+//        dialog.show();
+//
+//      /*  feedbackCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        feedbackSend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+//                _Intent.setType("text/email");
+//                _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+//                _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+//                _Intent.putExtra(android.content.Intent.EXTRA_TEXT, feedbackText.getText());
+//                startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+//                dialog.dismiss();
+//            }
+//        });*/
+//
+//
+//    }
+
+    private void sendFeedback() {
+        final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+        _Intent.setType("text/email");
+        _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+        _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+        _Intent.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.mail_feedback_message));
+        startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+    }
+
     private void setUpNavigationDrawer() {
 
         mProfileIcon = (ImageView) findViewById(R.id.profileIcon);
@@ -598,10 +644,29 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                switch (i) {
-                    case 0:
-                        Toast.makeText(HomeActivity.this, "My Profile is to be shown", Toast.LENGTH_SHORT).show();
-                        /**TODO: Add code to show My Profile Page**/
+                switch (i){
+                    case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                        startActivity(intent);
+                        finish();
+                        break;
+                    case 1: Toast.makeText(HomeActivity.this,"Feedback screen to be shown",Toast.LENGTH_SHORT).show();
+                            sendFeedback();
+                            //feedBackActivity();
+                            break;
+                        //TO DO : Add code to send feedback
+
+                    case 2: Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY");
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, "Send Invite"));
+                        break;
+
                 }
             }
         });

@@ -59,16 +59,16 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
     }
 
     public void onBindViewHolder(ViewHolder holder, int position){
-
-        //Picasso.with(context).load(cDlist.get(position).pictureUrl).fit().into(holder.cardImage);
-        //holder.cardTitle.setText(cDlist.get(position).name);
-
-        holder.cardTitle.setText("Pixtory, every picture has a story to tell");
-        //holder.cardPlace.setText(cDlist.get(position).place);
-        holder.cardPlace.setText("Bengaluru, India");
-        //holder.cardImage.setImageResource(R.drawable.cardimg);
         holder.cardImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        Picasso.with(context).load(R.drawable.cardimg).fit().into(holder.cardImage);
+        Picasso.with(context).load(cDlist.get(position).pictureUrl).fit().into(holder.cardImage);
+        holder.cardTitle.setText(cDlist.get(position).name);
+
+       // holder.cardTitle.setText("Pixtory, every picture has a story to tell");
+        holder.cardPlace.setText(cDlist.get(position).place);
+        //holder.cardPlace.setText("Bengaluru, India");
+        //holder.cardImage.setImageResource(R.drawable.cardimg);
+
+        //Picasso.with(context).load(R.drawable.cardimg).fit().into(holder.cardImage);
 
         //holder.cardFrame.setOnClickListener();
     }

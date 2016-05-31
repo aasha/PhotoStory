@@ -148,7 +148,7 @@ public class UserProfileFragment extends Fragment {
     }
 
     private void setPersonDetails(){
-        NetworkApiHelper.getInstance().getPersonDetails(mUserId, new NetworkApiCallback<GetPersonDetailsResponse>() {
+        NetworkApiHelper.getInstance().getPersonDetails(mUserId, 123 ,new NetworkApiCallback<GetPersonDetailsResponse>() {
             @Override
             public void success(GetPersonDetailsResponse o, Response response) {
                 //mProgress.dismiss();

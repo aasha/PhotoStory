@@ -47,6 +47,16 @@
     <string name="comment_textbox_hint">What do you have to say about this pixstory</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
+
     <string name="skip_login">skip login</string>
     <string name="sign_in_fb">Sign in with Facebook</string>
+
+
+
+    <string name="send_feedback">Send feedback</string>
+    <string name="title_send_feedback">Send feedback</string>
+    <string name="mail_feedback_email">shreeram.guduri@gmail.com</string>
+    <string name="mail_feedback_subject">Feedback on your app, Pixtory</string>
+    <string name="mail_feedback_message">Hi,Your Pixtory app is awesome! I would like to give you some feedback:</string>
+
 </resources>
