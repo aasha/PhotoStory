@@ -17,6 +17,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -45,8 +46,7 @@ import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
-import com.pixtory.app.typeface.Dekar;
-import com.pixtory.app.typeface.Intro;
+
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -109,6 +109,8 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        //To be removed later
+        checkForDeviceDensity();
         ButterKnife.bind(this);
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
@@ -282,15 +284,9 @@ public class HomeActivity extends AppCompatActivity implements
             TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
             TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
             TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
-            TextView mTextStoryMainPara = (TextView) mStoryLayout.findViewById(R.id.txtMainPara);
             TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
             LinearLayout mBtnShare = (LinearLayout) mStoryLayout.findViewById(R.id.btnShare);
             LinearLayout mBtnComment = (LinearLayout) mStoryLayout.findViewById(R.id.btnComment);
-
-            Dekar.applyFont(HomeActivity.this,mTextName,"fonts/Roboto-Regular.ttf");
-            Dekar.applyFont(HomeActivity.this,mTextDesc,"fonts/Roboto-Regular.ttf");
-            Dekar.applyFont(HomeActivity.this,mTextDate,"fonts/Roboto-Regular.ttf");
-            Dekar.applyFont(HomeActivity.this,mTextStoryDetails,"fonts/Roboto-Regular.ttf");
 
             final int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
@@ -303,8 +299,8 @@ public class HomeActivity extends AppCompatActivity implements
                     mTextName.setText(data.personDetails.name);
                     mTextDesc.setText(data.personDetails.desc);
                 }
+                Log.i(TAG,"bindStoryData->date::"+data.date);
                 mTextDate.setText(data.date);
-                mTextStoryMainPara.setText(data.pictureFirstPara);
                 mTextStoryDetails.setText(data.pictureDescription);
             }
 
@@ -344,13 +340,12 @@ public class HomeActivity extends AppCompatActivity implements
     private void buildCommentsLayout(int content_id ,ContentData data){
 
         Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
-        ImageView mAvatarImgView = (ImageView)mCommentsLayout.findViewById(R.id.imgProfile);
-        TextView mName = (TextView)mCommentsLayout.findViewById(R.id.txtName);
+
+        TextView mPlace = (TextView)mCommentsLayout.findViewById(R.id.txtPlace);
         TextView mDesc = (TextView)mCommentsLayout.findViewById(R.id.txtDesc);
 
-        Picasso.with(this).load(data.personDetails.imageUrl).fit().into(mAvatarImgView);
-        mName.setText(data.personDetails.name);
-        mDesc.setText(data.personDetails.desc);
+        mPlace.setText(data.place);
+        mDesc.setText(data.pictureDescription);
 
         mRLCommentList = (RelativeLayout)mCommentsLayout.findViewById(R.id.comments_layout);
         mTVLoading = (TextView)mCommentsLayout.findViewById(R.id.loading_comments);
@@ -434,7 +429,7 @@ public class HomeActivity extends AppCompatActivity implements
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
-        if(!(Utils.getUserId(HomeActivity.this)).equals("")) {
+        if(!(Utils.getFbID(HomeActivity.this)).equals("")) {
             //User is allowed to comment only if loggedIn
             NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
 
@@ -458,7 +453,7 @@ public class HomeActivity extends AppCompatActivity implements
             });
         }else{
             //TODO: Redirect user to facebook login page
-            Toast.makeText(this,"Please login",Toast.LENGTH_SHORT);
+            Toast.makeText(this,"Please login",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -581,7 +576,7 @@ public class HomeActivity extends AppCompatActivity implements
      */
     private void setUpNavigationDrawer() {
 
-        mProfileIcon = (ImageView)findViewById(R.id.profileIcon);
+        mProfileIcon = (ImageView) findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
 
@@ -592,7 +587,7 @@ public class HomeActivity extends AppCompatActivity implements
         mProfileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mDrawerLayout.isDrawerOpen(mDrawerList))
+                if (mDrawerLayout.isDrawerOpen(mDrawerList))
                     mDrawerLayout.closeDrawer(mDrawerList);
                 else
                     mDrawerLayout.openDrawer(mDrawerList);
@@ -603,13 +598,62 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                switch (i){
-                    case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
-                            /**TODO: Add code to show My Profile Page**/
+                switch (i) {
+                    case 0:
+                        Toast.makeText(HomeActivity.this, "My Profile is to be shown", Toast.LENGTH_SHORT).show();
+                        /**TODO: Add code to show My Profile Page**/
                 }
             }
         });
     }
+        //TODO: to be removed later
+
+    private void checkForDeviceDensity(){
+
+        StringBuilder density = new StringBuilder("");
+        float dpi = getResources().getDisplayMetrics().densityDpi;
+
+        switch ((int)dpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                density.append( "Low Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                density.append( "Medium Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                density.append( "High Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                density.append( "X-high Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                density.append( "XX-high Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                density.append( "XXX-high Density Display");
+                Log.i(TAG, density.toString());
+                break;
+
+        }
+
+        if(density.toString().equals("")) {
+            Log.i(TAG, "Screen density::"+dpi);
+            Toast.makeText(HomeActivity.this,"Screen density::"+dpi,Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Log.i(TAG, "Screen density::" + density);
+            Toast.makeText(HomeActivity.this,"Screen density::" + density,Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+
 
 }
 

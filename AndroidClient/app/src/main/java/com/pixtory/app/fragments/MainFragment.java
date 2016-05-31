@@ -92,6 +92,9 @@ public class MainFragment extends Fragment{
     @Bind(R.id.like_count)
     TextView mLikeCountTV = null;
 
+    @Bind(R.id.text_expert)
+    TextView mTextExpert = null;
+
     ScrollView mStoryContentScrollView = null;
 
     private int mSoftBarHeight = 0;
@@ -203,6 +206,8 @@ public class MainFragment extends Fragment{
         Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain);
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
+        String name = (!(cd.personDetails.name.equals("")))? "By "+cd.personDetails.name : "";
+        mTextExpert.setText(name);
 
         if (mContentData.likedByUser == true)
             mImageLike.setImageResource(R.drawable.liked);
@@ -278,6 +283,7 @@ public class MainFragment extends Fragment{
         mListener.onDetachStoryView(this, mContentIndex);
         mSlantView.setVisibility(View.GONE);
         mStoryLayout.setVisibility(View.GONE);
+        mTextExpert.setVisibility(View.VISIBLE);
         showFullScreen();
     }
 
@@ -388,6 +394,7 @@ public class MainFragment extends Fragment{
         mListener.onDetachStoryView(this, mContentIndex);
         mSlantView.setVisibility(View.GONE);
         mStoryLayout.setVisibility(View.GONE);
+        mTextExpert.setVisibility(View.VISIBLE);
     }
 
     private void setUpHalfScreenUI() {
@@ -398,6 +405,7 @@ public class MainFragment extends Fragment{
         //mYTPreview.setAlpha(1.0f);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         mMainLayout.setLayoutParams(params);
+
         ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mStoryLayout.getLayoutParams();
         recoScreenParams.height = 0;
         mStoryLayout.setLayoutParams(recoScreenParams);
@@ -437,6 +445,7 @@ public class MainFragment extends Fragment{
         if (isRecoViewAdded == false) {
             mListener.onAttachStoryView(this, mContentIndex);
             mSlantView.setVisibility(View.VISIBLE);
+            mTextExpert.setVisibility(View.GONE);
             isRecoViewAdded = true;
         }
         return true;
@@ -448,6 +457,7 @@ public class MainFragment extends Fragment{
         if (isRecoViewAdded == false) {
             mListener.onAttachStoryView(this, mContentIndex);
             mSlantView.setVisibility(View.VISIBLE);
+            mTextExpert.setVisibility(View.GONE);
             isRecoViewAdded = true;
         }
         mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -601,7 +611,7 @@ public class MainFragment extends Fragment{
 
     @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {
-        if(Utils.isEmpty(Utils.getUserId(mContext))) {
+        if(Utils.isEmpty(Utils.getFbID(mContext))) {
             if (mContentData.likedByUser == false) {
                 ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_in);
                 anim.setTarget(mImageLike);
@@ -669,7 +679,7 @@ public class MainFragment extends Fragment{
         }
         else {
             //TODO: Redirect user to login
-            Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT);
+            Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT).show();
         }
     }
 

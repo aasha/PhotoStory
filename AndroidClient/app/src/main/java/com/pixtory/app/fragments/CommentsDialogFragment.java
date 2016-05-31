@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.pixtory.app.R;
 
@@ -96,8 +97,14 @@ public class CommentsDialogFragment extends DialogFragment{
         mPostCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAddCommentListener.onAddCommentButtonClicked(mCommentText.getText().toString());
-                dismiss();
+                if((mCommentText.getText().toString()).equals("")){
+                    Toast.makeText(getActivity(),"You have not entered any comment!!",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    mAddCommentListener.onAddCommentButtonClicked(mCommentText.getText().toString());
+                    dismiss();
+                }
+
             }
         });
     }

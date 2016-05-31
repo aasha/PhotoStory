@@ -49,17 +49,13 @@
     <TextView
         android:layout_width="wrap_content"
         android:textAllCaps="false"
-
         android:layout_gravity="center"
         android:layout_height="wrap_content"
         android:text="@string/sign_in_fb"
         android:textStyle="bold"
         android:textSize="18sp"
         android:textColor="@color/white"
-        android:paddingLeft="20dp"
-
-
-        />
+        android:paddingLeft="20dp" />
 </LinearLayout>
 
 
@@ -71,10 +67,9 @@
         android:textAllCaps="true"
         android:id="@+id/skipLogin"
         android:textSize="18sp"
-        android:layout_marginTop="20dp"
         android:padding="20dp"
         android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
         android:text="@string/skip_login"/>
 
-    
 </RelativeLayout>
