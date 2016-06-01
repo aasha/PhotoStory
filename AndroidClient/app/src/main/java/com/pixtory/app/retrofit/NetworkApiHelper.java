@@ -36,11 +36,12 @@ public class NetworkApiHelper {
      * ============================================================================================================================================================================================
      */
 
-    public void registerUser(final String userName, final String userEmail, final String userImageUrl, final NetworkApiCallback cb) {
+    public void registerUser(final String userName, final String userEmail, final String userImageUrl,final String fbId ,final NetworkApiCallback cb) {
         RegisterRequest req = new RegisterRequest();
         req.userName = userName;
         req.userEmail = userEmail;
         req.userImageUrl = userImageUrl;
+        req.fbId = fbId;
         sAPI.register(req, new Callback<RegisterResponse>() {
             @Override
             public void success(RegisterResponse registerResponse, Response response) {

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.*;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
@@ -94,6 +96,8 @@ public class MainFragment extends Fragment{
 
     @Bind(R.id.text_expert)
     TextView mTextExpert = null;
+
+    private Toolbar mToolBar;
 
     ScrollView mStoryContentScrollView = null;
 
@@ -281,7 +285,7 @@ public class MainFragment extends Fragment{
     public void resetFragmentState() {
         isRecoViewAdded = false;
         mListener.onDetachStoryView(this, mContentIndex);
-        mSlantView.setVisibility(View.GONE);
+        mSlantView.setVisibility(View.INVISIBLE);
         mStoryLayout.setVisibility(View.GONE);
         mTextExpert.setVisibility(View.VISIBLE);
         showFullScreen();
@@ -392,7 +396,8 @@ public class MainFragment extends Fragment{
     private void setUpFullScreenUI() {
         isRecoViewAdded = false;
         mListener.onDetachStoryView(this, mContentIndex);
-        mSlantView.setVisibility(View.GONE);
+
+        mSlantView.setVisibility(View.INVISIBLE);
         mStoryLayout.setVisibility(View.GONE);
         mTextExpert.setVisibility(View.VISIBLE);
     }
@@ -452,162 +457,163 @@ public class MainFragment extends Fragment{
 
     }
 
-    public void scaleUpProdRecoView() {
-        ValueAnimator mCon = ValueAnimator.ofInt(mDeviceHeightInPx, (int) (0.70 * mDeviceHeightInPx));
-        if (isRecoViewAdded == false) {
-            mListener.onAttachStoryView(this, mContentIndex);
-            mSlantView.setVisibility(View.VISIBLE);
-            mTextExpert.setVisibility(View.GONE);
-            isRecoViewAdded = true;
-        }
-        mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mMainLayout.getLayoutParams();
-                layoutParams.height = val;
-                mMainLayout.setLayoutParams(layoutParams);
-            }
-        });
-        final ValueAnimator mPad = ValueAnimator.ofInt(0, 30);
-        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-                mImageMain.setPadding(val, val, val, val);
-            }
-        });
-        mPad.start();
-        final ValueAnimator mRec = ValueAnimator.ofInt(0, (int) (0.30 * mDeviceHeightInPx));
-        mRec.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
-                layoutParams.height = val;
-                mStoryLayout.setLayoutParams(layoutParams);
-            }
-        });
-        ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
-        arrayListObjectAnimators.add(mCon);
-        ValueAnimator[] objectAnimators = arrayListObjectAnimators.toArray(new ValueAnimator[arrayListObjectAnimators.size()]);
-        AnimatorSet animSetXY = new AnimatorSet();
-        animSetXY.playTogether(objectAnimators);
-        animSetXY.setDuration(500);//1sec
-        animSetXY.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        animSetXY.start();
-        mRec.setDuration(500);
-        mRec.start();
-
-        mRec.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                setUpHalfScreenUI();
-
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-
-    }
-
-    public void scaleDownProductRecoView() {
-        ValueAnimator mCon = ValueAnimator.ofInt((int) (0.70 * mDeviceHeightInPx), mDeviceHeightInPx);
-        mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mMainLayout.getLayoutParams();
-                layoutParams.height = val;
-                mMainLayout.setLayoutParams(layoutParams);
-            }
-        });
-        final ValueAnimator mRec = ValueAnimator.ofInt((int) (0.30 * mDeviceHeightInPx), 0);
-        mRec.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
-                layoutParams.height = val;
-                mStoryLayout.setLayoutParams(layoutParams);
-            }
-        });
-        ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
-        arrayListObjectAnimators.add(mCon);
-        ValueAnimator[] objectAnimators = arrayListObjectAnimators.toArray(new ValueAnimator[arrayListObjectAnimators.size()]);
-        AnimatorSet animSetXY = new AnimatorSet();
-        animSetXY.playTogether(objectAnimators);
-        animSetXY.setDuration(500);//1sec
-        animSetXY.start();
-        final ValueAnimator mPad = ValueAnimator.ofInt(0, 0);
-        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-                mImageMain.setPadding(val, val, val, val);
-            }
-        });
-        mPad.start();
-        mRec.setDuration(500);
-        mRec.start();
-        mRec.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                //mYTPreview.setAlpha(1.0f);
-                setUpFullScreenUI();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-    }
+//    public void scaleUpProdRecoView() {
+//        ValueAnimator mCon = ValueAnimator.ofInt(mDeviceHeightInPx, (int) (0.70 * mDeviceHeightInPx));
+//        if (isRecoViewAdded == false) {
+//            mListener.onAttachStoryView(this, mContentIndex);
+//            mSlantView.setVisibility(View.VISIBLE);
+//
+//            mTextExpert.setVisibility(View.GONE);
+//            isRecoViewAdded = true;
+//        }
+//        mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mMainLayout.getLayoutParams();
+//                layoutParams.height = val;
+//                mMainLayout.setLayoutParams(layoutParams);
+//            }
+//        });
+//        final ValueAnimator mPad = ValueAnimator.ofInt(0, 30);
+//        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
+//                mImageMain.setPadding(val, val, val, val);
+//            }
+//        });
+//        mPad.start();
+//        final ValueAnimator mRec = ValueAnimator.ofInt(0, (int) (0.30 * mDeviceHeightInPx));
+//        mRec.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
+//                layoutParams.height = val;
+//                mStoryLayout.setLayoutParams(layoutParams);
+//            }
+//        });
+//        ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
+//        arrayListObjectAnimators.add(mCon);
+//        ValueAnimator[] objectAnimators = arrayListObjectAnimators.toArray(new ValueAnimator[arrayListObjectAnimators.size()]);
+//        AnimatorSet animSetXY = new AnimatorSet();
+//        animSetXY.playTogether(objectAnimators);
+//        animSetXY.setDuration(500);//1sec
+//        animSetXY.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        });
+//        animSetXY.start();
+//        mRec.setDuration(500);
+//        mRec.start();
+//
+//        mRec.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                setUpHalfScreenUI();
+//
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        });
+//
+//    }
+//
+//    public void scaleDownProductRecoView() {
+//        ValueAnimator mCon = ValueAnimator.ofInt((int) (0.70 * mDeviceHeightInPx), mDeviceHeightInPx);
+//        mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mMainLayout.getLayoutParams();
+//                layoutParams.height = val;
+//                mMainLayout.setLayoutParams(layoutParams);
+//            }
+//        });
+//        final ValueAnimator mRec = ValueAnimator.ofInt((int) (0.30 * mDeviceHeightInPx), 0);
+//        mRec.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
+//                layoutParams.height = val;
+//                mStoryLayout.setLayoutParams(layoutParams);
+//            }
+//        });
+//        ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
+//        arrayListObjectAnimators.add(mCon);
+//        ValueAnimator[] objectAnimators = arrayListObjectAnimators.toArray(new ValueAnimator[arrayListObjectAnimators.size()]);
+//        AnimatorSet animSetXY = new AnimatorSet();
+//        animSetXY.playTogether(objectAnimators);
+//        animSetXY.setDuration(500);//1sec
+//        animSetXY.start();
+//        final ValueAnimator mPad = ValueAnimator.ofInt(0, 0);
+//        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
+//                mImageMain.setPadding(val, val, val, val);
+//            }
+//        });
+//        mPad.start();
+//        mRec.setDuration(500);
+//        mRec.start();
+//        mRec.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                //mYTPreview.setAlpha(1.0f);
+//                setUpFullScreenUI();
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        });
+//    }
 
     @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {

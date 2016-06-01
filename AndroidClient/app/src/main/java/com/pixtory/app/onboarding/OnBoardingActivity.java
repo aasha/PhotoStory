@@ -4,8 +4,10 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -29,6 +31,8 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.RegisterResponse;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONObject;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -163,7 +167,7 @@ public class OnBoardingActivity  extends FragmentActivity {
             @Override
             public void onCompleted(JSONObject user, GraphResponse response) {
                 if (user != null) {
-                    final String fbId = user.optString("userId");
+                    final String fbId = user.optString("id");
                     final String name = user.optString("name");
                     final String email = user.optString("email");
                     String accessToken = AccessToken.getCurrentAccessToken().getToken();
@@ -176,7 +180,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             .put("NAME", name)
                             .put("FBID", fbId)
                             .build());
-                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl, new NetworkApiCallback<RegisterResponse>() {
+                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl,fbId,new NetworkApiCallback<RegisterResponse>() {
                         @Override
                         public void success(RegisterResponse regResp, Response response) {
                             Log.i(TAG, "Registering user to pixtory sucess");
@@ -245,11 +249,10 @@ public class OnBoardingActivity  extends FragmentActivity {
     }
 
     private void registerUserName(final String name) {
-        NetworkApiHelper.getInstance().registerUser(name, null, null, new NetworkApiCallback<RegisterResponse>() {
+        NetworkApiHelper.getInstance().registerUser(name, null, null,null,new NetworkApiCallback<RegisterResponse>() {
             @Override
             public void success(RegisterResponse regResp, Response response) {
-//                if(commentDialog.isShowing())
-//                    commentDialog.dismiss();
+
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
                 Utils.putUserId(OnBoardingActivity.this, regResp.userId);
@@ -266,8 +269,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
             @Override
             public void failure(RegisterResponse error) {
-//                if(commentDialog.isShowing())
-//                    commentDialog.dismiss();
+
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
@@ -280,8 +282,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
             @Override
             public void networkFailure(RetrofitError error) {
-//                if(commentDialog.isShowing())
-//                    commentDialog.dismiss();
+
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)

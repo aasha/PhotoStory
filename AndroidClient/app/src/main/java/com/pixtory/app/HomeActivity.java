@@ -16,8 +16,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.*;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
@@ -78,8 +78,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     private ViewPager mPager = null;
     private int mCurrentFragmentPosition = 0;
-    RelativeLayout mStoryLayout = null;
-    RelativeLayout mCommentsLayout = null;
+    private RelativeLayout mStoryLayout = null;
+    private RelativeLayout mCommentsLayout = null;
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
@@ -94,8 +94,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     LinearLayout mUserProfileFragmentLayout = null;
     int previousPage = 0;
-    @Bind(R.id.profileIcon)
-    ImageView mImgUserProfile;
+//    @Bind(R.id.profileIcon)
+//    ImageView mImgUserProfile;
 
     Tracker mTracker;
     private ConnectionQuality mConnectionClass = ConnectionQuality.UNKNOWN;
@@ -108,6 +108,11 @@ public class HomeActivity extends AppCompatActivity implements
     private ListView mDrawerList;
     private ArrayAdapter<String> mDrawerListAdapter;
     private ImageView mProfileIcon;
+    private boolean isCommentsLayoutVisible = false;
+
+    private android.support.v7.widget.Toolbar mToolBar;
+
+    MainFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +128,7 @@ public class HomeActivity extends AppCompatActivity implements
         }
         setUpNavigationDrawer();
         setUpRecomView();
+
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -152,7 +158,7 @@ public class HomeActivity extends AppCompatActivity implements
         mListener = new ConnectionChangedListener();
         prepareFeed();
 
-        showShowcaseView();
+//        showShowcaseView();
 
         //Register for push notifs
         registerForPushNotification();
@@ -163,9 +169,9 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
 
-    @OnClick(R.id.profileIcon)
-    public void onUserImageClick() {
-    }
+//    @OnClick(R.id.profileIcon)
+//    public void onUserImageClick() {
+//    }
 
     private void prepareFeed() {
         mProgress = new ProgressDialog(this);
@@ -262,6 +268,7 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public void onDetachStoryView(Fragment ff, int position) {
         final ViewGroup parent = (ViewGroup) mStoryLayout.getParent();
+        isCommentsLayoutVisible = false;
         if (parent != null) {
             parent.removeAllViews();
         }
@@ -318,12 +325,14 @@ public class HomeActivity extends AppCompatActivity implements
             mBtnComment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     final ViewGroup parent = (ViewGroup) mCommentsLayout.getParent();
                     if (parent != null) {
                         parent.removeAllViews();
                     }
                     buildCommentsLayout(content_id , data);
                     mainFragment.attachStoryView(mCommentsLayout);
+                    isCommentsLayoutVisible = true;
 
                 }
             });
@@ -349,7 +358,7 @@ public class HomeActivity extends AppCompatActivity implements
         TextView mDesc = (TextView)mCommentsLayout.findViewById(R.id.txtDesc);
 
         mPlace.setText(data.place);
-        mDesc.setText(data.pictureDescription);
+        mDesc.setText(data.name);
 
         mRLCommentList = (RelativeLayout)mCommentsLayout.findViewById(R.id.comments_layout);
         mTVLoading = (TextView)mCommentsLayout.findViewById(R.id.loading_comments);
@@ -433,7 +442,7 @@ public class HomeActivity extends AppCompatActivity implements
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
-        if(!(Utils.getFbID(HomeActivity.this)).equals("")) {
+        if(!((Utils.getFbID(HomeActivity.this)).equals(""))) {
             //User is allowed to comment only if loggedIn
             NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
 
@@ -494,24 +503,24 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
 
-    /*
-   COACH MARK
-    */
-    private void showShowcaseView() {
-        if (!Utils.hasCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN)) {
-            final SimpleDraweeView coachMark = (SimpleDraweeView) findViewById(R.id.coach_mark);
-            coachMark.setBackgroundResource(R.drawable.coachmarks);
-            coachMark.setVisibility(View.VISIBLE);
-            // coachMark.setAlpha(0.8f);
-            Utils.setCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN);
-            coachMark.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    coachMark.setVisibility(View.GONE);
-                }
-            });
-        }
-    }
+//    /*
+//   COACH MARK
+//    */
+//    private void showShowcaseView() {
+//        if (!Utils.hasCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN)) {
+//            final SimpleDraweeView coachMark = (SimpleDraweeView) findViewById(R.id.coach_mark);
+//            coachMark.setBackgroundResource(R.drawable.coachmarks);
+//            coachMark.setVisibility(View.VISIBLE);
+//            // coachMark.setAlpha(0.8f);
+//            Utils.setCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN);
+//            coachMark.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    coachMark.setVisibility(View.GONE);
+//                }
+//            });
+//        }
+//    }
 
     @Override
     protected void onPause() {
@@ -633,10 +642,14 @@ public class HomeActivity extends AppCompatActivity implements
         mProfileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mDrawerLayout.isDrawerOpen(mDrawerList))
-                    mDrawerLayout.closeDrawer(mDrawerList);
-                else
-                    mDrawerLayout.openDrawer(mDrawerList);
+                if(!isCommentsLayoutVisible) {
+                    if (mDrawerLayout.isDrawerOpen(mDrawerList))
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    else
+                        mDrawerLayout.openDrawer(mDrawerList);
+                }else{
+
+                }
             }
         });
 
@@ -671,7 +684,8 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
     }
-        //TODO: to be removed later
+
+//    TODO: test method to be removed later
 
     private void checkForDeviceDensity(){
 

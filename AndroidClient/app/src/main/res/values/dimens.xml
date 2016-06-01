@@ -10,6 +10,14 @@
     <dimen name="showcase_radius_outer">60dp</dimen>
     <dimen name="card_insets">8dp</dimen>
 
-    <dimen name="story_content">17sp</dimen>
+    <dimen name="fb_signin_btn_font">32sp</dimen>
+    <dimen name="fb_signin_btn_height">70dp</dimen>
+    <dimen name="fb_signin_btn_width">375dp</dimen>
+
+    <dimen name="fb_btn_icon_height">18dp</dimen>
+    <dimen name="fb_btn_icon_width">38.67dp</dimen>
+    <dimen name="pixtory_subheading_font">26sp</dimen>
+    <dimen name="skip_login_font">9sp</dimen>
+
 
 </resources>
