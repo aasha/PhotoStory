@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
@@ -24,6 +25,8 @@ import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.transformations.BlurTransformation;
+import com.pixtory.app.transformations.GrayscaleTransformation;
+import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.views.CircularImageView;
@@ -112,13 +115,15 @@ public class UserProfileActivity extends Activity{
         //personId = 463896090;
 
         final CircularImageView profileImage = (CircularImageView)findViewById(R.id.person_image);
-        CircularImageView profileImageBorder = (CircularImageView)findViewById(R.id.person_image_boarder);
+        final CircularImageView profileImageBorder = (CircularImageView)findViewById(R.id.person_image_boarder);
         final TextView personName = (TextView)findViewById(R.id.person_name);
         final TextView personDesc = (TextView)findViewById(R.id.person_desc);
         final ImageView blurrPersonImage = (ImageView)findViewById(R.id.blur_person_image);
         ImageView backImage = (ImageView)findViewById(R.id.back_img);
         LinearLayout backClick = (LinearLayout)findViewById(R.id.back_click);
 
+        Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
+        Dekar.applyFont(UserProfileActivity.this,personDesc,"fonts/Roboto-Regular.ttf");
         /*
         final Target mTarget = new Target() {
             @Override
@@ -158,15 +163,18 @@ public class UserProfileActivity extends Activity{
 
                 if (o.personDetails!=null){
                     personInfo = o.personDetails;
+                    Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
                     personName.setText(personInfo.name);
                     personDesc.setText(personInfo.desc);
 
                     if(personInfo.imageUrl!=null)
                     {
+                        Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
                         Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
                         Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().into(profileImage);
                     }else {
-                        Picasso.with(UserProfileActivity.this).load("http://pixtory.in/assets/img/story-2-image.png").fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                        Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
+                        Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
                         Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().into(profileImage);
                     }
                 }else {
