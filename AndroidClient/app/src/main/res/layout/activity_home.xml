@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout">
@@ -48,13 +49,12 @@
 </LinearLayout>
 
 <!-- Slide Navigation Content-->
-    <ListView android:id="@+id/left_drawer_list"
-        android:layout_width="240dp"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@color/app_blue"
-        android:dividerHeight="1dp"
-        android:background="#fff"/>
+        app:headerLayout="@layout/drawer_header"
+        app:menu="@menu/drawer_list"/>
 
 </android.support.v4.widget.DrawerLayout>
