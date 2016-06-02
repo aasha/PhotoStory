@@ -46,6 +46,7 @@ import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.transformations.BlurTransformation;
 import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.userprofile.CircularImageBehaviour;

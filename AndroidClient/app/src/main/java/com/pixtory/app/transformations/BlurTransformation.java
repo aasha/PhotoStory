@@ -16,50 +16,64 @@ import com.squareup.picasso.Transformation;
 
 public class BlurTransformation implements Transformation {
 
-    private static final float BITMAP_SCALE = 0.1f;
-    private static final float BLUR_RADIUS = 7.5f;
-    protected static final int UP_LIMIT = 25;
-    protected static final int LOW_LIMIT = 1;
+    /**
+     * Max blur radius supported by the Renderscript library
+     **/
+    protected static final int MAX_RADIUS = 25;
+    /**
+     * Min blur radius supported by the Renderscript library
+     **/
+    protected static final int MIN_RADIUS = 1;
+    /**
+     * Application context to instantiate the Renderscript
+     **/
     protected final Context context;
-    protected final float blurRadius;
+    /**
+     * Selected radius
+     **/
+    protected final int radius;
 
-
-    public BlurTransformation(Context context, float radius) {
+    /**
+     * Creates a new Blur transformation
+     *
+     * @param context Application context to instantiate the Renderscript
+     **/
+    public BlurTransformation(Context context, int radius) {
         this.context = context;
-
-        if(radius<LOW_LIMIT){
-            this.blurRadius = LOW_LIMIT;
-        }else if(radius>UP_LIMIT){
-            this.blurRadius = UP_LIMIT;
-        }else
-            this.blurRadius = radius;
-    }
-
-    public BlurTransformation(Context context){
-        this.context = context;
-        blurRadius = BLUR_RADIUS;
+        this.radius = radius < MIN_RADIUS ? MIN_RADIUS :
+                radius > MAX_RADIUS ? MAX_RADIUS : radius;
     }
 
     @Override
     public Bitmap transform(Bitmap source) {
-        int width = Math.round(source.getWidth() * BITMAP_SCALE);
-        int height = Math.round(source.getHeight() * BITMAP_SCALE);
+        long startTime = System.currentTimeMillis();
+        // Load a clean bitmap and work from that.
+        Bitmap originalBitmap = source;
 
-        Bitmap inputBitmap = Bitmap.createScaledBitmap(source, width, height, false);
-        Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
+        // Create another bitmap that will hold the results of the filter.
+        Bitmap blurredBitmap;
+        blurredBitmap = Bitmap.createBitmap(originalBitmap);
 
+        // Create the Renderscript instance that will do the work.
         RenderScript rs = RenderScript.create(context);
-        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-        Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
-        Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
-        theIntrinsic.setRadius(blurRadius);
-        theIntrinsic.setInput(tmpIn);
-        theIntrinsic.forEach(tmpOut);
-        tmpOut.copyTo(outputBitmap);
 
+        // Allocate memory for Renderscript to work with
+        Allocation input = Allocation.createFromBitmap(rs, originalBitmap, Allocation.MipmapControl.MIPMAP_FULL, Allocation.USAGE_SCRIPT);
+        Allocation output = Allocation.createTyped(rs, input.getType());
+
+        // Load up an instance of the specific script that we want to use.
+        ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+        script.setInput(input);
+        // Set the blur radius
+        script.setRadius(radius);
+
+        // Start the ScriptIntrinisicBlur
+        script.forEach(output);
+        // Copy the output to the blurred bitmap
+        output.copyTo(blurredBitmap);
 
         source.recycle();
-        return outputBitmap;
+        return blurredBitmap;
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.transformations.BlurTransformation;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.views.CircularImageView;
@@ -160,23 +161,13 @@ public class UserProfileActivity extends Activity{
                     personDesc.setText(personInfo.desc);
 
                     if(personInfo.imageUrl!=null)
-                        new GetBitmapFromUrl(personInfo.imageUrl).execute();
-                        //Picasso.with(UserProfileActivity2.this).load(personInfo.imageUrl).fit().centerCrop().into(blurrPersonImage);
-                    else
-                        new GetBitmapFromUrl("http://pixtory.in/assets/img/story-2-image.png").execute();
-                    /*{
-                        Picasso.with(UserProfileActivity2.this).load("http://pixtory.in/assets/img/story-2-image.png").fit().centerCrop().into(blurrPersonImage);
-                        Bitmap blurrImg = BlurBuilder.blur(UserProfileActivity2.this,getScreenViewBitmap(blurrPersonImage));
-                        blurrPersonImage.setImageBitmap(blurrImg);
-                    }*/
-
-                    if(personInfo.imageUrl!=null)
+                    {
+                        Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
                         Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().into(profileImage);
-                    else
-                        Picasso.with(UserProfileActivity.this).load(R.drawable.pixtory).fit().into(profileImage);
-
-                    // profileImage.setImageBitmap(getScreenViewBitmap(blurrPersonImage));
-
+                    }else {
+                        Picasso.with(UserProfileActivity.this).load("http://pixtory.in/assets/img/story-2-image.png").fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                        Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().into(profileImage);
+                    }
                 }else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
                             .put(AppConstants.USER_ID,Integer.toString(personId))
