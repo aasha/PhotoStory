@@ -3,11 +3,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/dr_profile"
-            android:checked="true"
-            android:icon="@drawable/ic_user"
-            android:title="My Profle" />
-        <item
             android:id="@+id/dr_feedback"
             android:checked="true"
             android:icon="@drawable/ic_feedback"
@@ -18,8 +13,8 @@
             android:title="Invite" />
         <item
             android:id="@+id/dr_settings"
-            android:icon="@drawable/ic_settings"
-            android:title="Settings" />
+            android:icon="@drawable/ic_user"
+            android:title="Become Contributor" />
     </group>
 
 </menu>

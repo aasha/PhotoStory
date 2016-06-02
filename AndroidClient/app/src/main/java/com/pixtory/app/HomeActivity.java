@@ -612,6 +612,16 @@ public class HomeActivity extends AppCompatActivity implements
         TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
         Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
         mPN.setText("Sriram Guduri");
+        mPImg.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                startActivity(intent);
+
+            }
+        });
 
         mNV.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
 
@@ -619,13 +629,14 @@ public class HomeActivity extends AppCompatActivity implements
             int id = menuItem.getItemId();
             menuItem.setChecked(true);
             switch (id){
+                /*
                 case R.id.dr_profile:Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
                     intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                     intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
                     startActivity(intent);
                     break;
-
+*/
                 case R.id.dr_feedback:sendFeedback();
                     break;
 
