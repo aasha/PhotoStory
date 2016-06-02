@@ -35,14 +35,22 @@
                 android:layout_width="133dp"
                 android:layout_height="133dp"
                 android:id="@+id/person_image"/>
+            <LinearLayout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="11dp"
+                android:layout_marginTop="11dp"
+                android:id="@+id/back_click">
 
-            <ImageView android:layout_width="22dp"
-                android:layout_height="15dp"
-                android:id="@+id/back_img"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/back"
-                android:layout_marginTop="22dp"
-                android:layout_marginLeft="22dp"/>
+                <ImageView android:layout_width="22dp"
+                    android:layout_height="15dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:id="@+id/back_img"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/back"/>
+
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
