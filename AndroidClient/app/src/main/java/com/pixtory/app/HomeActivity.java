@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -47,8 +48,11 @@ import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.typeface.Intro;
+import com.pixtory.app.userprofile.CircularImageBehaviour;
+import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -579,36 +583,100 @@ public class HomeActivity extends AppCompatActivity implements
     /**
      *
      */
+
     private void setUpNavigationDrawer() {
 
         mProfileIcon = (ImageView)findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+       // mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+        final NavigationView mNV = (NavigationView)findViewById(R.id.navigation_view);
 
+
+/*
         String[] arr = getResources().getStringArray(R.array.menu_items);
         mDrawerListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arr);
-        mDrawerList.setAdapter(mDrawerListAdapter);
+        mDrawerList.setAdapter(mDrawerListAdapter);*/
 
         mProfileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mDrawerLayout.isDrawerOpen(mDrawerList))
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                if(mDrawerLayout.isDrawerOpen(mNV))
+                    mDrawerLayout.closeDrawer(mNV);
                 else
-                    mDrawerLayout.openDrawer(mDrawerList);
+                    mDrawerLayout.openDrawer(mNV);
             }
         });
 
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        View header = mNV.getHeaderView(0);
+        CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
+        TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
+        Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
+        mPN.setText("Sriram Guduri");
+
+        mNV.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+
+        public boolean onNavigationItemSelected(MenuItem menuItem){
+            int id = menuItem.getItemId();
+            menuItem.setChecked(true);
+            switch (id){
+                case R.id.dr_profile:Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                    intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                    intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                    startActivity(intent);
+                    break;
+
+                case R.id.dr_feedback:sendFeedback();
+                    break;
+
+                case R.id.dr_invite: sendInvite();
+                    break;
+            }
+            return true;
+
+        }
+
+        });
+
+       /* mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 switch (i){
                     case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
-                            /**TODO: Add code to show My Profile Page**/
+                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                        startActivity(intent);
+                        //finish();*//**TODO: Add code to show My Profile Page**//*
+                        break;*//**TODO: Add code to show My Profile Page**//*
+
+                    case 1: sendFeedback();
+                        break;
+
+                    case 2: sendInvite();
+                        break;
                 }
             }
-        });
+        });*/
+    }
+
+    private void sendFeedback() {
+        final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+        _Intent.setType("text/email");
+        _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+        _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+        _Intent.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.mail_feedback_message));
+        startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+    }
+
+    private void sendInvite(){
+        Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Send Invite"));
     }
 
 }
