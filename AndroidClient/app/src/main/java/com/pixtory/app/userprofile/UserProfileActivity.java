@@ -9,7 +9,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -115,6 +117,7 @@ public class UserProfileActivity extends Activity{
         final TextView personDesc = (TextView)findViewById(R.id.person_desc);
         final ImageView blurrPersonImage = (ImageView)findViewById(R.id.blur_person_image);
         ImageView backImage = (ImageView)findViewById(R.id.back_img);
+        LinearLayout backClick = (LinearLayout)findViewById(R.id.back_click);
 
         /*
         final Target mTarget = new Target() {
@@ -144,8 +147,8 @@ public class UserProfileActivity extends Activity{
 
                 if (o.contentList != null) {
                     contentDataList = o.contentList;
-                    Toast.makeText(UserProfileActivity.this,"Content Data Received : "+contentDataList.size(),Toast.LENGTH_SHORT).show();
-                } else {
+               }
+                else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
                             .put(AppConstants.USER_ID,Integer.toString(personId))
                             .put("MESSAGE", "No Data")
@@ -155,8 +158,6 @@ public class UserProfileActivity extends Activity{
 
                 if (o.personDetails!=null){
                     personInfo = o.personDetails;
-                    Toast.makeText(UserProfileActivity.this,"Person Data Received : "+personInfo.name,Toast.LENGTH_SHORT).show();
-
                     personName.setText(personInfo.name);
                     personDesc.setText(personInfo.desc);
 
@@ -222,6 +223,26 @@ public class UserProfileActivity extends Activity{
             public void onClick(View v) {
                 onBackPressed();
             }});
+
+        backClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }});
+    }
+
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     @Override
