@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="fill_parent">
     <TextView
-        android:text="FeedBack"
+        android:text="Feedback"
         android:textSize="20sp"
         android:textAlignment="center"
         android:paddingTop="15dp"
@@ -23,7 +23,7 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
         android:lines="6"
-        android:hint="Enter FeedBack" />
+        android:hint="Description" />
     <!--<View android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#3399ff"
@@ -51,12 +51,12 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/feedback_send"
-            android:text="Send Feedback"
+            android:text="SEND"
             android:textSize="15sp"
             android:textColor="#669d9d"
             android:paddingTop="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="30dp"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -45,12 +45,14 @@ import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.AddCommentResponse;
+import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.transformations.BlurTransformation;
+import com.pixtory.app.transformations.GrayscaleTransformation;
 import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.userprofile.CircularImageBehaviour;
@@ -631,16 +633,24 @@ public class HomeActivity extends AppCompatActivity implements
         View header = mNavigationView.getHeaderView(0);
 
         CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
+        CircularImageView mPImgB = (CircularImageView)header.findViewById(R.id.dr_profile_img_border);
         TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
         if(myDetails!=null) {
             if (myDetails.imageUrl != null && myDetails.imageUrl != "")
+            {
                 Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().into(mPImg);
+                //Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
+            }
             else
+            {
                 Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
+               // Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
+            }
             mPN.setText(myDetails.name);
         }
         else{
             Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
+            //Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
             mPN.setText("Guest");
         }
         mPImg.setOnClickListener(new View.OnClickListener(){
@@ -774,7 +784,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         dialog.getWindow().setLayout(lp.width,lp.height);
 
-        final EditText feedbackText = (EditText)findViewById(R.id.feedback_text);
+        final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
         TextView feedbackCancel = (TextView)dialog.findViewById(R.id.feedback_cancel);
         TextView feedbackSend =(TextView) dialog.findViewById(R.id.feedback_send);
 
@@ -783,19 +793,35 @@ public class HomeActivity extends AppCompatActivity implements
         feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 dialog.dismiss();
             }
         });
 
-        feedbackSend.setOnClickListener(new TextView.OnClickListener() {
+        feedbackSend.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
-                final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
-                _Intent.setType("text/email");
-                _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
-                _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
-                _Intent.putExtra(android.content.Intent.EXTRA_TEXT, feedbackText.getText());
-                startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+
+                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), feedbackText.getText().toString(),"","","",new NetworkApiCallback<BaseResponse>() {
+                    @Override
+                    public void success(BaseResponse o, Response response) {
+
+                        Toast.makeText(HomeActivity.this,"Feedback Sent",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void failure(BaseResponse error) {
+                        // mProgress.dismiss();
+
+                        Toast.makeText(HomeActivity.this, "Error sending feedback", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void networkFailure(RetrofitError error) {
+                        Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 dialog.dismiss();
             }
         });

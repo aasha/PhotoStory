@@ -32,4 +32,7 @@ public interface NetworkInterface {
     @POST("/getPersonDetails")
     void getPersonDetails(@Body GetPersonDetailsRequest req, Callback<GetPersonDetailsResponse> cd);
 
+    @POST("/userFeedBack")
+    void userFeedBack(@Body userFeedBackRequest req, Callback<BaseResponse> cd);
+
 }
