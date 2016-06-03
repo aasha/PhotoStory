@@ -119,94 +119,95 @@ public class UserProfileActivity extends Activity{
         final TextView personName = (TextView)findViewById(R.id.person_name);
         final TextView personDesc = (TextView)findViewById(R.id.person_desc);
         final ImageView blurrPersonImage = (ImageView)findViewById(R.id.blur_person_image);
+        final TextView personFollow = (TextView)findViewById(R.id.person_follow);
         ImageView backImage = (ImageView)findViewById(R.id.back_img);
         LinearLayout backClick = (LinearLayout)findViewById(R.id.back_click);
 
         Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
         Dekar.applyFont(UserProfileActivity.this,personDesc,"fonts/Roboto-Regular.ttf");
-        /*
-        final Target mTarget = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Bitmap blurredimage = BlurBuilder.blur(UserProfileActivity.this, bitmap);
-                blurrPersonImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                blurrPersonImage.setImageBitmap(blurredimage);// Do whatever you want with the Bitmap
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(UserProfileActivity.this,"Blur failed",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-        };
-        */
 
         personInfo = new PersonInfo();
         contentDataList = new ArrayList<ContentData>();
-        NetworkApiHelper.getInstance().getPersonDetails(userId, personId,new NetworkApiCallback<GetPersonDetailsResponse>() {
-            @Override
-            public void success(GetPersonDetailsResponse o, Response response) {
 
-                if (o.contentList != null) {
-                    contentDataList = o.contentList;
-               }
-                else {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                            .put(AppConstants.USER_ID,Integer.toString(personId))
-                            .put("MESSAGE", "No Data")
-                            .build());
-                    Toast.makeText(UserProfileActivity.this, "No content data!", Toast.LENGTH_SHORT).show();
-                }
+        if(userId==personId){
+            personFollow.setVisibility(View.GONE);
+            personInfo = App.getPersonInfo();
+            contentDataList = App.getPersonConentData();
+            personName.setText(personInfo.name);
+            personDesc.setText(personInfo.desc);
 
-                if (o.personDetails!=null){
-                    personInfo = o.personDetails;
-                    Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
-                    personName.setText(personInfo.name);
-                    personDesc.setText(personInfo.desc);
+            if (personInfo.imageUrl != null && personInfo.imageUrl!="") {
+                Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
+                Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().into(profileImage);
+            } else {
+                Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
+                Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().into(profileImage);
+            }
 
-                    if(personInfo.imageUrl!=null)
-                    {
-                        Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
-                        Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
-                        Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().into(profileImage);
-                    }else {
-                        Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
-                        Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
-                        Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().into(profileImage);
+        }
+        else {
+            NetworkApiHelper.getInstance().getPersonDetails(userId, personId, new NetworkApiCallback<GetPersonDetailsResponse>() {
+                @Override
+                public void success(GetPersonDetailsResponse o, Response response) {
+
+                    if (o.contentList != null) {
+                        contentDataList = o.contentList;
+                    } else {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                .put(AppConstants.USER_ID, Integer.toString(personId))
+                                .put("MESSAGE", "No Data")
+                                .build());
+                        Toast.makeText(UserProfileActivity.this, "No content data!", Toast.LENGTH_SHORT).show();
                     }
-                }else {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                            .put(AppConstants.USER_ID,Integer.toString(personId))
-                            .put("MESSAGE", "No Data")
-                            .build());
-                    System.out.println("Person data null");
-                    Toast.makeText(UserProfileActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+
+                    if (o.personDetails != null) {
+                        personInfo = o.personDetails;
+                        Dekar.applyFont(UserProfileActivity.this, personName, "fonts/Roboto-Regular.ttf");
+                        personName.setText(personInfo.name);
+                        personDesc.setText(personInfo.desc);
+
+                        if (personInfo.imageUrl != null) {
+                            Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
+                            Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                            Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().into(profileImage);
+                        } else {
+                            Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
+                            Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                            Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().into(profileImage);
+                        }
+                    } else {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                .put(AppConstants.USER_ID, Integer.toString(personId))
+                                .put("MESSAGE", "No Data")
+                                .build());
+                        System.out.println("Person data null");
+                        Toast.makeText(UserProfileActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
 
-            @Override
-            public void failure(GetPersonDetailsResponse error) {
+                @Override
+                public void failure(GetPersonDetailsResponse error) {
 
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                        .put(AppConstants.USER_ID, Integer.toString(personId))
-                        .put("MESSAGE", error.errorMessage)
-                        .build());
-                Toast.makeText(UserProfileActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                            .put(AppConstants.USER_ID, Integer.toString(personId))
+                            .put("MESSAGE", error.errorMessage)
+                            .build());
+                    Toast.makeText(UserProfileActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void networkFailure(RetrofitError error) {
-                //mProgress.dismiss();
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                        .put(AppConstants.USER_ID,Integer.toString(personId))
-                        .put("MESSAGE", error.getMessage())
-                        .build());
-                Toast.makeText(UserProfileActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void networkFailure(RetrofitError error) {
+
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                            .put(AppConstants.USER_ID, Integer.toString(personId))
+                            .put("MESSAGE", error.getMessage())
+                            .build());
+                    Toast.makeText(UserProfileActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         //initialise recyclerview and set its layout as grid layout
         gridLayout = new GridLayoutManager(this,2);

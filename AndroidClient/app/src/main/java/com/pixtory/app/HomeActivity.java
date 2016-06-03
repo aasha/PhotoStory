@@ -39,11 +39,13 @@ import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
+import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.AddCommentResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
+import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.transformations.BlurTransformation;
@@ -122,6 +124,7 @@ public class HomeActivity extends AppCompatActivity implements
         }
         setUpNavigationDrawer();
         setUpRecomView();
+        setPersonDetails();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -150,6 +153,7 @@ public class HomeActivity extends AppCompatActivity implements
         mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
         mListener = new ConnectionChangedListener();
         prepareFeed();
+
 
         showShowcaseView();
 
@@ -307,6 +311,16 @@ public class HomeActivity extends AppCompatActivity implements
                     Picasso.with(this).load(data.personDetails.imageUrl).fit().into(mProfileImage);
                     mTextName.setText(data.personDetails.name);
                     mTextDesc.setText(data.personDetails.desc);
+                    mProfileImage.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                            intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                            intent.putExtra("PERSON_ID",data.personDetails.userId);
+                            startActivity(intent);
+
+                        }
+                    });
                 }
                 mTextDate.setText(data.date);
                 mTextStoryMainPara.setText(data.pictureFirstPara);
@@ -607,12 +621,23 @@ public class HomeActivity extends AppCompatActivity implements
                     mDrawerLayout.openDrawer(mNV);
             }
         });
-
+        PersonInfo myDetails = new PersonInfo();
+        myDetails = App.getPersonInfo();
         View header = mNV.getHeaderView(0);
+
         CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
         TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
-        Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
-        mPN.setText("Sriram Guduri");
+        if(myDetails!=null) {
+            if (myDetails.imageUrl != null && myDetails.imageUrl != "")
+                Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().into(mPImg);
+            else
+                Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
+            mPN.setText(myDetails.name);
+        }
+        else{
+            Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
+            mPN.setText("Sriram Guduri");
+        }
         mPImg.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -689,6 +714,40 @@ public class HomeActivity extends AppCompatActivity implements
         sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Send Invite"));
+    }
+
+    private void setPersonDetails(){
+
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
+            @Override
+            public void success(GetPersonDetailsResponse o, Response response) {
+
+                if (o.contentList != null) {
+                    App.setPersonConentData(o.contentList);
+                } else {
+                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
+                }
+
+                if (o.personDetails!=null){
+                    App.setPersonInfo(o.personDetails);
+                }else {
+                    System.out.println("Person data null");
+                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(GetPersonDetailsResponse error) {
+                // mProgress.dismiss();
+
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }
