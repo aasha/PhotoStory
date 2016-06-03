@@ -12,7 +12,7 @@
             android:icon="@drawable/ic_invite"
             android:title="Invite" />
         <item
-            android:id="@+id/dr_settings"
+            android:id="@+id/dr_contributor"
             android:icon="@drawable/ic_user"
             android:title="Become a contributor" />
     </group>

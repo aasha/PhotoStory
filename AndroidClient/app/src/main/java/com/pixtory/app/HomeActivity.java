@@ -2,6 +2,7 @@ package com.pixtory.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.*;
 
@@ -18,6 +19,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -314,10 +316,13 @@ public class HomeActivity extends AppCompatActivity implements
                     mProfileImage.setOnClickListener(new View.OnClickListener(){
                         @Override
                         public void onClick(View v) {
+
+                            Toast.makeText(HomeActivity.this,data.personDetails.userId+"",Toast.LENGTH_SHORT).show();
+                            /*
                             Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
                             intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                             intent.putExtra("PERSON_ID",data.personDetails.userId);
-                            startActivity(intent);
+                            startActivity(intent);*/
 
                         }
                     });
@@ -604,7 +609,7 @@ public class HomeActivity extends AppCompatActivity implements
         mProfileIcon = (ImageView)findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
        // mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
-        final NavigationView mNV = (NavigationView)findViewById(R.id.navigation_view);
+        final NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
 
 
 /*
@@ -615,15 +620,15 @@ public class HomeActivity extends AppCompatActivity implements
         mProfileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mDrawerLayout.isDrawerOpen(mNV))
-                    mDrawerLayout.closeDrawer(mNV);
+                if(mDrawerLayout.isDrawerOpen(mNavigationView))
+                    mDrawerLayout.closeDrawer(mNavigationView);
                 else
-                    mDrawerLayout.openDrawer(mNV);
+                    mDrawerLayout.openDrawer(mNavigationView);
             }
         });
         PersonInfo myDetails = new PersonInfo();
         myDetails = App.getPersonInfo();
-        View header = mNV.getHeaderView(0);
+        View header = mNavigationView.getHeaderView(0);
 
         CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
         TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
@@ -636,7 +641,7 @@ public class HomeActivity extends AppCompatActivity implements
         }
         else{
             Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
-            mPN.setText("Sriram Guduri");
+            mPN.setText("Guest");
         }
         mPImg.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -649,7 +654,7 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
 
-        mNV.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
 
         public boolean onNavigationItemSelected(MenuItem menuItem){
             int id = menuItem.getItemId();
@@ -663,10 +668,13 @@ public class HomeActivity extends AppCompatActivity implements
                     startActivity(intent);
                     break;
 */
-                case R.id.dr_feedback:sendFeedback();
+                case R.id.dr_feedback:feedBackActivity();
                     break;
 
                 case R.id.dr_invite: sendInvite();
+                    break;
+
+                case R.id.dr_contributor:
                     break;
             }
             return true;
@@ -749,6 +757,52 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
     }
+
+    private void feedBackActivity(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.feedback_dialog);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+
+        final EditText feedbackText = (EditText)findViewById(R.id.feedback_text);
+        TextView feedbackCancel = (TextView)dialog.findViewById(R.id.feedback_cancel);
+        TextView feedbackSend =(TextView) dialog.findViewById(R.id.feedback_send);
+
+
+
+        feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        feedbackSend.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+                _Intent.setType("text/email");
+                _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+                _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+                _Intent.putExtra(android.content.Intent.EXTRA_TEXT, feedbackText.getText());
+                startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
 
 }
 
