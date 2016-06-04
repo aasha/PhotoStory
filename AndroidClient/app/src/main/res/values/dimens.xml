@@ -19,5 +19,7 @@
     <dimen name="pixtory_subheading_font">26sp</dimen>
     <dimen name="skip_login_font">9sp</dimen>
 
+    <dimen name="image_layout_height">240dp</dimen>
+
 
 </resources>

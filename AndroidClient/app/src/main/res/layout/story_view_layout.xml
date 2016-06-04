@@ -5,7 +5,6 @@
     android:visibility="visible"
     android:background="@color/white">
 
-
     <com.pixtory.app.views.CircularImageView
             android:layout_width="50dp"
             android:layout_height="50dp"

@@ -6,12 +6,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.*;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import butterknife.*;
 
@@ -70,14 +74,12 @@ public class MainFragment extends Fragment{
     @Bind(R.id.pic_story_layout)
     LinearLayout mStoryLayout = null;
 
-    @Bind(R.id.main_layout)
-    FrameLayout mMainLayout = null;
-
     @Bind(R.id.image_main)
     ImageView mImageMain = null;
 
     @Bind(R.id.layout_image_details)
-    RelativeLayout mImageDetailsLayout = null;
+    LinearLayout mImageDetailsLayout = null;
+    int mImageInfoLayoutHeight;
 
     @Bind(R.id.text_title)
     TextView mTextTitle = null;
@@ -191,21 +193,25 @@ public class MainFragment extends Fragment{
 
         Log.d("TAG", "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
-        applyFonts();
 
+        mImageInfoLayoutHeight = (int)getResources().getDimension(R.dimen.image_layout_height);
+        Log.i("mImageInfoHeight is :::",""+mImageInfoLayoutHeight);
         return mRootView;
     }
 
-    private void applyFonts() {
-        Dekar.applyFont(this.getActivity(), mTextPlace , "fonts/Roboto-Regular.ttf");
-        Dekar.applyFont(this.getActivity(), mTextTitle , "fonts/Roboto-Regular.ttf");
-        Dekar.applyFont(this.getActivity(), mLikeCountTV,"fonts/Roboto-Regular.ttf");
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        bindData();
     }
+
 
     private void bindData() {
         if (mContentData == null) {
             return;
         }
+
         final ContentData cd = mContentData;
         Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain);
         mTextTitle.setText(cd.name);
@@ -221,11 +227,6 @@ public class MainFragment extends Fragment{
         mLikeCountTV.setText(String.valueOf(cd.likeCount));
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        bindData();
-    }
 
 
     @Override
@@ -283,12 +284,12 @@ public class MainFragment extends Fragment{
 
 
     public void resetFragmentState() {
-        isRecoViewAdded = false;
+
         mListener.onDetachStoryView(this, mContentIndex);
-        mSlantView.setVisibility(View.INVISIBLE);
+        mSlantView.setVisibility(View.GONE);
         mStoryLayout.setVisibility(View.GONE);
         mTextExpert.setVisibility(View.VISIBLE);
-        showFullScreen();
+//        showFullScreen();
     }
 
     public void attachStoryView(View v) {
@@ -312,12 +313,6 @@ public class MainFragment extends Fragment{
 
                 @Override
                 public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    if (distanceX < 5 && distanceX > -5) {
-                        mIsScrolling = true;
-                        mIsFling = false;
-                        modifyScreenHeight((int) e2.getRawY());
-                        lastScrollPosition = (int) e2.getRawY();
-                    }
                     return super.onScroll(e1, e2, distanceX, distanceY);
                 }
 
@@ -353,7 +348,6 @@ public class MainFragment extends Fragment{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            scrollScreen();
         }
         return false;
     }
@@ -365,256 +359,67 @@ public class MainFragment extends Fragment{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            scrollScreen();
         }
         return false;
     }
 
 
-    private void scrollScreen(){
-        if (mIsScrolling && !mIsFling) {
-            mIsScrolling = false;
-            mIsFling = false;
-            if (lastScrollPosition < (0.90 * mDeviceHeightInPx)) {
-                showHalfScreen();
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_Tap)
-                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put("META", "Swipe")
-                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                        .build());
-            } else {
-                showFullScreen();
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Reco_VideoExpand)
-                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                        .build());
-            }
-        }
-    }
+    private void showHalfScreen() {
+        int fromY   = mDeviceHeightInPx - mImageInfoLayoutHeight;
+        int toY     = (int)0.70*mDeviceHeightInPx;
+        animateContent(mImageDetailsLayout, true , fromY , toY);
 
-
-    private void setUpFullScreenUI() {
-        isRecoViewAdded = false;
-        mListener.onDetachStoryView(this, mContentIndex);
-
-        mSlantView.setVisibility(View.INVISIBLE);
-        mStoryLayout.setVisibility(View.GONE);
-        mTextExpert.setVisibility(View.VISIBLE);
-    }
-
-    private void setUpHalfScreenUI() {
-        isRecoViewAdded = true;
+        mListener.onAttachStoryView(MainFragment.this, mContentIndex);
+        mSlantView.setVisibility(View.VISIBLE);
+        mTextExpert.setVisibility(View.GONE);
     }
 
     private void showFullScreen() {
-        //mYTPreview.setAlpha(1.0f);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mMainLayout.setLayoutParams(params);
+        int fromY     = (int)0.70*mDeviceHeightInPx;
+        int toY   = mDeviceHeightInPx - mImageInfoLayoutHeight;
+        animateContent(mImageDetailsLayout, false , fromY , toY);
+    }
 
-        ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mStoryLayout.getLayoutParams();
-        recoScreenParams.height = 0;
-        mStoryLayout.setLayoutParams(recoScreenParams);
-        final ValueAnimator mPad = ValueAnimator.ofInt(0, 0);
-        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    private void animateContent(View view , final boolean showContent , int fromY , int toY){
+
+        ObjectAnimator transAnimation= ObjectAnimator.ofFloat(view ,"translationY" , fromY, toY);
+        transAnimation.setDuration(500);//set duration
+        transAnimation.start();//start animatio
+
+        transAnimation.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-                mImageMain.setPadding(val, val, val, val);
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+                if(!showContent){
+                    mSlantView.setVisibility(View.GONE);
+                    mTextExpert.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
             }
         });
-        mPad.start();
-        setUpFullScreenUI();
     }
 
-    private void showHalfScreen() {
-        modifyScreenHeight((int) (0.30 * mDeviceHeightInPx));
-        setUpHalfScreenUI();
-    }
 
-    private boolean modifyScreenHeight(int newHeight) {
-        //mYTPreview.setAlpha(0.0f);
-        if (newHeight < (0.30 * mDeviceHeightInPx)) {
-            return true;
-        }
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mMainLayout.getLayoutParams();
-        params.height = newHeight;
-        params.width = mDeviceWidthInPx;
 
-        mMainLayout.setLayoutParams(params);
-
-        ViewGroup.LayoutParams recoScreenParams = (ViewGroup.LayoutParams) mStoryLayout.getLayoutParams();
-        recoScreenParams.height = mDeviceHeightInPx - newHeight;
-
-        mStoryLayout.setLayoutParams(recoScreenParams);
-        if (isRecoViewAdded == false) {
-            mListener.onAttachStoryView(this, mContentIndex);
-            mSlantView.setVisibility(View.VISIBLE);
-            mTextExpert.setVisibility(View.GONE);
-            isRecoViewAdded = true;
-        }
-        return true;
-
-    }
-
-//    public void scaleUpProdRecoView() {
-//        ValueAnimator mCon = ValueAnimator.ofInt(mDeviceHeightInPx, (int) (0.70 * mDeviceHeightInPx));
-//        if (isRecoViewAdded == false) {
-//            mListener.onAttachStoryView(this, mContentIndex);
-//            mSlantView.setVisibility(View.VISIBLE);
-//
-//            mTextExpert.setVisibility(View.GONE);
-//            isRecoViewAdded = true;
-//        }
-//        mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mMainLayout.getLayoutParams();
-//                layoutParams.height = val;
-//                mMainLayout.setLayoutParams(layoutParams);
-//            }
-//        });
-//        final ValueAnimator mPad = ValueAnimator.ofInt(0, 30);
-//        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-//                mImageMain.setPadding(val, val, val, val);
-//            }
-//        });
-//        mPad.start();
-//        final ValueAnimator mRec = ValueAnimator.ofInt(0, (int) (0.30 * mDeviceHeightInPx));
-//        mRec.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
-//                layoutParams.height = val;
-//                mStoryLayout.setLayoutParams(layoutParams);
-//            }
-//        });
-//        ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
-//        arrayListObjectAnimators.add(mCon);
-//        ValueAnimator[] objectAnimators = arrayListObjectAnimators.toArray(new ValueAnimator[arrayListObjectAnimators.size()]);
-//        AnimatorSet animSetXY = new AnimatorSet();
-//        animSetXY.playTogether(objectAnimators);
-//        animSetXY.setDuration(500);//1sec
-//        animSetXY.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//
-//            }
-//        });
-//        animSetXY.start();
-//        mRec.setDuration(500);
-//        mRec.start();
-//
-//        mRec.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                setUpHalfScreenUI();
-//
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//
-//            }
-//        });
-//
-//    }
-//
-//    public void scaleDownProductRecoView() {
-//        ValueAnimator mCon = ValueAnimator.ofInt((int) (0.70 * mDeviceHeightInPx), mDeviceHeightInPx);
-//        mCon.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mMainLayout.getLayoutParams();
-//                layoutParams.height = val;
-//                mMainLayout.setLayoutParams(layoutParams);
-//            }
-//        });
-//        final ValueAnimator mRec = ValueAnimator.ofInt((int) (0.30 * mDeviceHeightInPx), 0);
-//        mRec.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mStoryLayout.getLayoutParams();
-//                layoutParams.height = val;
-//                mStoryLayout.setLayoutParams(layoutParams);
-//            }
-//        });
-//        ArrayList<ValueAnimator> arrayListObjectAnimators = new ArrayList<ValueAnimator>(); //ArrayList of ObjectAnimators
-//        arrayListObjectAnimators.add(mCon);
-//        ValueAnimator[] objectAnimators = arrayListObjectAnimators.toArray(new ValueAnimator[arrayListObjectAnimators.size()]);
-//        AnimatorSet animSetXY = new AnimatorSet();
-//        animSetXY.playTogether(objectAnimators);
-//        animSetXY.setDuration(500);//1sec
-//        animSetXY.start();
-//        final ValueAnimator mPad = ValueAnimator.ofInt(0, 0);
-//        mPad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = mImageMain.getLayoutParams();
-//                mImageMain.setPadding(val, val, val, val);
-//            }
-//        });
-//        mPad.start();
-//        mRec.setDuration(500);
-//        mRec.start();
-//        mRec.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                //mYTPreview.setAlpha(1.0f);
-//                setUpFullScreenUI();
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//
-//            }
-//        });
-//    }
-
+    /**
+     *
+     * @param view
+     * Implementation to like a story
+     */
     @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {
         if(Utils.isEmpty(Utils.getFbID(mContext))) {
