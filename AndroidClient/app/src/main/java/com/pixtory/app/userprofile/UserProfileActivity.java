@@ -9,7 +9,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -122,9 +124,11 @@ public class UserProfileActivity extends Activity{
         final TextView personFollow = (TextView)findViewById(R.id.person_follow);
         ImageView backImage = (ImageView)findViewById(R.id.back_img);
         LinearLayout backClick = (LinearLayout)findViewById(R.id.back_click);
+        //FrameLayout profileFrame = (FrameLayout)findViewById(R.id.profile_frame);
 
         Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
         Dekar.applyFont(UserProfileActivity.this,personDesc,"fonts/Roboto-Regular.ttf");
+
 
         personInfo = new PersonInfo();
         contentDataList = new ArrayList<ContentData>();
@@ -141,9 +145,9 @@ public class UserProfileActivity extends Activity{
                 Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
                 Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().into(profileImage);
             } else {
-                Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
-                Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
-                Picasso.with(UserProfileActivity.this).load(R.drawable.sample_pimg).fit().into(profileImage);
+                Picasso.with(UserProfileActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
+                Picasso.with(UserProfileActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new BlurTransformation(UserProfileActivity.this, 10)).into(blurrPersonImage);
+                Picasso.with(UserProfileActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().into(profileImage);
             }
 
         }
@@ -218,7 +222,7 @@ public class UserProfileActivity extends Activity{
         cardLayoutAdapter = new CardLayoutAdapter(this, App.getContentData());
         recyclerView.setAdapter(cardLayoutAdapter);
 
-        //get the screen the screen dimesions
+        //get the screen dimesions
         DisplayMetrics dm =  new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(dm);
 

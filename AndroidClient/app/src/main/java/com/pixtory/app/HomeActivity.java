@@ -126,9 +126,10 @@ public class HomeActivity extends AppCompatActivity implements
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
-        setUpNavigationDrawer();
+
         setUpRecomView();
         setPersonDetails();
+        setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -629,13 +630,51 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
         PersonInfo myDetails = new PersonInfo();
+        //setPersonDetails();
         myDetails = App.getPersonInfo();
         View header = mNavigationView.getHeaderView(0);
 
-        CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
+        final CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
         CircularImageView mPImgB = (CircularImageView)header.findViewById(R.id.dr_profile_img_border);
-        TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
-        if(myDetails!=null) {
+        final TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
+
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
+            @Override
+            public void success(GetPersonDetailsResponse o, Response response) {
+
+                if (o.contentList != null) {
+                    App.setPersonConentData(o.contentList);
+                } else {
+                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
+                }
+
+                if (o.personDetails!=null){
+                    App.setPersonInfo(o.personDetails);
+                    if(o.personDetails.imageUrl==""||o.personDetails.imageUrl==null)
+                        Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
+                    else
+                        Picasso.with(HomeActivity.this).load(o.personDetails.imageUrl).fit().centerCrop().into(mPImg);
+                    mPN.setText(o.personDetails.name);
+                }else {
+                    System.out.println("Person data null");
+                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(GetPersonDetailsResponse error) {
+                // mProgress.dismiss();
+
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        /*if(myDetails!=null) {
             if (myDetails.imageUrl != null && myDetails.imageUrl != "")
             {
                 Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().into(mPImg);
@@ -652,7 +691,7 @@ public class HomeActivity extends AppCompatActivity implements
             Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
             //Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
             mPN.setText("Guest");
-        }
+        }*/
         mPImg.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
