@@ -35,7 +35,6 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 
 import retrofit.RetrofitError;
@@ -351,7 +350,7 @@ public class MainFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnMainFragmentInteractionListener {
-        public void onAnimateMenuIcon(boolean showBackArrow);
+        void onAnimateMenuIcon(boolean showBackArrow);
     }
 
 //
@@ -428,7 +427,7 @@ public class MainFragment extends Fragment {
         }
         return false;
     }
-
+    
     @OnTouch(R.id.pic_story_layout)
     public boolean onTouchStory(LinearLayout view, MotionEvent me) {
         if (gesture.onTouchEvent(me)) {

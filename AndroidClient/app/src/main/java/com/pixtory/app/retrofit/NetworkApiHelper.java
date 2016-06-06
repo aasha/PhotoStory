@@ -199,9 +199,7 @@ public class NetworkApiHelper {
             }
         });
     }
-    /**
-     * ============================================================================================================================================================================================
-     */
+
     public void getPersonDetails(int userId, int personId,final NetworkApiCallback cb) {
         GetPersonDetailsRequest req = new GetPersonDetailsRequest();
         req.userId = userId;
@@ -223,4 +221,29 @@ public class NetworkApiHelper {
             }
         });
     }
+
+    public void userFeedBack(int userId, String feedBack,String category, String subCategory, String details, final NetworkApiCallback cb) {
+        userFeedBackRequest req = new userFeedBackRequest();
+        req.userId = userId;
+        req.feedBack = feedBack;
+        req.category = category;
+        req.subCategory = subCategory;
+        req.details = details;
+
+        sAPI.userFeedBack(req, new Callback<BaseResponse>() {
+            @Override
+            public void success(BaseResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
+
 }

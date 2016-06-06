@@ -34,39 +34,48 @@
 
     <uses-feature android:name="android.hardware.camera" />
 
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
     <application
-        android:name=".app.App"
-        android:hardwareAccelerated="true"
-        android:icon="@drawable/pixtory"
-        android:label="@string/app_name"
-        android:largeHeap="true"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+            android:name=".app.App"
+            android:hardwareAccelerated="true"
+            android:icon="@drawable/pixtory"
+            android:label="@string/app_name"
+            android:largeHeap="true"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
+
         <activity
             android:name=".onboarding.OnBoardingActivity"
             android:icon="@drawable/pixtory"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-            android:screenOrientation="portrait">
+            android:label="OnBoardingActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
         <activity
             android:name=".userprofile.UserProfileActivity"
             android:icon="@drawable/pixtory"
-            android:label="UserProfileActivity"
-            android:screenOrientation="portrait"></activity>
+            android:label="USerProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+        </activity>
+
+        <activity
+                android:name=".HomeActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+        </activity>
+
         <activity
             android:name=".userprofile.UserProfileActivity2"
             android:icon="@drawable/pixtory"
             android:label="UserProfileActivity"
             android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".HomeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
+
         <activity
             android:name=".WebviewActivity"
             android:label="@string/title_activity_webview"

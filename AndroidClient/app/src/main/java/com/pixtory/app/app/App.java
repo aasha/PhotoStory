@@ -11,6 +11,7 @@ import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.pixtory.app.model.ContentData;
+import com.pixtory.app.model.PersonInfo;
 
 import java.util.ArrayList;
 
@@ -33,6 +34,9 @@ public class App extends Application implements AppConstants {
 
     private Tracker mTracker;
 
+    private static PersonInfo mPersonInfo;
+
+    private static ArrayList<ContentData> mPersonConentData;
 
     @Override
     public void onCreate() {
@@ -93,4 +97,16 @@ public class App extends Application implements AppConstants {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
+    public static void setPersonInfo(PersonInfo personInfo){
+        mPersonInfo = personInfo;
+    }
+
+    public static PersonInfo getPersonInfo(){ return mPersonInfo; }
+
+    public static void setPersonConentData(ArrayList<ContentData> conentData){
+        mPersonConentData = conentData;
+    }
+
+    public static ArrayList<ContentData> getPersonConentData(){ return mPersonConentData; }
 }

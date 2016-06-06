@@ -5,15 +5,19 @@ import android.animation.AnimatorInflater;
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.*;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import android.support.design.widget.NavigationView;
+
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
@@ -31,7 +35,15 @@ import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
+
+import com.pixtory.app.model.PersonInfo;
+import com.pixtory.app.pushnotification.QuickstartPreferences;
+import com.pixtory.app.pushnotification.RegistrationIntentService;
+
+import com.pixtory.app.retrofit.BaseResponse;
+import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
+import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 
@@ -39,13 +51,22 @@ import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 
+import com.pixtory.app.userprofile.UserProfileActivity;
+import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
+import com.pixtory.app.views.CircularImageView;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener, CommentsDialogFragment.OnAddCommentButtonClickListener{
+public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener{
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -99,8 +120,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
-        setUpNavigationDrawer();
 
+        setPersonDetails();
+        setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -231,6 +253,35 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
     }
 
+
+
+
+
+//    /**
+//     * Method to hide loading comments progressbar and show comments list
+//     */
+//    public void setCommentListVisibility(){
+//
+//        if(commentDataList!= null && commentDataList.size()>0){
+//
+//            Log.i(TAG,"Comment Count::"+commentDataList.size());
+//            mTVCommentCount.setText(String.valueOf(commentDataList.size()));
+//            mCommentText.setVisibility(View.VISIBLE);
+//            mCommentsRecyclerViewAdapter = new CommentsListAdapter(HomeActivity.this);
+//            mCommentsRecyclerViewAdapter.setData(commentDataList);
+//            mCommentsRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
+//
+//        }else{
+//            Log.i(TAG,"No Comment Yet for this story");
+//            mTVCommentCount.setText(" NO COMMENT YET ");
+//            mCommentText.setVisibility(View.GONE);
+//        }
+//
+//        mTVLoading.setVisibility(View.GONE);
+//        mRLCommentList.setVisibility(View.VISIBLE);
+//    }
+
+
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
@@ -297,12 +348,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     }
 
-    @Override
-    public void onAddCommentButtonClicked(String str) {
-        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-        if(mainFragment !=null)
-            mainFragment.postComment(str);
-    }
+//    @Override
+//    public void onAddCommentButtonClicked(String str) {
+//        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+//        if(mainFragment !=null)
+//            mainFragment.postComment(str);
+//    }
 
     private class ConnectionChangedListener
             implements ConnectionClassManager.ConnectionClassStateChangeListener {
@@ -323,27 +374,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     }
 
 
-    private void sendFeedback() {
-        final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
-        _Intent.setType("text/email");
-        _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
-        _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
-        _Intent.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.mail_feedback_message));
-        startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
-    }
-
     /**
      * Navigation Drawer Implementation
      */
+
     private void setUpNavigationDrawer() {
 
         menuIcon = (ImageView) findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+       // mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+        final NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
 
-        String[] arr = getResources().getStringArray(R.array.menu_items);
-        mDrawerListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arr);
-        mDrawerList.setAdapter(mDrawerListAdapter);
 
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -352,23 +393,130 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
 
                     if(!mainFragment.isCommentsVisible()) {
-                        if (mDrawerLayout.isDrawerOpen(mDrawerList))
-                            mDrawerLayout.closeDrawer(mDrawerList);
+                        if (mDrawerLayout.isDrawerOpen(mNavigationView))
+                            mDrawerLayout.closeDrawer(mNavigationView);
                         else
-                            mDrawerLayout.openDrawer(mDrawerList);
+                            mDrawerLayout.openDrawer(mNavigationView);
                     }else{
                         mainFragment.onBackButtonClicked();
                     }
 
+
+                if(mDrawerLayout.isDrawerOpen(mNavigationView))
+                    mDrawerLayout.closeDrawer(mNavigationView);
+                else
+                    mDrawerLayout.openDrawer(mNavigationView);
+            }
+        });
+        PersonInfo myDetails = new PersonInfo();
+        //setPersonDetails();
+        myDetails = App.getPersonInfo();
+        View header = mNavigationView.getHeaderView(0);
+
+        final CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
+        final TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
+
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
+            @Override
+            public void success(GetPersonDetailsResponse o, Response response) {
+
+                if (o.contentList != null) {
+                    App.setPersonConentData(o.contentList);
+                } else {
+                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
+                }
+
+                if (o.personDetails!=null){
+                    App.setPersonInfo(o.personDetails);
+                    if(o.personDetails.imageUrl==""||o.personDetails.imageUrl==null)
+                        Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
+                    else
+                        Picasso.with(HomeActivity.this).load(o.personDetails.imageUrl).fit().centerCrop().into(mPImg);
+                    mPN.setText(o.personDetails.name);
+                }else {
+                    System.out.println("Person data null");
+                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(GetPersonDetailsResponse error) {
+                // mProgress.dismiss();
+
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
             }
         });
 
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*if(myDetails!=null) {
+            if (myDetails.imageUrl != null && myDetails.imageUrl != "")
+            {
+                Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().into(mPImg);
+                //Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
+            }
+            else
+            {
+                Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
+               // Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
+            }
+            mPN.setText(myDetails.name);
+        }
+        else{
+            Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
+            //Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
+            mPN.setText("Guest");
+        }*/
+        mPImg.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                startActivity(intent);
+
+            }
+        });
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+
+        public boolean onNavigationItemSelected(MenuItem menuItem){
+            int id = menuItem.getItemId();
+            menuItem.setChecked(true);
+            switch (id){
+                /*
+                case R.id.dr_profile:Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                    intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                    intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                    startActivity(intent);
+                    break;
+*/
+                case R.id.dr_feedback:feedBackActivity();
+                    break;
+
+                case R.id.dr_invite: sendInvite();
+                    break;
+
+                case R.id.dr_contributor:
+                    break;
+            }
+            return true;
+
+        }
+
+        });
+
+       /* mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 switch (i){
                     case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
+<<<<<<< HEAD
 
                         Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
                         intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
@@ -390,10 +538,77 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         startActivity(Intent.createChooser(sendIntent, "Send Invite"));
                         break;
 
+=======
+                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                        startActivity(intent);
+                        //finish();*//**TODO: Add code to show My Profile Page**//*
+                        break;*//**TODO: Add code to show My Profile Page**//*
+
+                    case 1: sendFeedback();
+                        break;
+
+                    case 2: sendInvite();
+                        break;
                 }
+            }
+        });*/
+    }
+
+    private void sendFeedback() {
+        final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+        _Intent.setType("text/email");
+        _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+        _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+        _Intent.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.mail_feedback_message));
+        startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+    }
+
+    private void sendInvite(){
+        Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Send Invite"));
+    }
+
+    private void setPersonDetails(){
+
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
+            @Override
+            public void success(GetPersonDetailsResponse o, Response response) {
+
+                if (o.contentList != null) {
+                    App.setPersonConentData(o.contentList);
+                } else {
+                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
+
+                }
+
+                if (o.personDetails!=null){
+                    App.setPersonInfo(o.personDetails);
+                }else {
+                    System.out.println("Person data null");
+                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(GetPersonDetailsResponse error) {
+                // mProgress.dismiss();
+
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     @Override
     public void onAnimateMenuIcon(final boolean showBackArrow){
@@ -475,7 +690,66 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     }
 
+    private void feedBackActivity(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.feedback_dialog);
 
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+
+        final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
+        TextView feedbackCancel = (TextView)dialog.findViewById(R.id.feedback_cancel);
+        TextView feedbackSend =(TextView) dialog.findViewById(R.id.feedback_send);
+
+
+
+        feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        feedbackSend.setOnClickListener(new TextView.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), feedbackText.getText().toString(),"","","",new NetworkApiCallback<BaseResponse>() {
+                    @Override
+                    public void success(BaseResponse o, Response response) {
+
+                        Toast.makeText(HomeActivity.this,"Feedback Sent",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void failure(BaseResponse error) {
+                        // mProgress.dismiss();
+
+                        Toast.makeText(HomeActivity.this, "Error sending feedback", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void networkFailure(RetrofitError error) {
+                        Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
 
 }
 
