@@ -26,6 +26,7 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
+
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import java.util.ArrayList;
@@ -347,7 +348,7 @@ public class MainFragment extends Fragment{
         }
         return false;
     }
-
+    
     @OnTouch(R.id.pic_story_layout)
     public boolean onTouchStory(LinearLayout view, MotionEvent me) {
         if (gesture.onTouchEvent(me)) {
