@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:id="@+id/drawer_layout">
 
-
 <!-- Activity Content -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,11 +19,13 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="@null">
+
     <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="@null"/>
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:tools="http://schemas.android.com/tools"
                   android:id="@+id/user_profile_fragment_layout"
@@ -35,9 +36,9 @@
 
         <ImageView android:layout_width="30dp"
                   android:layout_height="30dp"
-                  android:layout_margin="10dp"
+                  android:layout_margin="20dp"
                   android:id="@+id/profileIcon"
-                  android:background="@drawable/menu"
+                  android:background="@drawable/menu_icon"
                   android:gravity="center"
                 android:layout_gravity="left"/>
         <com.facebook.drawee.view.SimpleDraweeView
@@ -55,6 +56,11 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer_list"/>
+        app:menu="@menu/drawer_list"
+        android:choiceMode="singleChoice"
+        android:divider="@color/grey_3"
+        android:dividerHeight="1dp"
+        android:background="#fff"/>
+
 
 </android.support.v4.widget.DrawerLayout>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,6 +43,20 @@ import java.util.ArrayList;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.HEAD;
+
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.pixtory.app.R;
+import com.pixtory.app.model.ContentData;
+import com.pixtory.app.model.PersonInfo;
+import com.pixtory.app.utils.BlurBuilder;
+import com.pixtory.app.views.CircularImageView;
+import com.pixtory.app.views.SlantView;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * Created by sriram on 24/05/2016.
@@ -261,7 +276,6 @@ public class UserProfileActivity extends Activity{
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     @Override

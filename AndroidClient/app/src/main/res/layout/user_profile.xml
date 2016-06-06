@@ -9,7 +9,6 @@
         android:background="@drawable/gradient"
         android:id="@+id/profile_frame">
 
-
         <FrameLayout  android:padding="0dp"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -36,6 +35,7 @@
                 android:layout_width="133dp"
                 android:layout_height="133dp"
                 android:id="@+id/person_image"/>
+
             <LinearLayout
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -95,6 +95,7 @@
 
 
             </RelativeLayout>
+
 
 
             <com.pixtory.app.views.SlantViewP

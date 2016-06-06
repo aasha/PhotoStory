@@ -7,4 +7,5 @@ public class RegisterRequest {
     public String userName = null;
     public String userEmail = null;
     public String userImageUrl = null;
+    public String fbId = null;
 }

@@ -17,9 +17,10 @@
         android:gravity="center">
     <TextView
         android:text="@string/post_your_comment"
-        android:textSize="18sp"
+        android:fontFamily="sans-serif-light"
+        android:textSize="17sp"
         android:layout_margin="20dp"
-        android:textColor="#B3000000"
+        android:textColor="@color/grey_1"
         android:id="@+id/post_comment_text"
         android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
@@ -35,8 +36,10 @@
     <EditText
         android:id="@+id/et_comment"
         android:layout_below="@+id/post_comment_text"
+        android:textColor="@color/grey_1"
         android:hint="@string/comment_textbox_hint"
         android:textColorHint="@color/grey_5"
+        android:fontFamily="sans-serif-light"
         android:background="@drawable/square_background"
         android:layout_height="220dp"
         android:layout_width="match_parent"
@@ -55,6 +58,7 @@
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:textStyle="bold"
+        android:fontFamily="sans-serif"
         android:textColor="@color/grey_2"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="25dp"
@@ -65,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
+            android:fontFamily="sans-serif-light"
             android:layout_alignLeft="@+id/char_limit_txt"
             android:textColor="@color/grey_2"
             android:layout_marginTop="10dp"
@@ -77,14 +82,16 @@
         android:layout_height="40dp"
         android:textAllCaps="true"
         android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-light"
         android:background="@color/app_blue"
-        android:textColor="@color/white"
+        android:textColor="#B3ffffff"
         android:id="@+id/postCommentBtn"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="40dp"
         android:text="Submit"
+        android:textSize="12sp"
         />
     </RelativeLayout>
     </ScrollView>

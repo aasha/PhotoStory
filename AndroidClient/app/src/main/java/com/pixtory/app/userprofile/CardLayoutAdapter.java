@@ -62,8 +62,6 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
         Picasso.with(context).load(cDlist.get(position).pictureUrl).fit().centerCrop().into(holder.cardImage);
         //holder.cardImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         holder.cardTitle.setText(cDlist.get(position).name);
-
-        // holder.cardTitle.setText("Pixtory, every picture has a story to tell");
         holder.cardPlace.setText(cDlist.get(position).place);
         //holder.cardPlace.setText("Bengaluru, India");
         //holder.cardImage.setImageResource(R.drawable.cardimg);

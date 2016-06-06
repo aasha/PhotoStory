@@ -4,14 +4,17 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,6 +31,8 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.RegisterResponse;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONObject;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -37,7 +42,7 @@ import java.util.List;
 
 
 public class OnBoardingActivity  extends FragmentActivity {
-//
+    //
 //    Dialog commentDialog ;
     private CallbackManager callbackManager;
     private ProgressDialog mProgressDialog = null;
@@ -69,38 +74,17 @@ public class OnBoardingActivity  extends FragmentActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
-        //User will be directed to Main Feed page is already loggedIn
-//        if (redirectIfLoggedIn()) {
-//            return;
-//        }
+
+//        User will be directed to Main Feed page is already loggedIn
+        if (redirectIfLoggedIn()) {
+            return;
+        }
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("Logging in...");
         mProgressDialog.setCanceledOnTouchOutside(false);
 
-//        //Prompt to input username
-//        commentDialog = new Dialog(this);
-//        commentDialog.setContentView(R.layout.dialog);
-//        commentDialog.setCancelable(false);
-
-//        final EditText txtName = (EditText)commentDialog.findViewById(R.id.body);
-//        Button okBtn = (Button) commentDialog.findViewById(R.id.ok);
-//        okBtn.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                registerUserName(txtName.getText().toString());
-//            }
-//        });
-//        Button cancelBtn = (Button) commentDialog.findViewById(R.id.cancel);
-//        cancelBtn.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                commentDialog.dismiss();
-//            }
-//        });
-        LinearLayout imageViewFb = (LinearLayout)findViewById(R.id.fb_sign_btn);
+        LinearLayout imageViewFb = (LinearLayout) findViewById(R.id.fb_sign_btn);
 
         imageViewFb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,24 +95,15 @@ public class OnBoardingActivity  extends FragmentActivity {
             }
         });
 
-//        ImageView imageViewLogin = (ImageView) findViewById(R.id.login1);
-//        imageViewLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Click)
-//                        .build());
-//                commentDialog.show();
-//            }
-//        });
 
-        TextView skipLogin = (TextView)findViewById(R.id.skipLogin);
+        TextView skipLogin = (TextView) findViewById(R.id.skipLogin);
         skipLogin.setPaintFlags(skipLogin.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         skipLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                registerUserName("User");
-//                mProgressDialog.show();
-                  gotoNextScreen();
+                registerUserName("User");
+                mProgressDialog.show();
+//                gotoNextScreen();
             }
         });
 
@@ -179,18 +154,20 @@ public class OnBoardingActivity  extends FragmentActivity {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
+
     private void onFacebookLoginSuccess() {
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
 
             @Override
             public void onCompleted(JSONObject user, GraphResponse response) {
                 if (user != null) {
-                    final String fbId = user.optString("userId");
+                    final String fbId = user.optString("id");
                     final String name = user.optString("name");
                     final String email = user.optString("email");
                     String accessToken = AccessToken.getCurrentAccessToken().getToken();
@@ -203,19 +180,19 @@ public class OnBoardingActivity  extends FragmentActivity {
                             .put("NAME", name)
                             .put("FBID", fbId)
                             .build());
-                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl, new NetworkApiCallback<RegisterResponse>() {
+                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl,fbId,new NetworkApiCallback<RegisterResponse>() {
                         @Override
                         public void success(RegisterResponse regResp, Response response) {
-                            Log.i(TAG,"Registering user to pixtory sucess");
+                            Log.i(TAG, "Registering user to pixtory sucess");
                             closeDialog();
                             Utils.putUserId(OnBoardingActivity.this, regResp.userId);
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Success)
                                     .put(AppConstants.USER_ID, regResp.userId)
                                     .build());
-                            Utils.putFbId(OnBoardingActivity.this,fbId);
-                            Utils.putEmail(OnBoardingActivity.this,email);
-                            Utils.putUserName(OnBoardingActivity.this,name);
-                            Utils.putUserImage(OnBoardingActivity.this,imgUrl);
+                            Utils.putFbId(OnBoardingActivity.this, fbId);
+                            Utils.putEmail(OnBoardingActivity.this, email);
+                            Utils.putUserName(OnBoardingActivity.this, name);
+                            Utils.putUserImage(OnBoardingActivity.this, imgUrl);
                             AmplitudeLog.sendUserInfo(regResp.userId);
                             gotoNextScreen();
                         }
@@ -243,11 +220,12 @@ public class OnBoardingActivity  extends FragmentActivity {
         request.executeAsync();
     }
 
-    private void gotoNextScreen(){
+    private void gotoNextScreen() {
         Intent i = new Intent(OnBoardingActivity.this, HomeActivity.class);
         startActivity(i);
         this.finish();
     }
+
     private Boolean redirectIfLoggedIn() {
         closeDialog();
         String userId = Utils.getUserId(OnBoardingActivity.this);
@@ -269,53 +247,54 @@ public class OnBoardingActivity  extends FragmentActivity {
         } catch (Exception ignored) {
         }
     }
-//    private void registerUserName(final String name){
-//        NetworkApiHelper.getInstance().registerUser(name, null, null, new NetworkApiCallback<RegisterResponse>() {
-//            @Override
-//            public void success(RegisterResponse regResp, Response response) {
-//                if(commentDialog.isShowing())
-//                    commentDialog.dismiss();
-//                if(mProgressDialog.isShowing())
-//                    mProgressDialog.dismiss();
-//                Utils.putUserId(OnBoardingActivity.this,regResp.userId);
+
+    private void registerUserName(final String name) {
+        NetworkApiHelper.getInstance().registerUser(name, null, null,null,new NetworkApiCallback<RegisterResponse>() {
+            @Override
+            public void success(RegisterResponse regResp, Response response) {
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+                Utils.putUserId(OnBoardingActivity.this, regResp.userId);
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Success)
 //                        .build());
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Success)
-//                        .put("USER_ID", regResp.userId)
-//                        .build());
-//                Utils.putUserName(OnBoardingActivity.this, name);
-//                AmplitudeLog.sendUserInfo(regResp.userId);
-//                gotoNextScreen();
-//            }
-//
-//            @Override
-//            public void failure(RegisterResponse error) {
-//                if(commentDialog.isShowing())
-//                    commentDialog.dismiss();
-//                if(mProgressDialog.isShowing())
-//                    mProgressDialog.dismiss();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Success)
+                        .put("USER_ID", regResp.userId)
+                        .build());
+                Utils.putUserName(OnBoardingActivity.this, name);
+
+                AmplitudeLog.sendUserInfo(regResp.userId);
+                gotoNextScreen();
+            }
+
+            @Override
+            public void failure(RegisterResponse error) {
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
 //                        .build());
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
-//                        .put("MESSAGE", error.errorMessage)
-//                        .build());
-//                Toast.makeText(OnBoardingActivity.this, "Username is taken. Please insert a new username", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void networkFailure(RetrofitError error) {
-//                if(commentDialog.isShowing())
-//                    commentDialog.dismiss();
-//                if(mProgressDialog.isShowing())
-//                    mProgressDialog.dismiss();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
+                        .put("MESSAGE", error.errorMessage)
+                        .build());
+                Toast.makeText(OnBoardingActivity.this, "Username is taken. Please insert a new username", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
 //                        .build());
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
-//                        .put("MESSAGE", error.getMessage())
-//                        .build());
-//                Toast.makeText(OnBoardingActivity.this, "Please connect to network", Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
-//    }
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
+                        .put("MESSAGE", error.getMessage())
+                        .build());
+                Toast.makeText(OnBoardingActivity.this, "Please connect to network", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+
 }

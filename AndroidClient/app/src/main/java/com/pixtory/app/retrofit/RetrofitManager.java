@@ -37,7 +37,6 @@ public class RetrofitManager {
 
         RestAdapter restAdapter = restAdapterBuilder.build();
 
-
         NetworkInterface service = restAdapter.create(NetworkInterface.class);
         return service;
     }

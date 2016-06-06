@@ -19,6 +19,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.*;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
@@ -57,6 +59,9 @@ import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.typeface.Intro;
 import com.pixtory.app.userprofile.CircularImageBehaviour;
 import com.pixtory.app.userprofile.UserProfileActivity;
+
+import com.pixtory.app.typeface.Intro;
+import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.CircularImageView;
@@ -69,6 +74,7 @@ import java.util.List;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.HEAD;
 
 /**
  * Created by aasha.medhi on 12/23/15.
@@ -85,8 +91,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     private ViewPager mPager = null;
     private int mCurrentFragmentPosition = 0;
-    RelativeLayout mStoryLayout = null;
-    RelativeLayout mCommentsLayout = null;
+    private RelativeLayout mStoryLayout = null;
+    private RelativeLayout mCommentsLayout = null;
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
@@ -101,8 +107,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     LinearLayout mUserProfileFragmentLayout = null;
     int previousPage = 0;
-    @Bind(R.id.profileIcon)
-    ImageView mImgUserProfile;
+//    @Bind(R.id.profileIcon)
+//    ImageView mImgUserProfile;
 
     Tracker mTracker;
     private ConnectionQuality mConnectionClass = ConnectionQuality.UNKNOWN;
@@ -115,11 +121,18 @@ public class HomeActivity extends AppCompatActivity implements
     private ListView mDrawerList;
     private ArrayAdapter<String> mDrawerListAdapter;
     private ImageView mProfileIcon;
+    private boolean isCommentsLayoutVisible = false;
+
+    private android.support.v7.widget.Toolbar mToolBar;
+
+    MainFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        //To be removed later
+        checkForDeviceDensity();
         ButterKnife.bind(this);
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
@@ -130,6 +143,7 @@ public class HomeActivity extends AppCompatActivity implements
         setUpRecomView();
         setPersonDetails();
         setUpNavigationDrawer();
+
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -160,7 +174,7 @@ public class HomeActivity extends AppCompatActivity implements
         prepareFeed();
 
 
-        showShowcaseView();
+//        showShowcaseView();
 
         //Register for push notifs
         registerForPushNotification();
@@ -171,9 +185,9 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
 
-    @OnClick(R.id.profileIcon)
-    public void onUserImageClick() {
-    }
+//    @OnClick(R.id.profileIcon)
+//    public void onUserImageClick() {
+//    }
 
     private void prepareFeed() {
         mProgress = new ProgressDialog(this);
@@ -270,6 +284,7 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public void onDetachStoryView(Fragment ff, int position) {
         final ViewGroup parent = (ViewGroup) mStoryLayout.getParent();
+        isCommentsLayoutVisible = false;
         if (parent != null) {
             parent.removeAllViews();
         }
@@ -296,15 +311,9 @@ public class HomeActivity extends AppCompatActivity implements
             TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
             TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
             TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
-            TextView mTextStoryMainPara = (TextView) mStoryLayout.findViewById(R.id.txtMainPara);
             TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
             LinearLayout mBtnShare = (LinearLayout) mStoryLayout.findViewById(R.id.btnShare);
             LinearLayout mBtnComment = (LinearLayout) mStoryLayout.findViewById(R.id.btnComment);
-
-            Dekar.applyFont(HomeActivity.this,mTextName,"fonts/Roboto-Regular.ttf");
-            Dekar.applyFont(HomeActivity.this,mTextDesc,"fonts/Roboto-Regular.ttf");
-            Dekar.applyFont(HomeActivity.this,mTextDate,"fonts/Roboto-Regular.ttf");
-            Dekar.applyFont(HomeActivity.this,mTextStoryDetails,"fonts/Roboto-Regular.ttf");
 
             final int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
@@ -330,8 +339,8 @@ public class HomeActivity extends AppCompatActivity implements
                         }
                     });
                 }
+                Log.i(TAG,"bindStoryData->date::"+data.date);
                 mTextDate.setText(data.date);
-                mTextStoryMainPara.setText(data.pictureFirstPara);
                 mTextStoryDetails.setText(data.pictureDescription);
             }
 
@@ -345,12 +354,14 @@ public class HomeActivity extends AppCompatActivity implements
             mBtnComment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     final ViewGroup parent = (ViewGroup) mCommentsLayout.getParent();
                     if (parent != null) {
                         parent.removeAllViews();
                     }
                     buildCommentsLayout(content_id , data);
                     mainFragment.attachStoryView(mCommentsLayout);
+                    isCommentsLayoutVisible = true;
 
                 }
             });
@@ -371,13 +382,12 @@ public class HomeActivity extends AppCompatActivity implements
     private void buildCommentsLayout(int content_id ,ContentData data){
 
         Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
-        ImageView mAvatarImgView = (ImageView)mCommentsLayout.findViewById(R.id.imgProfile);
-        TextView mName = (TextView)mCommentsLayout.findViewById(R.id.txtName);
+
+        TextView mPlace = (TextView)mCommentsLayout.findViewById(R.id.txtPlace);
         TextView mDesc = (TextView)mCommentsLayout.findViewById(R.id.txtDesc);
 
-        Picasso.with(this).load(data.personDetails.imageUrl).fit().into(mAvatarImgView);
-        mName.setText(data.personDetails.name);
-        mDesc.setText(data.personDetails.desc);
+        mPlace.setText(data.place);
+        mDesc.setText(data.name);
 
         mRLCommentList = (RelativeLayout)mCommentsLayout.findViewById(R.id.comments_layout);
         mTVLoading = (TextView)mCommentsLayout.findViewById(R.id.loading_comments);
@@ -461,7 +471,7 @@ public class HomeActivity extends AppCompatActivity implements
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         int content_id = App.getContentData().get(mCurrentFragmentPosition).id;
 
-        if(!(Utils.getUserId(HomeActivity.this)).equals("")) {
+        if(!((Utils.getFbID(HomeActivity.this)).equals(""))) {
             //User is allowed to comment only if loggedIn
             NetworkApiHelper.getInstance().addComment(Utils.getUserId(HomeActivity.this), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
 
@@ -485,7 +495,7 @@ public class HomeActivity extends AppCompatActivity implements
             });
         }else{
             //TODO: Redirect user to facebook login page
-            Toast.makeText(this,"Please login",Toast.LENGTH_SHORT);
+            Toast.makeText(this,"Please login",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -522,24 +532,24 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
 
-    /*
-   COACH MARK
-    */
-    private void showShowcaseView() {
-        if (!Utils.hasCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN)) {
-            final SimpleDraweeView coachMark = (SimpleDraweeView) findViewById(R.id.coach_mark);
-            coachMark.setBackgroundResource(R.drawable.coachmarks);
-            coachMark.setVisibility(View.VISIBLE);
-            // coachMark.setAlpha(0.8f);
-            Utils.setCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN);
-            coachMark.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    coachMark.setVisibility(View.GONE);
-                }
-            });
-        }
-    }
+//    /*
+//   COACH MARK
+//    */
+//    private void showShowcaseView() {
+//        if (!Utils.hasCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN)) {
+//            final SimpleDraweeView coachMark = (SimpleDraweeView) findViewById(R.id.coach_mark);
+//            coachMark.setBackgroundResource(R.drawable.coachmarks);
+//            coachMark.setVisibility(View.VISIBLE);
+//            // coachMark.setAlpha(0.8f);
+//            Utils.setCoachMarkShown(HomeActivity.this, AppConstants.HAS_TAP_COACH_MARK_SHOWN);
+//            coachMark.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    coachMark.setVisibility(View.GONE);
+//                }
+//            });
+//        }
+//    }
 
     @Override
     protected void onPause() {
@@ -607,9 +617,42 @@ public class HomeActivity extends AppCompatActivity implements
      *
      */
 
+//    private void feedBackActivity(){
+//        final Dialog dialog = new Dialog(HomeActivity.this);
+//        dialog.setContentView(R.layout.feedback_dialog);
+//        final EditText feedbackText = (EditText)findViewById(R.id.feedback_text);
+//        Button feedbackCancel = (Button) findViewById(R.id.feedback_cancel);
+//        Button feedbackSend =(Button)findViewById(R.id.feedback_send);
+//
+//        dialog.show();
+//
+//      /*  feedbackCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        feedbackSend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
+//                _Intent.setType("text/email");
+//                _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
+//                _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
+//                _Intent.putExtra(android.content.Intent.EXTRA_TEXT, feedbackText.getText());
+//                startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
+//                dialog.dismiss();
+//            }
+//        });*/
+//
+//
+//    }
+
+
     private void setUpNavigationDrawer() {
 
-        mProfileIcon = (ImageView)findViewById(R.id.profileIcon);
+        mProfileIcon = (ImageView) findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
        // mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         final NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
@@ -623,10 +666,14 @@ public class HomeActivity extends AppCompatActivity implements
         mProfileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mDrawerLayout.isDrawerOpen(mNavigationView))
-                    mDrawerLayout.closeDrawer(mNavigationView);
-                else
-                    mDrawerLayout.openDrawer(mNavigationView);
+                if(!isCommentsLayoutVisible) {
+                    if (mDrawerLayout.isDrawerOpen(mNavigationView))
+                        mDrawerLayout.closeDrawer(mNavigationView);
+                    else
+                        mDrawerLayout.openDrawer(mNavigationView);
+                }else{
+
+                }
             }
         });
         PersonInfo myDetails = new PersonInfo();
@@ -783,6 +830,11 @@ public class HomeActivity extends AppCompatActivity implements
                     App.setPersonConentData(o.contentList);
                 } else {
                     Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                        startActivity(intent);
+                        finish();
                 }
 
                 if (o.personDetails!=null){
@@ -868,6 +920,53 @@ public class HomeActivity extends AppCompatActivity implements
         dialog.show();
     }
 
+
+//    TODO: test method to be removed later
+
+    private void checkForDeviceDensity(){
+
+        StringBuilder density = new StringBuilder("");
+        float dpi = getResources().getDisplayMetrics().densityDpi;
+
+        switch ((int)dpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                density.append( "Low Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                density.append( "Medium Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                density.append( "High Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                density.append( "X-high Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                density.append( "XX-high Density Display");
+                Log.i(TAG, density.toString());
+                break;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                density.append( "XXX-high Density Display");
+                Log.i(TAG, density.toString());
+                break;
+
+        }
+
+        if(density.toString().equals("")) {
+            Log.i(TAG, "Screen density::"+dpi);
+            Toast.makeText(HomeActivity.this,"Screen density::"+dpi,Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Log.i(TAG, "Screen density::" + density);
+            Toast.makeText(HomeActivity.this,"Screen density::" + density,Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
 
 }
 
