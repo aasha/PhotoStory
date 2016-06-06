@@ -721,24 +721,6 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
 
-        /*if(myDetails!=null) {
-            if (myDetails.imageUrl != null && myDetails.imageUrl != "")
-            {
-                Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().into(mPImg);
-                //Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
-            }
-            else
-            {
-                Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
-               // Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
-            }
-            mPN.setText(myDetails.name);
-        }
-        else{
-            Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
-            //Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
-            mPN.setText("Guest");
-        }*/
         mPImg.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -756,21 +738,14 @@ public class HomeActivity extends AppCompatActivity implements
             int id = menuItem.getItemId();
             menuItem.setChecked(true);
             switch (id){
-                /*
-                case R.id.dr_profile:Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
-                    intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
-                    intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
-                    startActivity(intent);
-                    break;
-*/
+
                 case R.id.dr_feedback:feedBackActivity();
                     break;
 
                 case R.id.dr_invite: sendInvite();
                     break;
 
-                case R.id.dr_contributor:
+                case R.id.dr_contributor:contributeActivity();
                     break;
             }
             return true;
@@ -779,27 +754,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         });
 
-       /* mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                switch (i){
-                    case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
-                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
-                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
-                        startActivity(intent);
-                        //finish();*//**TODO: Add code to show My Profile Page**//*
-                        break;*//**TODO: Add code to show My Profile Page**//*
-
-                    case 1: sendFeedback();
-                        break;
-
-                    case 2: sendInvite();
-                        break;
-                }
-            }
-        });*/
     }
 
     private void sendFeedback() {
@@ -966,6 +920,66 @@ public class HomeActivity extends AppCompatActivity implements
         }
 
 
+    }
+
+    private void contributeActivity(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.contribute_dialog);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+
+        final EditText cEmail = (EditText)dialog.findViewById(R.id.c_email);
+        TextView contributeCancel = (TextView)dialog.findViewById(R.id.contribute_cancel);
+        TextView contriuteSubmit =(TextView) dialog.findViewById(R.id.contribute_submit);
+
+
+            contributeCancel.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        contriuteSubmit.setOnClickListener(new TextView.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(),"","","",new NetworkApiCallback<BaseResponse>() {
+                    @Override
+                    public void success(BaseResponse o, Response response) {
+
+                        Toast.makeText(HomeActivity.this,"Feedback Sent",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void failure(BaseResponse error) {
+                        // mProgress.dismiss();
+
+                        Toast.makeText(HomeActivity.this, "Error sending feedback", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void networkFailure(RetrofitError error) {
+                        Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
 }
