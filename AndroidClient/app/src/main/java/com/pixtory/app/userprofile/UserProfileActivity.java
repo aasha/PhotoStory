@@ -125,7 +125,6 @@ public class UserProfileActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_profile);
-
         Bundle extras = getIntent().getExtras();
         userId = Integer.parseInt(extras.getString("USER_ID"));
         personId = Integer.parseInt(extras.getString("PERSON_ID"));
@@ -140,6 +139,7 @@ public class UserProfileActivity extends Activity{
         ImageView backImage = (ImageView)findViewById(R.id.back_img);
         LinearLayout backClick = (LinearLayout)findViewById(R.id.back_click);
         //FrameLayout profileFrame = (FrameLayout)findViewById(R.id.profile_frame);
+
 
         Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
         Dekar.applyFont(UserProfileActivity.this,personDesc,"fonts/Roboto-Regular.ttf");

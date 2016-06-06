@@ -8,6 +8,14 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -18,6 +26,8 @@ import com.pixtory.app.model.ContentData;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import retrofit.http.HEAD;
 
 
 public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.ViewHolder>{
@@ -59,9 +69,13 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position){
 
 
+
         Picasso.with(context).load(cDlist.get(position).pictureUrl).fit().centerCrop().into(holder.cardImage);
         //holder.cardImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         holder.cardTitle.setText(cDlist.get(position).name);
+
+        // holder.cardTitle.setText("Pixtory, every picture has a story to tell");
+
         holder.cardPlace.setText(cDlist.get(position).place);
         //holder.cardPlace.setText("Bengaluru, India");
         //holder.cardImage.setImageResource(R.drawable.cardimg);
