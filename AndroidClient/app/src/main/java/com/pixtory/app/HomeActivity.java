@@ -739,13 +739,13 @@ public class HomeActivity extends AppCompatActivity implements
             menuItem.setChecked(true);
             switch (id){
 
-                case R.id.dr_feedback:feedBackActivity();
+                case R.id.dr_feedback:showFeedBackDialog();
                     break;
 
                 case R.id.dr_invite: sendInvite();
                     break;
 
-                case R.id.dr_contributor:contributeActivity();
+                case R.id.dr_contributor:showContributeDialog();
                     break;
             }
             return true;
@@ -756,22 +756,13 @@ public class HomeActivity extends AppCompatActivity implements
 
     }
 
-    private void sendFeedback() {
-        final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
-        _Intent.setType("text/email");
-        _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
-        _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
-        _Intent.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.mail_feedback_message));
-        startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
-    }
-
     private void sendInvite(){
         Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
         sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, "Send Invite"));
+        startActivity(Intent.createChooser(sendIntent, "Send Invite via"));
     }
 
     private void setPersonDetails(){
@@ -813,7 +804,7 @@ public class HomeActivity extends AppCompatActivity implements
         });
     }
 
-    private void feedBackActivity(){
+    private void showFeedBackDialog(){
         final Dialog dialog = new Dialog(HomeActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.feedback_dialog);
@@ -832,7 +823,6 @@ public class HomeActivity extends AppCompatActivity implements
         final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
         TextView feedbackCancel = (TextView)dialog.findViewById(R.id.feedback_cancel);
         TextView feedbackSend =(TextView) dialog.findViewById(R.id.feedback_send);
-
 
 
         feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
@@ -922,7 +912,10 @@ public class HomeActivity extends AppCompatActivity implements
 
     }
 
-    private void contributeActivity(){
+    /*
+    method for 'become a contributor' item
+    */
+    private void showContributeDialog(){
         final Dialog dialog = new Dialog(HomeActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.contribute_dialog);
