@@ -37,7 +37,6 @@
                   android:layout_height="30dp"
                   android:layout_margin="20dp"
                   android:id="@+id/profileIcon"
-                  android:background="@drawable/menu_icon"
                   android:gravity="center"
                 android:layout_gravity="left"/>
         <com.facebook.drawee.view.SimpleDraweeView

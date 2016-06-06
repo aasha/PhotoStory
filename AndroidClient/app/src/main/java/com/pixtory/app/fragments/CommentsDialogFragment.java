@@ -50,7 +50,6 @@ public class CommentsDialogFragment extends DialogFragment{
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NO_FRAME, R.style.CustomDialog);
 
-
         if(!(getActivity() instanceof OnAddCommentButtonClickListener)){
             throw new ClassCastException(getActivity().toString()
                     + " must implement OnAddCommentButtonClickListener");
@@ -110,6 +109,6 @@ public class CommentsDialogFragment extends DialogFragment{
     }
 
     public interface OnAddCommentButtonClickListener{
-        public void onAddCommentButtonClicked(String str);
+        void onAddCommentButtonClicked(String str);
     }
 }
