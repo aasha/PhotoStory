@@ -32,23 +32,30 @@ public class PagerParallaxTransformer implements ViewPager.PageTransformer {
     public void transformPage(View view, float position) {
 
         int pageWidth = view.getWidth();
-
+        float scale = ((float)pageWidth - 5)/pageWidth;
+        /*if(position!=0){
+            view.setScaleX(scale);
+        }
+        else
+            view.setScaleX(1);
+*/
         if (position < -1) {
             // This page is way off-screen to the left.
             view.setAlpha(1);
 
         } else if (position <= 1 && mViewsToParallax != null) { // [-1,1]
             for (ParallaxTransformParameters parallaxTransformInformation : mViewsToParallax) {
-                applyParallaxEffect(view, position, pageWidth, parallaxTransformInformation,
+                addParallaxEffect(view, position, pageWidth, parallaxTransformInformation,
                         position > 0);
             }
         } else {
             // This page is way off-screen to the right.
             view.setAlpha(1);
         }
+
     }
 
-    private void applyParallaxEffect(View view, float position, int pageWidth,
+    private void addParallaxEffect(View view, float position, int pageWidth,
                                      ParallaxTransformParameters information, boolean isEnter) {
         if (information.isValid() && view.findViewById(information.resourceId) != null) {
             if (isEnter && !information.isEnterDefault()) {
