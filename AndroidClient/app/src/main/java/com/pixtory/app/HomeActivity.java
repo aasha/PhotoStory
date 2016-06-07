@@ -45,6 +45,7 @@ import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.transformations.PagerParallaxTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
 
 import com.pixtory.app.typeface.Intro;
@@ -69,7 +70,7 @@ import retrofit.http.HEAD;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener{
+public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener,CommentsDialogFragment.OnAddCommentButtonClickListener{
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -130,6 +131,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
 
+        PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
+        mPager.setPageTransformer(true,pagerParallaxTransformer);
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -351,12 +354,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     }
 
-//    @Override
-//    public void onAddCommentButtonClicked(String str) {
-//        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-//        if(mainFragment !=null)
-//            mainFragment.postComment(str);
-//    }
+    @Override
+    public void onAddCommentButtonClicked(String str) {
+        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+        if(mainFragment !=null)
+            mainFragment.postComment(str);
+    }
 
     private class ConnectionChangedListener
             implements ConnectionClassManager.ConnectionClassStateChangeListener {
@@ -395,14 +398,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
                     mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
 
-                    //if(!mainFragment.isCommentsVisible()) {
+                    if(!mainFragment.isCommentsVisible()) {
                         if (mDrawerLayout.isDrawerOpen(mNavigationView))
                             mDrawerLayout.closeDrawer(mNavigationView);
                         else
                             mDrawerLayout.openDrawer(mNavigationView);
-                    //}else{
-                    //    mainFragment.onBackButtonClicked();
-                    //}
+                    }else{
+                        mainFragment.onBackButtonClicked();
+                    }
 
             }
         });
