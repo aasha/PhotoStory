@@ -59,7 +59,7 @@
         <activity
             android:name=".userprofile.UserProfileActivity"
             android:icon="@drawable/pixtory"
-            android:label="USerProfileActivity"
+            android:label="UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>

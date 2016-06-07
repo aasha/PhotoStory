@@ -722,32 +722,39 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         contriuteSubmit.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
+                if (!isEmailValid(cEmail.getText().toString()))
+                    Toast.makeText(HomeActivity.this, "Please enter a valid email id.", Toast.LENGTH_SHORT).show();
+                else{
+                    NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(), "", "", "", new NetworkApiCallback<BaseResponse>() {
+                        @Override
+                        public void success(BaseResponse o, Response response) {
 
-                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(),"","","",new NetworkApiCallback<BaseResponse>() {
-                    @Override
-                    public void success(BaseResponse o, Response response) {
+                            Toast.makeText(HomeActivity.this, "Feedback Sent", Toast.LENGTH_SHORT).show();
+                        }
 
-                        Toast.makeText(HomeActivity.this,"Feedback Sent",Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void failure(BaseResponse error) {
+                            // mProgress.dismiss();
 
-                    @Override
-                    public void failure(BaseResponse error) {
-                        // mProgress.dismiss();
+                            Toast.makeText(HomeActivity.this, "Error sending feedback", Toast.LENGTH_SHORT).show();
+                        }
 
-                        Toast.makeText(HomeActivity.this, "Error sending feedback", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void networkFailure(RetrofitError error) {
-                        Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void networkFailure(RetrofitError error) {
+                            Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
                 dialog.dismiss();
+            }
             }
         });
 
         dialog.show();
+    }
+
+    boolean isEmailValid(CharSequence email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
 }

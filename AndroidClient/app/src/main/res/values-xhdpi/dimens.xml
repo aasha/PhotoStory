@@ -8,5 +8,6 @@
     <dimen name="fb_btn_icon_height">29dp</dimen>
     <dimen name="pixtory_subheading_font">20sp</dimen>
     <dimen name="skip_login_font">18sp</dimen>
+    <dimen name="card_name_font">15sp</dimen>
 
 </resources>

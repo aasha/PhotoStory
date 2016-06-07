@@ -254,6 +254,12 @@ public class MainFragment extends Fragment {
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
                 mTextDesc.setText(cd.personDetails.desc);
+                mProfileImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(mContext,cd.personDetails.userId+"",Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextDate.setText(cd.date);
