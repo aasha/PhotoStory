@@ -141,9 +141,6 @@ public class UserProfileActivity extends Activity{
         //FrameLayout profileFrame = (FrameLayout)findViewById(R.id.profile_frame);
 
 
-        Dekar.applyFont(UserProfileActivity.this,personName,"fonts/Roboto-Regular.ttf");
-        Dekar.applyFont(UserProfileActivity.this,personDesc,"fonts/Roboto-Regular.ttf");
-
 
         personInfo = new PersonInfo();
         contentDataList = new ArrayList<ContentData>();
@@ -234,7 +231,7 @@ public class UserProfileActivity extends Activity{
         recyclerView.setLayoutManager(gridLayout);
 
         //intialise card layout adapter and set it to recycler view
-        cardLayoutAdapter = new CardLayoutAdapter(this, App.getContentData());
+        cardLayoutAdapter = new CardLayoutAdapter(this, contentDataList);
         recyclerView.setAdapter(cardLayoutAdapter);
 
         //get the screen dimesions

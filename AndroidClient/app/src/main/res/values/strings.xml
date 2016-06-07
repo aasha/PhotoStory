@@ -57,6 +57,6 @@
     <string name="mail_feedback_subject">Feedback on your app, Pixtory</string>
     <string name="mail_feedback_message">Hi,
 \n\nYour Pixtory app is awesome! I would like to give you some feedback:</string>
-
+    <string name="follow">Follow</string>
 
 </resources>

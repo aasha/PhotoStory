@@ -35,6 +35,7 @@
     <color name="grey_3">#999999</color>
     <color name="gey_4">#cccccc</color>
     <color name="grey_5">#e1e1e1</color>
+    <color name="profile_screen_background">#d6dbe5</color>
 
 
 </resources>
