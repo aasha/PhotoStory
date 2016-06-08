@@ -149,8 +149,9 @@ public class UserProfileActivity extends Activity{
             personFollow.setVisibility(View.GONE);
             personInfo = App.getPersonInfo();
             contentDataList = App.getPersonConentData();
+            cardLayoutAdapter = new CardLayoutAdapter(this, contentDataList);
             personName.setText(personInfo.name);
-            personDesc.setText(personInfo.desc);
+            personDesc.setText(personInfo.description);
 
             if (personInfo.imageUrl != null && personInfo.imageUrl!="") {
                 Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
@@ -162,14 +163,34 @@ public class UserProfileActivity extends Activity{
                 Picasso.with(UserProfileActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().into(profileImage);
             }
 
+            //initialise recyclerview and set its layout as grid layout
+            gridLayout = new GridLayoutManager(this,2);
+            recyclerView = (RecyclerView)findViewById(R.id.profile_recycler_view);
+            recyclerView.setLayoutManager(gridLayout);
+
+            //intialise card layout adapter and set it to recycler view
+
+            recyclerView.setAdapter(cardLayoutAdapter);
+
+            //get the screen dimesions
+            DisplayMetrics dm =  new DisplayMetrics();
+            this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+            //set spacing proportional to width of the the screen (0.063 times the screen width
+            double spacing = 0.063*dm.widthPixels;
+            SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
+            recyclerView.addItemDecoration(decoration);
+
         }
         else {
             NetworkApiHelper.getInstance().getPersonDetails(userId, personId, new NetworkApiCallback<GetPersonDetailsResponse>() {
                 @Override
                 public void success(GetPersonDetailsResponse o, Response response) {
-
+                    Toast.makeText(UserProfileActivity.this,"success",Toast.LENGTH_SHORT);
                     if (o.contentList != null) {
                         contentDataList = o.contentList;
+                        cardLayoutAdapter = new CardLayoutAdapter(UserProfileActivity.this, contentDataList);
+                        Toast.makeText(UserProfileActivity.this,contentDataList.size()+"",Toast.LENGTH_SHORT);
                     } else {
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
                                 .put(AppConstants.USER_ID, Integer.toString(personId))
@@ -180,9 +201,8 @@ public class UserProfileActivity extends Activity{
 
                     if (o.personDetails != null) {
                         personInfo = o.personDetails;
-                        Dekar.applyFont(UserProfileActivity.this, personName, "fonts/Roboto-Regular.ttf");
                         personName.setText(personInfo.name);
-                        personDesc.setText(personInfo.desc);
+                        personDesc.setText(personInfo.description);
 
                         if (personInfo.imageUrl != null) {
                             Picasso.with(UserProfileActivity.this).load(personInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(UserProfileActivity.this)).transform(new BlurTransformation(UserProfileActivity.this, 10)).into(profileImageBorder);
@@ -201,6 +221,24 @@ public class UserProfileActivity extends Activity{
                         System.out.println("Person data null");
                         Toast.makeText(UserProfileActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
                     }
+
+                    //initialise recyclerview and set its layout as grid layout
+                    gridLayout = new GridLayoutManager(UserProfileActivity.this,2);
+                    recyclerView = (RecyclerView)findViewById(R.id.profile_recycler_view);
+                    recyclerView.setLayoutManager(gridLayout);
+
+                    //intialise card layout adapter and set it to recycler view
+
+                    recyclerView.setAdapter(cardLayoutAdapter);
+
+                    //get the screen dimesions
+                    DisplayMetrics dm =  new DisplayMetrics();
+                    UserProfileActivity.this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                    //set spacing proportional to width of the the screen (0.063 times the screen width
+                    double spacing = 0.063*dm.widthPixels;
+                    SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
+                    recyclerView.addItemDecoration(decoration);
                 }
 
                 @Override
@@ -225,23 +263,7 @@ public class UserProfileActivity extends Activity{
             });
         }
 
-        //initialise recyclerview and set its layout as grid layout
-        gridLayout = new GridLayoutManager(this,2);
-        recyclerView = (RecyclerView)findViewById(R.id.profile_recycler_view);
-        recyclerView.setLayoutManager(gridLayout);
 
-        //intialise card layout adapter and set it to recycler view
-        cardLayoutAdapter = new CardLayoutAdapter(this, contentDataList);
-        recyclerView.setAdapter(cardLayoutAdapter);
-
-        //get the screen dimesions
-        DisplayMetrics dm =  new DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        //set spacing proportional to width of the the screen (0.063 times the screen width
-        double spacing = 0.063*dm.widthPixels;
-        SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
-        recyclerView.addItemDecoration(decoration);
 
         backImage.setOnClickListener(new View.OnClickListener() {
             @Override

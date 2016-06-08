@@ -20,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.*;
 
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -31,6 +32,7 @@ import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.SlantView;
@@ -253,11 +255,15 @@ public class MainFragment extends Fragment {
                 }
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
-                mTextDesc.setText(cd.personDetails.desc);
+                mTextDesc.setText(cd.personDetails.description);
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(mContext,cd.personDetails.userId+"",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(mContext, UserProfileActivity.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(mContext));
+                        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
+                        startActivity(intent);
                     }
                 });
             }

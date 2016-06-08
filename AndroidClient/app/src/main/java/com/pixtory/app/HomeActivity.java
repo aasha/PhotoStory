@@ -9,6 +9,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.*;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -558,6 +560,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         lp.gravity = Gravity.CENTER;
 
         dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
         TextView feedbackCancel = (TextView)dialog.findViewById(R.id.feedback_cancel);
@@ -706,6 +709,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         lp.gravity = Gravity.CENTER;
 
         dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final EditText cEmail = (EditText)dialog.findViewById(R.id.c_email);
         TextView contributeCancel = (TextView)dialog.findViewById(R.id.contribute_cancel);
