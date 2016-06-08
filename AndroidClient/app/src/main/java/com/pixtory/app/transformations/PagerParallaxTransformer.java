@@ -45,7 +45,7 @@ public class PagerParallaxTransformer implements ViewPager.PageTransformer {
 
         } else if (position <= 1 && mViewsToParallax != null) { // [-1,1]
             for (ParallaxTransformParameters parallaxTransformInformation : mViewsToParallax) {
-                addParallaxEffect(view, position, pageWidth, parallaxTransformInformation,
+                applyParallaxEffect(view, position, pageWidth, parallaxTransformInformation,
                         position > 0);
             }
         } else {
@@ -55,7 +55,7 @@ public class PagerParallaxTransformer implements ViewPager.PageTransformer {
 
     }
 
-    private void addParallaxEffect(View view, float position, int pageWidth,
+    private void applyParallaxEffect(View view, float position, int pageWidth,
                                      ParallaxTransformParameters information, boolean isEnter) {
         if (information.isValid() && view.findViewById(information.resourceId) != null) {
             if (isEnter && !information.isEnterDefault()) {

@@ -246,4 +246,24 @@ public class NetworkApiHelper {
         });
     }
 
+    public void getContributorMail(int userId, String mailId, final NetworkApiCallback cb) {
+        GetContributorMailRequest req = new GetContributorMailRequest();
+        req.userId = userId;
+        req.mailId = mailId;
+
+        sAPI.getContributorMail(req, new Callback<BaseResponse>() {
+            @Override
+            public void success(BaseResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
 }

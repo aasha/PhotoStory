@@ -725,18 +725,18 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 if (!isEmailValid(cEmail.getText().toString()))
                     Toast.makeText(HomeActivity.this, "Please enter a valid email id.", Toast.LENGTH_SHORT).show();
                 else{
-                    NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(), "", "", "", new NetworkApiCallback<BaseResponse>() {
+                    NetworkApiHelper.getInstance().getContributorMail(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(),  new NetworkApiCallback<BaseResponse>() {
                         @Override
                         public void success(BaseResponse o, Response response) {
 
-                            Toast.makeText(HomeActivity.this, "Feedback Sent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(HomeActivity.this, "Email Id Sent", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void failure(BaseResponse error) {
                             // mProgress.dismiss();
 
-                            Toast.makeText(HomeActivity.this, "Error sending feedback", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(HomeActivity.this, "Error sending Email id", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
