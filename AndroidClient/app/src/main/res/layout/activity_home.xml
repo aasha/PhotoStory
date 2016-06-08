@@ -57,9 +57,9 @@
         app:headerLayout="@layout/drawer_header"
         app:menu="@menu/drawer_list"
         android:choiceMode="singleChoice"
-        android:divider="@color/grey_3"
+        android:divider="@color/translucent"
         android:dividerHeight="1dp"
-        android:background="#fff"/>
+        android:background="#80ffffff"/>
 
 
 </android.support.v4.widget.DrawerLayout>
