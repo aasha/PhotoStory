@@ -33,9 +33,8 @@ public class PagerParallaxTransformer implements ViewPager.PageTransformer {
 
         int pageWidth = view.getWidth();
         float scale = ((float)pageWidth - 5)/pageWidth;
-        /*if(position!=0){
+       /* if(position!=0)
             view.setScaleX(scale);
-        }
         else
             view.setScaleX(1);
 */

@@ -133,6 +133,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
         mPager.setPageTransformer(true,pagerParallaxTransformer);
+        mPager.setPageMargin(6);
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
