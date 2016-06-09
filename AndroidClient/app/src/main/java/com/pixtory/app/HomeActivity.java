@@ -5,12 +5,16 @@ import android.animation.AnimatorInflater;
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 
+import android.app.Application;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.WallpaperManager;
 import android.content.*;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -61,7 +65,9 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -136,6 +142,19 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
         mPager.setPageTransformer(true,pagerParallaxTransformer);
         mPager.setPageMargin(6);
+        mPager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomeActivity.this,"Clicked",Toast.LENGTH_SHORT).show();
+            }
+        });
+        mPager.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(HomeActivity.this,"Long press detected",Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -482,6 +501,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
                 case R.id.dr_contributor:showContributeDialog();
                     break;
+
+                case R.id.dr_wallpaper:mDrawerLayout.closeDrawer(mNavigationView);
+                    //showWallpaperDialog();
+                    setWallpaper();
+                    break;
             }
             return true;
 
@@ -761,6 +785,77 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     boolean isEmailValid(CharSequence email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
+
+    private void showWallpaperDialog(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.wallpaper_dialog);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
+        TextView wallpaperNo = (TextView)dialog.findViewById(R.id.wallpaper_no);
+        TextView wallpaperYes =(TextView) dialog.findViewById(R.id.wallpaper_yes);
+        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
+        layoutParams.width = (int)(0.5*dm.widthPixels);
+        wallpaperYes.setLayoutParams(layoutParams);*/
+        wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void setWallpaper(){
+        String imgUrl = App.getContentData().get(mPager.getCurrentItem()).pictureUrl;
+        Picasso.with(HomeActivity.this).load(imgUrl).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Toast.makeText(HomeActivity.this,"Wallpaper set",Toast.LENGTH_SHORT).show();
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+    }
+
 
 }
 
