@@ -83,7 +83,7 @@ public class MainFragment extends Fragment {
     ImageView mImageMain = null;
 
     @Bind(R.id.bottom_container)
-    LinearLayout mImageDetailBottomContainer = null;
+    RelativeLayout mImageDetailBottomContainer = null;
 
     @Bind(R.id.image_details_layout)
     RelativeLayout mImageDetailsLayout;
@@ -428,8 +428,8 @@ public class MainFragment extends Fragment {
         return false;
     }
     
-    @OnTouch(R.id.pic_story_layout)
-    public boolean onTouchStory(LinearLayout view, MotionEvent me) {
+    @OnTouch(R.id.image_details_layout)
+    public boolean onTouchStory(RelativeLayout view, MotionEvent me) {
         if (gesture.onTouchEvent(me)) {
             return true;
         }
@@ -442,9 +442,12 @@ public class MainFragment extends Fragment {
 
     private void showHalfScreen() {
         setUpHalfScreen();
+
         int fromY   = mDeviceHeightInPx - mImageInfoLayoutHeight;
-        int toY     = (int)0.70*mDeviceHeightInPx;
-        animateContent(mImageDetailBottomContainer, false , fromY , toY);
+        double toY     = 0.50*mDeviceHeightInPx;
+        toY = toY*(-1);
+
+        animateContent(mImageDetailBottomContainer, false , 0 , (int)toY);
 
     }
 
@@ -469,14 +472,14 @@ public class MainFragment extends Fragment {
     private void setUpHalfScreen(){
         mSlantView.setVisibility(View.VISIBLE);
         mStoryLayout.setVisibility(View.VISIBLE);
-        mTextExpert.setVisibility(View.GONE);
+//        mTextExpert.setVisibility(View.GONE);
     }
 
     private void animateContent(View view , final boolean showContent , int fromY , int toY){
 
         ObjectAnimator transAnimation= ObjectAnimator.ofFloat(view ,"translationY" , fromY, toY);
         transAnimation.setDuration(500);//set duration
-        transAnimation.start();//start animatio
+        transAnimation.start();//start animation
 
         transAnimation.addListener(new Animator.AnimatorListener() {
             @Override
@@ -642,7 +645,7 @@ public class MainFragment extends Fragment {
      */
     @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {
-        if(Utils.isEmpty(Utils.getFbID(mContext))) {
+        if(Utils.isNotEmpty(Utils.getFbID(mContext))) {
             if (mContentData.likedByUser == false) {
                 ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_in);
                 anim.setTarget(mImageLike);

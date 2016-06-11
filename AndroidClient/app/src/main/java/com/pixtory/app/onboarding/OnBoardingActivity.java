@@ -120,7 +120,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Cancel)
                                 .build());
                         closeDialog();
-                        Toast.makeText(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please try again later.", Toast.LENGTH_SHORT).show();
+                        Utils.showToastMessage(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please try again later.");
                     }
 
                     @Override
@@ -130,8 +130,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                                 .build());
 
                         closeDialog();
-                        Toast.makeText(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please check your network connection or try again later.(" + exception.getMessage() + ")", Toast.LENGTH_LONG).show();
-
+                        Utils.showToastMessage(OnBoardingActivity.this,  "Sorry, unable to login to facebook.Please check your network connection or try again later.(" + exception.getMessage() + ")");
                     }
                 });
     }
@@ -173,7 +172,6 @@ public class OnBoardingActivity  extends FragmentActivity {
                     String accessToken = AccessToken.getCurrentAccessToken().getToken();
                     final String imgUrl = "https://graph.facebook.com/" + fbId + "/picture?width=500&height=500";
 
-
                     mProgressDialog.setTitle("Registering user...");
                     mProgressDialog.show();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Success)
@@ -202,7 +200,9 @@ public class OnBoardingActivity  extends FragmentActivity {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                                     .put("MESSAGE", error.errorMessage)
                                     .build());
+                            Log.i(TAG,"RegisterResponse error::"+error.errorMessage);
                             closeDialog();
+                            Utils.showToastMessage(OnBoardingActivity.this , "Oops something went wrong, Please try logging in again after sometime");
                         }
 
                         @Override
@@ -210,7 +210,9 @@ public class OnBoardingActivity  extends FragmentActivity {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                                     .put("MESSAGE", error.getMessage())
                                     .build());
+                            Log.i(TAG,"RegisterResponse RetrofitError error::"+error.getMessage());
                             closeDialog();
+                            Utils.showToastMessage(OnBoardingActivity.this , "Oops something went wrong, Please try logging in again after sometime");
                         }
                     });
 
@@ -277,7 +279,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                         .put("MESSAGE", error.errorMessage)
                         .build());
-                Toast.makeText(OnBoardingActivity.this, "Username is taken. Please insert a new username", Toast.LENGTH_SHORT).show();
+                Utils.showToastMessage(OnBoardingActivity.this, "Username is taken. Please insert a new username");
             }
 
             @Override
@@ -290,7 +292,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                         .put("MESSAGE", error.getMessage())
                         .build());
-                Toast.makeText(OnBoardingActivity.this, "Please connect to network", Toast.LENGTH_SHORT).show();
+                Utils.showToastMessage(OnBoardingActivity.this, "Please connect to network");
 
             }
         });

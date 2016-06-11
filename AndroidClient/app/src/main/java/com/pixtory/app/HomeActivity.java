@@ -31,35 +31,22 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
-import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 
-import com.pixtory.app.model.PersonInfo;
-import com.pixtory.app.pushnotification.QuickstartPreferences;
-import com.pixtory.app.pushnotification.RegistrationIntentService;
-
 import com.pixtory.app.retrofit.BaseResponse;
-import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
-import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 
-import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 
 import com.pixtory.app.userprofile.UserProfileActivity;
-import com.pixtory.app.utils.AmplitudeLog;
-import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -101,7 +88,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private DeviceBandwidthSampler mDeviceBandwidthSampler;
     private ConnectionChangedListener mListener;
 
-    /** Naviagation Drawer Objects**/
+    /** Navigation Drawer Objects**/
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ArrayAdapter<String> mDrawerListAdapter;
@@ -121,7 +108,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             showAlert();
         }
 
-        setPersonDetails();
+//        setPersonDetails();
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
@@ -348,12 +335,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     }
 
-//    @Override
-//    public void onAddCommentButtonClicked(String str) {
-//        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-//        if(mainFragment !=null)
-//            mainFragment.postComment(str);
-//    }
 
     private class ConnectionChangedListener
             implements ConnectionClassManager.ConnectionClassStateChangeListener {
@@ -373,104 +354,46 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
     }
 
-
     /**
      * Navigation Drawer Implementation
      */
-
     private void setUpNavigationDrawer() {
 
         menuIcon = (ImageView) findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-       // mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
-        final NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
-
+        final NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
 
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                    mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+                mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
 
-                    if(!mainFragment.isCommentsVisible()) {
-                        if (mDrawerLayout.isDrawerOpen(mNavigationView))
-                            mDrawerLayout.closeDrawer(mNavigationView);
-                        else
-                            mDrawerLayout.openDrawer(mNavigationView);
-                    }else{
-                        mainFragment.onBackButtonClicked();
-                    }
-
-
-                if(mDrawerLayout.isDrawerOpen(mNavigationView))
-                    mDrawerLayout.closeDrawer(mNavigationView);
-                else
-                    mDrawerLayout.openDrawer(mNavigationView);
-            }
-        });
-        PersonInfo myDetails = new PersonInfo();
-        //setPersonDetails();
-        myDetails = App.getPersonInfo();
-        View header = mNavigationView.getHeaderView(0);
-
-        final CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
-        final TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
-
-        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
-            @Override
-            public void success(GetPersonDetailsResponse o, Response response) {
-
-                if (o.contentList != null) {
-                    App.setPersonConentData(o.contentList);
-                } else {
-                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
-                }
-
-                if (o.personDetails!=null){
-                    App.setPersonInfo(o.personDetails);
-                    if(o.personDetails.imageUrl==""||o.personDetails.imageUrl==null)
-                        Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
+                if(!mainFragment.isCommentsVisible()) {
+                //Navigation drawer is shown
+                    if (mDrawerLayout.isDrawerOpen(navigationView))
+                        mDrawerLayout.closeDrawer(navigationView);
                     else
-                        Picasso.with(HomeActivity.this).load(o.personDetails.imageUrl).fit().centerCrop().into(mPImg);
-                    mPN.setText(o.personDetails.name);
-                }else {
-                    System.out.println("Person data null");
-                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.openDrawer(navigationView);
+                }else{
+                //menu icon behaves as back arrow, on click of which user is navigated back to story content from
+                //comments section
+                    mainFragment.onBackButtonClicked();
                 }
-            }
 
-            @Override
-            public void failure(GetPersonDetailsResponse error) {
-                // mProgress.dismiss();
-
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
             }
         });
 
-        /*if(myDetails!=null) {
-            if (myDetails.imageUrl != null && myDetails.imageUrl != "")
-            {
-                Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().into(mPImg);
-                //Picasso.with(HomeActivity.this).load(myDetails.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
-            }
-            else
-            {
-                Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().into(mPImg);
-               // Picasso.with(HomeActivity.this).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
-            }
-            mPN.setText(myDetails.name);
-        }
-        else{
-            Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
-            //Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(HomeActivity.this)).transform(new BlurTransformation(HomeActivity.this,7.5f)).into(mPImgB);
-            mPN.setText("Guest");
-        }*/
-        mPImg.setOnClickListener(new View.OnClickListener(){
+        View header = navigationView.getHeaderView(0);
+        final CircularImageView userImage = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
+        final TextView userName = (TextView)header.findViewById(R.id.dr_profile_name);
+
+        if(Utils.isNotEmpty(Utils.getUserImage(this)))
+            Picasso.with(HomeActivity.this).load(Utils.getUserImage(this)).fit().into(userImage);
+
+        userName.setText(Utils.getUserName(this));
+
+        userImage.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
@@ -481,7 +404,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             }
         });
 
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
 
         public boolean onNavigationItemSelected(MenuItem menuItem){
             int id = menuItem.getItemId();
@@ -510,50 +433,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         });
 
-       /* mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                switch (i){
-                    case 0: Toast.makeText(HomeActivity.this,"My Profile is to be shown",Toast.LENGTH_SHORT).show();
-<<<<<<< HEAD
-
-                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
-                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
-                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
-                        startActivity(intent);
-                        finish();
-                        break;
-                    case 1: Toast.makeText(HomeActivity.this,"Feedback screen to be shown",Toast.LENGTH_SHORT).show();
-                            sendFeedback();
-                            //feedBackActivity();
-                            break;
-                        //TODO : Add code to send feedback
-
-                    case 2: Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY");
-                        sendIntent.setType("text/plain");
-                        startActivity(Intent.createChooser(sendIntent, "Send Invite"));
-                        break;
-
-=======
-                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
-                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
-                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
-                        startActivity(intent);
-                        //finish();*//**TODO: Add code to show My Profile Page**//*
-                        break;*//**TODO: Add code to show My Profile Page**//*
-
-                    case 1: sendFeedback();
-                        break;
-
-                    case 2: sendInvite();
-                        break;
-                }
-            }
-        });*/
     }
 
     private void sendFeedback() {
@@ -574,42 +453,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         startActivity(Intent.createChooser(sendIntent, "Send Invite"));
     }
 
-    private void setPersonDetails(){
 
-        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
-            @Override
-            public void success(GetPersonDetailsResponse o, Response response) {
-
-                if (o.contentList != null) {
-                    App.setPersonConentData(o.contentList);
-                } else {
-                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
-
-                }
-
-                if (o.personDetails!=null){
-                    App.setPersonInfo(o.personDetails);
-                }else {
-                    System.out.println("Person data null");
-                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void failure(GetPersonDetailsResponse error) {
-                // mProgress.dismiss();
-
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
+    /**
+     * Code to animate menu icon to back arrow
+     * @param showBackArrow
+     */
     @Override
     public void onAnimateMenuIcon(final boolean showBackArrow){
 
