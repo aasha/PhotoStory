@@ -26,6 +26,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.*;
 import butterknife.ButterKnife;
 import com.facebook.network.connectionclass.*;
@@ -33,7 +36,9 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.pixtory.app.adapters.ImageArrayAdapter;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
+import com.pixtory.app.animations.FlipAnimation;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
@@ -52,6 +57,7 @@ import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.transformations.PagerParallaxTransformer;
+import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
 
 import com.pixtory.app.typeface.Intro;
@@ -123,7 +129,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_home_2);
         //TODO to be removed later
 //        checkForDeviceDensity();
         ButterKnife.bind(this);
@@ -134,13 +140,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
 
         setPersonDetails();
-        setUpNavigationDrawer();
+        setUpNavigationDrawer2();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
 
-        PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
-        mPager.setPageTransformer(true,pagerParallaxTransformer);
+        //PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
+        ParallaxPagerTransformer parallaxPagerTransformer = new ParallaxPagerTransformer(HomeActivity.this,R.id.image_main,0.5f);
+        mPager.setPageTransformer(true,parallaxPagerTransformer);
         mPager.setPageMargin(6);
         mPager.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -503,8 +510,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     break;
 
                 case R.id.dr_wallpaper:mDrawerLayout.closeDrawer(mNavigationView);
-                    //showWallpaperDialog();
-                    setWallpaper();
+                    showWallpaperAlert();
+                    //setWallpaper();
                     break;
             }
             return true;
@@ -587,8 +594,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
-        TextView feedbackCancel = (TextView)dialog.findViewById(R.id.feedback_cancel);
-        TextView feedbackSend =(TextView) dialog.findViewById(R.id.feedback_send);
+        LinearLayout feedbackCancel = (LinearLayout)dialog.findViewById(R.id.feedback_cancel);
+        LinearLayout feedbackSend =(LinearLayout) dialog.findViewById(R.id.feedback_send);
 
 
         feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
@@ -736,8 +743,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final EditText cEmail = (EditText)dialog.findViewById(R.id.c_email);
-        TextView contributeCancel = (TextView)dialog.findViewById(R.id.contribute_cancel);
-        TextView contriuteSubmit =(TextView) dialog.findViewById(R.id.contribute_submit);
+        LinearLayout contributeCancel = (LinearLayout)dialog.findViewById(R.id.contribute_cancel);
+        LinearLayout contriuteSubmit =(LinearLayout) dialog.findViewById(R.id.contribute_submit);
 
 
             contributeCancel.setOnClickListener(new TextView.OnClickListener() {
@@ -804,7 +811,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
-        TextView wallpaperNo = (TextView)dialog.findViewById(R.id.wallpaper_no);
+        TextView wallpaperNo = (TextView) dialog.findViewById(R.id.wallpaper_no);
         TextView wallpaperYes =(TextView) dialog.findViewById(R.id.wallpaper_yes);
         /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
         layoutParams.width = (int)(0.5*dm.widthPixels);
@@ -813,6 +820,48 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void onClick(View v) {
 
+                dialog.dismiss();
+            }
+        });
+
+        wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void showWallpaperAlert(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.wallpaper_alert);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
+        LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
+        LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
+        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
+        layoutParams.width = (int)(0.5*dm.widthPixels);
+        wallpaperYes.setLayoutParams(layoutParams);*/
+        wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setWallpaper();
                 dialog.dismiss();
             }
         });
@@ -855,6 +904,112 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             }
         });
     }
+
+
+    private void setUpNavigationDrawer2() {
+
+        menuIcon = (ImageView)findViewById(R.id.profileIcon);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+
+        final ArrayList<Drawable> items = new ArrayList<Drawable>();
+        items.add(getResources().getDrawable(R.drawable.cross_icon));
+        items.add(getResources().getDrawable(R.drawable.profile_icon));
+        items.add(getResources().getDrawable(R.drawable.contributor_icon));
+        items.add(getResources().getDrawable(R.drawable.invite_3));
+        items.add(getResources().getDrawable(R.drawable.feedback_icon));
+        items.add(getResources().getDrawable(R.drawable.wallpaper_icon));
+
+        mDrawerLayout.setScrimColor(Color.TRANSPARENT);
+
+        final ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(HomeActivity.this,0,items);
+        mDrawerList.setAdapter(imageArrayAdapter);
+
+        menuIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+
+                if(!mainFragment.isCommentsVisible()){
+                if(mDrawerLayout.isDrawerOpen(mDrawerList)){
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                }
+                else{
+                    //mDrawerList.setAdapter(imageArrayAdapter);
+                    mDrawerList.setLayoutAnimation(new LayoutAnimationController(AnimationUtils.loadAnimation(HomeActivity.this,R.anim.rotate_in),0.2f));
+                    mDrawerLayout.openDrawer(mDrawerList);
+                }
+                }else{
+                    mainFragment.onBackButtonClicked();
+                }
+            }
+        });
+
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                switch (i){
+                    case 0:mDrawerList.setLayoutAnimation(new LayoutAnimationController(AnimationUtils.loadAnimation(HomeActivity.this,R.anim.left_out),0.2f));
+                            mDrawerList.postOnAnimationDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //Toast.makeText(HomeActivity.this,"Animation done",Toast.LENGTH_SHORT).show();
+                                    mDrawerLayout.closeDrawer(mDrawerList);
+                                }
+                            },600);
+                        //
+                        break;
+                    case 1: Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                        startActivity(intent);
+                        break;
+
+                    case 2: showContributeDialog();
+                        break;
+
+                    case 3:sendInvite();
+                        break;
+
+                    case 4:showFeedBackDialog();
+                        break;
+
+                    case 5:showWallpaperAlert();
+                        break;
+                }
+            }
+        });
+    }
+
+    private void showLoginAlert(){
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.login_alert);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        LinearLayout loginClick = (LinearLayout) dialog.findViewById(R.id.login_click);
+        loginClick.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
 
 
 }
