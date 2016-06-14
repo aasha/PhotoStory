@@ -58,6 +58,8 @@ public class OnBoardingActivity  extends FragmentActivity {
     private final static String OB_FBLogin_Fail = "OB_FBLogin_Fail";
     private final static String OB_Register_Success = "OB_Register_Success";
     private final static String OB_Register_Failure = "OB_Register_Failure";
+    private final static String OB_Login_Skip = "OB_Login_Skip";
+
 
     private List<String> mFBPermissions = Arrays.asList("public_profile",
             "email", "user_about_me");
@@ -101,6 +103,7 @@ public class OnBoardingActivity  extends FragmentActivity {
         skipLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Login_Skip).build());
                 registerUserName("User");
                 mProgressDialog.show();
 //                gotoNextScreen();

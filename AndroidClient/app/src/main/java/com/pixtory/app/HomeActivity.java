@@ -5,7 +5,6 @@ import android.animation.AnimatorInflater;
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 
-import android.app.Application;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
@@ -18,19 +17,17 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import android.support.design.widget.NavigationView;
-
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.*;
 import butterknife.ButterKnife;
+
 import com.facebook.network.connectionclass.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -38,7 +35,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.pixtory.app.adapters.ImageArrayAdapter;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
-import com.pixtory.app.animations.FlipAnimation;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
@@ -46,40 +42,25 @@ import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 
-import com.pixtory.app.model.PersonInfo;
-import com.pixtory.app.pushnotification.QuickstartPreferences;
-import com.pixtory.app.pushnotification.RegistrationIntentService;
-
 import com.pixtory.app.retrofit.BaseResponse;
-import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
-import com.pixtory.app.transformations.PagerParallaxTransformer;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
 
-import com.pixtory.app.typeface.Intro;
-import com.pixtory.app.userprofile.UserProfileActivity2;
-import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 
-import com.pixtory.app.userprofile.UserProfileActivity;
-import com.pixtory.app.utils.AmplitudeLog;
-import com.pixtory.app.utils.Utils;
-import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.http.HEAD;
 
 /**
  * Created by aasha.medhi on 12/23/15.
@@ -129,7 +110,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_2);
+        setContentView(R.layout.activity_home);
         //TODO to be removed later
 //        checkForDeviceDensity();
         ButterKnife.bind(this);
@@ -140,7 +121,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
 
         setPersonDetails();
-        setUpNavigationDrawer2();
+        setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -174,6 +155,20 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 else
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
+                mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+               //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
+               if(mainFragment.isFullScreenShown())
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
+                            .put("POSITION_ID",""+previousPage)
+                            .build());
+                else
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
+                            .build());
+
             }
 
             @Override
@@ -339,7 +334,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         try {
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Exit)
                     .put("TIMESTAMP", System.currentTimeMillis() + "")
-                    .put(AppConstants.OPINION_ID, App.getContentData().get(mCurrentFragmentPosition).id + "")
+                    .put("PIXTORY_ID", App.getContentData().get(mCurrentFragmentPosition).id + "")
                     .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                     .build());
         } catch (Exception e) {
@@ -362,10 +357,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mConnectionClassManager.register(mListener);
         mDeviceBandwidthSampler.startSampling();
         ConnectionQuality cq = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
+        /*AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
                 .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                 .put(AppConstants.CONNECTION_QUALITY, cq.toString())
-                .build());
+                .build());*/
         Log.e("AASHA", "Connection q " + cq.toString());
     }
 
@@ -396,7 +391,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         @Override
         public void onBandwidthStateChange(ConnectionQuality bandwidthState) {
             mConnectionClass = bandwidthState;
-            runOnUiThread(new Runnable() {
+           /* runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
@@ -404,7 +399,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             .put(AppConstants.CONNECTION_QUALITY, mConnectionClass.toString())
                             .build());
                 }
-            });
+            });*/
         }
     }
 
@@ -412,6 +407,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     /**
      * Navigation Drawer Implementation
      */
+/*
 
     private void setUpNavigationDrawer() {
 
@@ -521,6 +517,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         });
 
     }
+*/
+
+/*
 
     private void sendFeedback() {
         final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
@@ -531,6 +530,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
 
     }
+*/
 
     private void sendInvite(){
         Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
@@ -613,6 +613,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), feedbackText.getText().toString(),"","","",new NetworkApiCallback<BaseResponse>() {
                     @Override
                     public void success(BaseResponse o, Response response) {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("FeedBack_Submit_Click")
+                                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                                .build());
 
                         Toast.makeText(HomeActivity.this,"Feedback Sent",Toast.LENGTH_SHORT).show();
                     }
@@ -764,6 +767,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     NetworkApiHelper.getInstance().getContributorMail(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(),  new NetworkApiCallback<BaseResponse>() {
                         @Override
                         public void success(BaseResponse o, Response response) {
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("BecomeContributor_Submit_Click")
+                                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                                    .build());
 
                             Toast.makeText(HomeActivity.this, "Email Id Sent", Toast.LENGTH_SHORT).show();
                         }
@@ -906,7 +912,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     }
 
 
-    private void setUpNavigationDrawer2() {
+    private void setUpNavigationDrawer() {
 
         menuIcon = (ImageView)findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -921,14 +927,31 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         items.add(getResources().getDrawable(R.drawable.wallpaper_icon));
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
+        DisplayMetrics dm = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        final ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(HomeActivity.this,0,items);
+        final ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(HomeActivity.this,0,items,dm.heightPixels);
         mDrawerList.setAdapter(imageArrayAdapter);
 
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+                if(mainFragment.isFullScreenShown())
+                {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Hamburger_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                        .put("PIXTORY_ID",App.getContentData().get(mPager.getCurrentItem()).id+"")
+                        .put("POSITION_ID",mPager.getCurrentItem()+"")
+                        .build());
+                }
+                else
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Hamburger_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                        .put("PIXTORY_ID",App.getContentData().get(mPager.getCurrentItem()).id+"")
+                        .put("POSITION_ID",mPager.getCurrentItem()+"")
+                        .build());
+
 
                 if(!mainFragment.isCommentsVisible()){
                 if(mDrawerLayout.isDrawerOpen(mDrawerList)){
@@ -961,19 +984,31 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             },600);
                         //
                         break;
-                    case 1: Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                    case 1:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Profile_Click")
+                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                    .build());
+                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
                         intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                         intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
                         startActivity(intent);
                         break;
 
-                    case 2: showContributeDialog();
+                    case 2: AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_BecomeContributor_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+                        showContributeDialog();
                         break;
 
-                    case 3:sendInvite();
+                    case 3:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_InviteFriends_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+                        sendInvite();
                         break;
 
-                    case 4:showFeedBackDialog();
+                    case 4:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Feedback_Click")
+                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                    .build());
+                        showFeedBackDialog();
                         break;
 
                     case 5:showWallpaperAlert();

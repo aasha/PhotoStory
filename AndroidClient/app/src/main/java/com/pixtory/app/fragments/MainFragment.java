@@ -260,6 +260,11 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
+                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",cd.id+"")
+                                .put("POSITION_ID",mContentIndex+"")
+                                .build());
                         Intent intent = new Intent(mContext, UserProfileActivity.class);
                         intent.putExtra("USER_ID",Utils.getUserId(mContext));
                         intent.putExtra("PERSON_ID",cd.personDetails.id+"");
@@ -276,11 +281,24 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 share(Uri.parse(cd.pictureUrl));
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Share_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",cd.id+"")
+                        .build());
             }
         });
         mBtnComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
+                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                .put("PIXTORY_ID",cd.id+"")
+                .build());
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",cd.id+"")
+                        .build());
                 boolean showBackArrow = true;
                 mListener.onAnimateMenuIcon(showBackArrow);
                 buildCommentsLayout(cd);
@@ -416,6 +434,11 @@ public class MainFragment extends Fragment {
                             if(!isFullScreenShown){
                                 showFullScreen();
                                 isFullScreenShown = true;
+                                Toast.makeText(mContext,"swipe up",Toast.LENGTH_SHORT).show();
+                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
+                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                        .put("PIXTORY_ID",""+mContentData.id)
+                                        .build());
                             }
 
                         } else {
@@ -482,6 +505,10 @@ public class MainFragment extends Fragment {
         mSlantView.setVisibility(View.VISIBLE);
         mStoryLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.GONE);
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                .put("PIXTORY_ID",""+mContentData.id)
+                .build());
     }
 
     private void animateContent(View view , final boolean showContent , int fromY , int toY){
@@ -605,6 +632,10 @@ public class MainFragment extends Fragment {
                     @Override
                     public void success(AddCommentResponse addCommentResponse, Response response) {
                         Log.i(TAG, "Add Comment Request Success");
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_SubmitComment_Click")
+                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",mContentData.id+"")
+                                .build());
                         if (mCommentsRecyclerViewAdapter != null)
                             mCommentsRecyclerViewAdapter.notifyDataSetChanged();
                     }
@@ -682,10 +713,21 @@ public class MainFragment extends Fragment {
                 });
                 mContentData.likedByUser = true;
                 anim.start();
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Like)
+                if(isFullScreenShown)
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Like_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
+                        .put("PIXTORY_ID", "" + mContentData.id)
+                        .put("POSITION_ID",""+mContentIndex)
+                        .put("BOOLEAN","True")
                         .build());
+                else
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_Like")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                            .put("PIXTORY_ID", "" + mContentData.id)
+                            .put("POSITION_ID",""+mContentIndex)
+                            .put("BOOLEAN","False")
+                            .build());
+
             } else {
                 ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_out);
                 anim.setTarget(mImageLike);
@@ -768,5 +810,7 @@ public class MainFragment extends Fragment {
             attachPixtoryContent(SHOW_PIC_STORY);
         }
     }
+
+    public  boolean isFullScreenShown(){return isFullScreenShown;}
 
 }

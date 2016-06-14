@@ -3,6 +3,7 @@ package com.pixtory.app.app;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
+import android.util.Log;
 import android.view.LayoutInflater;
 import com.amplitude.api.Amplitude;
 import com.crittercism.app.Crittercism;
@@ -60,7 +61,8 @@ public class App extends Application implements AppConstants {
 
 //        GoogleAnalytics.getInstance(this).getLogger()
 //                .setLogLevel(Logger.LogLevel.VERBOSE);
-        Amplitude.getInstance().initialize(this, "b259cb0f274cd6282370c6b78a5f41be").enableForegroundTracking(this);
+        Log.d("Amplitude", "Amplitude init");
+        Amplitude.getInstance().initialize(this, "7c657990d3385956001836ca63567102").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
     }
 

@@ -16,6 +16,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.pixtory.app.R;
+import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
 
 /**
  * Created by Sonali Kakrayne on 5/23/2016.
@@ -100,6 +103,7 @@ public class CommentsDialogFragment extends DialogFragment{
                     Toast.makeText(getActivity(),"You have not entered any comment!!",Toast.LENGTH_SHORT).show();
                 }
                 else{
+
                     mAddCommentListener.onAddCommentButtonClicked(mCommentText.getText().toString());
                     dismiss();
                 }
