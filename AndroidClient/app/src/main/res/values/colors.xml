@@ -36,6 +36,11 @@
     <color name="gey_4">#cccccc</color>
     <color name="grey_5">#e1e1e1</color>
     <color name="profile_screen_background">#d6dbe5</color>
+    <color name="translucent_menu">#BB000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="fb_blue">#3b5998</color>
+
+
 
 
 </resources>

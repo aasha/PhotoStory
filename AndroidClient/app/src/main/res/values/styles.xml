@@ -23,6 +23,6 @@
     </style>
 
     <style name="EditTextCustom" parent="android:Widget.EditText">
-        <item name="android:background">@color/white</item>
+        <item name="android:background">@color/transparent</item>
     </style>
 </resources>

@@ -53,8 +53,8 @@ import java.io.IOException;
 public class UserProfileFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "USER_ID";
+    private static final String ARG_PARAM2 = "PERSON_ID";
     private static final String Get_Person_Details_Done = "Get_Person_Details_Done";
     private static final String Get_Person_Details_Failed = "Get_Person_Details_Failed";
 
@@ -62,6 +62,7 @@ public class UserProfileFragment extends Fragment {
     private String mParam1;
 
     private int mUserId;
+    private int mPersonId;
     private PersonInfo mPersonInfo;
     private ArrayList<ContentData> mContentDataList;
     private RecyclerView.LayoutManager gridLayout;
@@ -84,11 +85,11 @@ public class UserProfileFragment extends Fragment {
      * @return A new instance of fragment UserProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static UserProfileFragment newInstance(int userId) {
+    public static UserProfileFragment newInstance(String userId,String personId) {
         UserProfileFragment fragment = new UserProfileFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, userId);
-        //  args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, userId);
+        args.putString(ARG_PARAM2, personId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -97,7 +98,8 @@ public class UserProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mUserId = getArguments().getInt(ARG_PARAM1);
+            mUserId = Integer.parseInt(getArguments().getString(ARG_PARAM1));
+            mPersonId = Integer.parseInt(getArguments().getString(ARG_PARAM2));
             setPersonDetails();
             //mPersonInfo = App.getPersonInfo(mUserId);
             // mContentDataList = App.getContentData();
@@ -148,7 +150,7 @@ public class UserProfileFragment extends Fragment {
     }
 
     private void setPersonDetails(){
-        NetworkApiHelper.getInstance().getPersonDetails(mUserId, 123 ,new NetworkApiCallback<GetPersonDetailsResponse>() {
+        NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId ,new NetworkApiCallback<GetPersonDetailsResponse>() {
             @Override
             public void success(GetPersonDetailsResponse o, Response response) {
                 //mProgress.dismiss();
