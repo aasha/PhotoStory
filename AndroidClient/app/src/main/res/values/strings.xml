@@ -9,7 +9,7 @@
     <string name="title_activity_webview">WebviewActivity</string>
     <string name="title_activity_home_feed">HomeFeedActivity</string>
 
-    <string name="app_id">1084755038244044</string>
+    <string name="app_id">1207785742565519</string>
 
     <string-array name="feedback_array">
         <item>I liked this</item>

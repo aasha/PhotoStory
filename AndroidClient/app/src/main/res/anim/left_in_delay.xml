@@ -1,3 +1,4 @@
 <layoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
+    android:animation="@anim/fade_out"
     android:delay="0.2"
     android:repeatCount="infinite"/>

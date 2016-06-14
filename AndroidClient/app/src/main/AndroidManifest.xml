@@ -45,25 +45,28 @@
             android:theme="@style/AppTheme">
 
         <activity
-                android:name=".onboarding.OnBoardingActivity"
-                android:icon="@drawable/pixtory"
-                android:label="OnBoardingActivity"
-                android:screenOrientation="portrait">
+            android:name=".onboarding.OnBoardingActivity"
+            android:icon="@drawable/pixtory"
+            android:label="Pixtory">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".TestActivity"
+            android:icon="@drawable/pixtory"
+            android:label="Pixtory">
 
         </activity>
 
         <activity
             android:name=".userprofile.UserProfileActivity"
             android:icon="@drawable/pixtory"
-            android:label="UserProfileActivity"
+            android:label="USerProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>
-
 
         <activity
                 android:name=".HomeActivity"
