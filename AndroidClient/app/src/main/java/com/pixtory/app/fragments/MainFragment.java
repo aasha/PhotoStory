@@ -434,7 +434,6 @@ public class MainFragment extends Fragment {
                             if(!isFullScreenShown){
                                 showFullScreen();
                                 isFullScreenShown = true;
-                                Toast.makeText(mContext,"swipe up",Toast.LENGTH_SHORT).show();
                                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
                                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                         .put("PIXTORY_ID",""+mContentData.id)
