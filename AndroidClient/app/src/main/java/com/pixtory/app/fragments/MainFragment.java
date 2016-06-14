@@ -3,8 +3,11 @@ package com.pixtory.app.fragments;
 import android.animation.*;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -875,6 +878,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
         else {
             //TODO: Redirect user to login
+            showLoginAlert();
             Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT).show();
         }
     }
@@ -923,5 +927,32 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public  boolean isFullScreenShown(){return isFullScreenShown;}
+
+    private void showLoginAlert(){
+        final Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.login_alert);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        LinearLayout loginClick = (LinearLayout) dialog.findViewById(R.id.login_click);
+        loginClick.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
 
 }

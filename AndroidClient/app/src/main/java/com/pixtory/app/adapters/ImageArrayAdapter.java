@@ -52,8 +52,8 @@ public class ImageArrayAdapter extends ArrayAdapter<Drawable> {
         */
         if(position==0){
             ViewGroup.LayoutParams layoutParams = menuImage.getLayoutParams();
-            layoutParams.height = layoutParams.height/2;
-            layoutParams.width = layoutParams.width/2;
+            layoutParams.height = (int)(0.64*layoutParams.height);
+            layoutParams.width = (int)(0.64*layoutParams.width);
             menuImage.setLayoutParams(layoutParams);
         }
 
