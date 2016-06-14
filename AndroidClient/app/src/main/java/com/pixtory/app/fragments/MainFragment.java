@@ -328,7 +328,35 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         startActivity(intent);
                     }
                 });
-            }
+                mTextName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
+                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",cd.id+"")
+                                .put("POSITION_ID",mContentIndex+"")
+                                .build());
+                        Intent intent = new Intent(mContext, UserProfileActivity.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(mContext));
+                        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
+                        startActivity(intent);
+                    }
+
+                });
+                mTextDesc.setOnClickListener(new View.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
+                                                             .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                                                             .put("PIXTORY_ID",cd.id+"")
+                                                             .put("POSITION_ID",mContentIndex+"")
+                                                             .build());
+                                                     Intent intent = new Intent(mContext, UserProfileActivity.class);
+                                                     intent.putExtra("USER_ID",Utils.getUserId(mContext));
+                                                     intent.putExtra("PERSON_ID",cd.personDetails.id+"");
+                                                     startActivity(intent);
+                                                 }
+            });
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextDate.setText(cd.date);
             mTextStoryDetails.setText(cd.pictureDescription);
@@ -363,6 +391,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
         });
 
+    }
     }
 
     public void attachPixtoryContent(int story_or_comment){
