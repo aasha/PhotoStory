@@ -357,6 +357,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                                      startActivity(intent);
                                                  }
             });
+            }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextDate.setText(cd.date);
             mTextStoryDetails.setText(cd.pictureDescription);
@@ -392,7 +393,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         });
 
     }
-    }
+
 
     public void attachPixtoryContent(int story_or_comment){
         mStoryParentLayout.removeAllViews();
