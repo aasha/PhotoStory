@@ -35,4 +35,7 @@ public interface NetworkInterface {
     @POST("/userFeedBack")
     void userFeedBack(@Body userFeedBackRequest req, Callback<BaseResponse> cd);
 
+    @POST("/getContributorMail")
+    void getContributorMail(@Body GetContributorMailRequest req, Callback<BaseResponse> cd);
+
 }

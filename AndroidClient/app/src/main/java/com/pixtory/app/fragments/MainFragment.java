@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,11 +16,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.*;
 
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -31,8 +34,11 @@ import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.pixtory.app.views.ObservableScrollView;
+import com.pixtory.app.views.ScrollViewListener;
 import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
@@ -43,7 +49,7 @@ import retrofit.client.Response;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements ScrollViewListener{
 
     private static final String TAG = MainFragment.class.getName();
 
@@ -86,7 +92,7 @@ public class MainFragment extends Fragment {
     RelativeLayout mImageDetailBottomContainer = null;
 
     @Bind(R.id.image_details_layout)
-    RelativeLayout mImageDetailsLayout;
+    ObservableScrollView mImageDetailsLayout;
 
     int mImageInfoLayoutHeight;
 
@@ -108,9 +114,14 @@ public class MainFragment extends Fragment {
     @Bind(R.id.text_expert)
     TextView mTextExpert = null;
 
+    @Bind(R.id.like_layout)
+    RelativeLayout mTopLikeLayout = null;
+
     private int mSoftBarHeight = 0;
     private boolean isFullScreenShown = true;
     private boolean isCommentsVisible = false;
+
+    ViewGroup.LayoutParams imageViewLayoutParams;
 
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
@@ -160,6 +171,8 @@ public class MainFragment extends Fragment {
         // Required empty public constructor
     }
 
+
+
     private ContentData mContentData = null;
 
     // Used to test indes positions. TEMP VARIABLE
@@ -186,13 +199,17 @@ public class MainFragment extends Fragment {
         mDeviceWidthInPx = displayMetrics.widthPixels;
         mDeviceHeightInPx = displayMetrics.heightPixels;
 
+
+        px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
+        newHt = mDeviceHeightInPx +px;
+
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
         mDeviceHeightInPx += mSoftBarHeight;
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
 
     View mRootView = null;
-
+    RelativeLayout.LayoutParams imgParams ;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -203,17 +220,48 @@ public class MainFragment extends Fragment {
 
         mImageInfoLayoutHeight = (int)getResources().getDimension(R.dimen.image_layout_height);
         Log.i("mImageInfoHeight is :::",""+mImageInfoLayoutHeight);
+
+        setUpStoryContent();
+        bindData();
+
+        attachPixtoryContent(SHOW_PIC_STORY);
+
+
+        top = mDeviceHeightInPx - getResources().getDimension(R.dimen.image_layout_height);
+        mHalfScreenSize = (int)(0.55f*mDeviceHeightInPx);
+        Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
+        RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
+
+        relativeParams.setMargins(0, (int)top, 0, 0);
+        mTopLikeLayout.setLayoutParams(relativeParams);
+        mTopLikeLayout  .requestLayout();
+        setUpFullScreen();
+
+        mImageDetailsLayout.setSmoothScrollingEnabled(true);
+
+        mImageDetailsLayout.setScrollViewListener(this);
+
+        imageViewLayoutParams = mImageMain.getLayoutParams();
+        imgParams = (RelativeLayout.LayoutParams) mImageMain.getLayoutParams();
         return mRootView;
     }
 
 
+
+
+    float top;
+    int px;
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.i(TAG,"OnActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        setUpStoryContent();
-        bindData();
-        attachPixtoryContent(SHOW_PIC_STORY);
-        setUpFullScreen();
+//        setUpStoryContent();
+//        bindData();
+//
+//        attachPixtoryContent(SHOW_PIC_STORY);
+//
+//        top = mDeviceHeightInPx - getResources().getDimension(R.dimen.image_layout_height);
+
     }
 
 
@@ -238,6 +286,14 @@ public class MainFragment extends Fragment {
 
 
         //***Binding StoryContent****/
+//        ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
+//        TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
+//        TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
+//        TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
+//        TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
+//        LinearLayout mBtnShare = (LinearLayout) mStoryLayout.findViewById(R.id.btnShare);
+//        LinearLayout mBtnComment = (LinearLayout) mStoryLayout.findViewById(R.id.btnComment);
+
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
@@ -253,7 +309,17 @@ public class MainFragment extends Fragment {
                 }
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
-                mTextDesc.setText(cd.personDetails.desc);
+                mTextDesc.setText(cd.personDetails.description);
+                mProfileImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(mContext, UserProfileActivity.class);
+                        intent.putExtra("USER_ID",Utils.getUserId(mContext));
+                        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
+                        startActivity(intent);
+                    }
+                });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextDate.setText(cd.date);
@@ -266,15 +332,15 @@ public class MainFragment extends Fragment {
                 share(Uri.parse(cd.pictureUrl));
             }
         });
-        mBtnComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean showBackArrow = true;
-                mListener.onAnimateMenuIcon(showBackArrow);
-                buildCommentsLayout(cd);
-                attachPixtoryContent(SHOW_PIC_COMMENTS);
-            }
-        });
+//        mBtnComment.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                boolean showBackArrow = true;
+//                mListener.onAnimateMenuIcon(showBackArrow);
+//                buildCommentsLayout(cd);
+//                attachPixtoryContent(SHOW_PIC_COMMENTS);
+//            }
+//        });
 
     }
 
@@ -339,6 +405,17 @@ public class MainFragment extends Fragment {
         isCommentsVisible = commentsVisible;
     }
 
+
+    int  scrollY,oldScrollY;
+    boolean scrollUp = true;
+    @Override
+    public void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldX, int oldY) {
+//        Log.i(TAG,"x:y="+x+":"+y);
+        scrollY = y;
+        oldScrollY = oldY;
+        modifyScreenHeight(y);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -365,22 +442,28 @@ public class MainFragment extends Fragment {
 //    }
 //
     /********Swipe Up and Down Logic*********************/
-
-    boolean isRecoViewAdded = false;
     boolean mIsScrolling = false;
     boolean mIsFling = false;
-    int lastScrollPosition = 0;
 
     final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
 
                 @Override
                 public boolean onDown(MotionEvent e) {
+                    Log.i(TAG, "MotionEvent.ACTION_DOWN");
                     return true;
                 }
 
                 @Override
                 public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                    if (distanceX < 5 && distanceX > -5) {
+                        mIsScrolling = true;
+                        mIsFling = false;
+                        Log.i(TAG, "onScroll::::"+mImageDetailsLayout.getScrollY());
+//
+//                        modifyScreenHeight(mImageDetailsLayout.getScrollY());
+
+                    }
                     return super.onScroll(e1, e2, distanceX, distanceY);
                 }
 
@@ -393,19 +476,15 @@ public class MainFragment extends Fragment {
                         if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                             mIsFling = true;
-                            if(isFullScreenShown){
-                                showHalfScreen();
-                                isFullScreenShown = false;
-                            }
+                            Log.i(TAG, "onFlingUp::::"+mImageDetailsLayout.getScrollY());
+
+//                            modifyScreenHeight(mImageDetailsLayout.getScrollY());
 
                         } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                             mIsFling = true;
-                            if(!isFullScreenShown){
-                                showFullScreen();
-                                isFullScreenShown = true;
-                            }
 
+                            Log.i(TAG, "onFlingDown");
                         } else {
                             mIsFling = false;
                         }
@@ -417,44 +496,83 @@ public class MainFragment extends Fragment {
                 }
             });
 
-    @OnTouch(R.id.image_main)
-    public boolean onTouch(ImageView view, MotionEvent me) {
-        if (gesture.onTouchEvent(me)) {
-            return true;
-        }
 
-        if (me.getAction() == MotionEvent.ACTION_UP) {
-        }
-        return false;
+
+    int newHt;
+    private boolean modifyScreenHeight(int offset) {
+
+        imgParams.height = (newHt) -offset;
+        mImageMain.setLayoutParams(imgParams);
+
+        return true;
+
     }
-    
+
+//    @OnTouch(R.id.image_main)
+//    public boolean onTouch(ImageView view, MotionEvent me) {
+//        if (gesture.onTouchEvent(me)) {
+//            return true;
+//        }
+//
+////        if (me.getAction() == MotionEvent.ACTION_UP) {
+////        }
+//        return false;
+//    }
+
+    int mHalfScreenSize;
     @OnTouch(R.id.image_details_layout)
-    public boolean onTouchStory(RelativeLayout view, MotionEvent me) {
+    public boolean onTouchStory(ScrollView view, MotionEvent me) {
         if (gesture.onTouchEvent(me)) {
             return true;
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
+            Log.i(TAG , "MotionEvent.ACTION_UP::"+scrollUp+"::scrollY::"+scrollY);
+
+            scrollUp= (scrollY < oldScrollY)?false:true;
+
+            if(scrollY < mHalfScreenSize){
+
+                mImageDetailsLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(scrollUp)
+                            mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
+                        else
+                            mImageDetailsLayout.smoothScrollTo(0,0);
+                    }
+                });
+
+
+            }
+
+
         }
         return false;
     }
 
 
-    private void showHalfScreen() {
+    private void showHalfScreen(int lastScrollPos) {
         setUpHalfScreen();
+//        modifyScreenHeight((int) (0.30 * mDeviceHeightInPx));
 
-        int fromY   = mDeviceHeightInPx - mImageInfoLayoutHeight;
-        double toY     = 0.50*mDeviceHeightInPx;
-        toY = toY*(-1);
-
-        animateContent(mImageDetailBottomContainer, false , 0 , (int)toY);
-
+        int fromY = 0;
+//        double toY = (-1)*0.50*mDeviceHeightInPx;
+//        int toY = -200;
+        float toY = 0.70f*mDeviceHeightInPx;
+//        float scrollBy =  (mTopLikeLayout.getTop()) - toY;
+//        mImageDetailsLayout.smoothScrollBy(0 , (int)scrollBy);
+        Log.i(TAG,"smooth scrollTo="+toY);
+        mImageDetailsLayout.smoothScrollTo(0,(int)toY);
+        modifyScreenHeight((int)toY);
+//        animateContent(mImageDetailBottomContainer, false , 0 ,  , 500);
+//        animateContent(mImageMain, false ,fromY , -500 , 500);
     }
 
     private void showFullScreen() {
         int fromY     = (int)0.30*mDeviceHeightInPx;
         int toY   = mDeviceHeightInPx - mImageInfoLayoutHeight;
-        animateContent(mImageDetailBottomContainer, true , fromY , toY);
+        animateContent(mImageDetailBottomContainer, true , -800 , 0 , 500);
         if(isCommentsVisible()){
             mListener.onAnimateMenuIcon(false);
             attachPixtoryContent(SHOW_PIC_STORY);
@@ -463,8 +581,8 @@ public class MainFragment extends Fragment {
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
-        mSlantView.setVisibility(View.GONE);
-        mStoryLayout.setVisibility(View.GONE);
+        mSlantView.setVisibility(View.VISIBLE);
+//        mStoryLayout.setVisibility(View.GONE);
         mImageDetailsLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.VISIBLE);
     }
@@ -475,10 +593,10 @@ public class MainFragment extends Fragment {
 //        mTextExpert.setVisibility(View.GONE);
     }
 
-    private void animateContent(View view , final boolean showContent , int fromY , int toY){
+    private void animateContent(View view , final boolean showContent , int fromY , int toY,int duration){
 
         ObjectAnimator transAnimation= ObjectAnimator.ofFloat(view ,"translationY" , fromY, toY);
-        transAnimation.setDuration(500);//set duration
+        transAnimation.setDuration(duration);//set duration
         transAnimation.start();//start animation
 
         transAnimation.addListener(new Animator.AnimatorListener() {

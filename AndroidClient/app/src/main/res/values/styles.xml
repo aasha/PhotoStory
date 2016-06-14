@@ -18,4 +18,11 @@
         <item name="android:windowIsFloating">true</item>
     </style>
 
+    <style name="TranslucentBlack" parent="android:Theme.Translucent">
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+
+    <style name="EditTextCustom" parent="android:Widget.EditText">
+        <item name="android:background">@color/white</item>
+    </style>
 </resources>

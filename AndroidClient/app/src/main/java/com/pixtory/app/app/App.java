@@ -43,7 +43,7 @@ public class App extends Application implements AppConstants {
         super.onCreate();
         mInstance = this;
 
-        Crittercism.initialize(getApplicationContext(), "5696628d6c33dc0f00f115e0");
+        Crittercism.initialize(getApplicationContext(), "67496ab9c7094339adf79c54d369ccc900555300");
         Fresco.initialize(getApplicationContext());
 
         Stetho.initialize(

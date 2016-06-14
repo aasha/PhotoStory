@@ -5,6 +5,9 @@ package com.pixtory.app.userprofile;
  */
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +26,8 @@ import com.pixtory.app.model.ContentData;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import retrofit.http.HEAD;
 
 
 public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.ViewHolder>{
@@ -62,9 +67,6 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
     }
 
     public void onBindViewHolder(ViewHolder holder, int position){
-        holder.cardImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        Picasso.with(context).load(cDlist.get(position).pictureUrl).fit().into(holder.cardImage);
-        holder.cardTitle.setText(cDlist.get(position).name);
 
 
 

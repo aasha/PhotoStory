@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/dialog_background_translucent">
+    <TextView
+        android:text="We've got something new!"
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:paddingTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:contentDescription="@string/app_name"
+        android:padding="10dp"
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif-light"/>
+
+    <View android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/app_blue"
+        android:layout_marginRight="3dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="22sp"
+        android:layout_height="wrap_content"
+        android:text="Stunning wallpapers"
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="0dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="22sp"
+        android:layout_height="wrap_content"
+        android:text="Handpicked."
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="0dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="22sp"
+        android:layout_height="wrap_content"
+        android:text="Every day."
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="22sp"
+        android:layout_height="wrap_content"
+        android:text="Would you like to try it?"
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="20sp"
+        android:layout_height="wrap_content"
+        android:text="Yes please!"
+        android:background="@drawable/rounded_blue"
+        android:textColor="@color/white"
+        android:padding="10dp"
+        android:paddingLeft="10dp"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:id="@+id/wallpaper_yes"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="20sp"
+        android:layout_height="wrap_content"
+        android:text="Not now"
+        android:textColor="@color/white"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="25dp"
+        android:id="@+id/wallpaper_no"
+        android:paddingBottom="10dp"/>
+
+
+</LinearLayout>
