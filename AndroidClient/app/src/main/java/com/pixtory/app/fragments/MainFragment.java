@@ -4,10 +4,13 @@ import android.animation.*;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +47,9 @@ import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
 import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import retrofit.RetrofitError;
@@ -503,6 +509,19 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public boolean onDown(MotionEvent e) {
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
                     return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    super.onLongPress(e);
+                    //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
+                    if(isFullScreenShown){
+                        showWallpaperAlert();
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
+                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                            .put("PIXTORY_ID",mContentData.id+"")
+                            .put("POSITION_ID",mContentIndex+"")
+                            .build());}
                 }
 
                 @Override
@@ -984,5 +1003,76 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         dialog.show();
     }
+
+    private void showWallpaperAlert(){
+        final Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.wallpaper_alert);
+
+        DisplayMetrics dm =  new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
+        LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
+        LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
+        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
+        layoutParams.width = (int)(0.5*dm.widthPixels);
+        wallpaperYes.setLayoutParams(layoutParams);*/
+        wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setWallpaper();
+                dialog.dismiss();
+            }
+        });
+
+        wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void setWallpaper(){
+        String imgUrl = mContentData.pictureUrl;
+        Picasso.with(mContext).load(imgUrl).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Toast.makeText(mContext,"Wallpaper set",Toast.LENGTH_SHORT).show();
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(mContext.getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+    }
+
 
 }
