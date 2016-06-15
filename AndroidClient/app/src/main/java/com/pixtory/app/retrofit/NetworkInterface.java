@@ -27,5 +27,15 @@ public interface NetworkInterface {
     void addPushNotifsId(@Body AddPushNotifsIdRequest req, Callback<BaseResponse> cb);
 
     @POST("/getCommentDetailList")
-    void getCommentDetailList(@Body GetCommentDetailsRequest req, Callback<BaseResponse> cd);
+    void getCommentDetailList(@Body GetCommentDetailsRequest req, Callback<GetCommentDetailsResponse> cd);
+
+    @POST("/getPersonDetails")
+    void getPersonDetails(@Body GetPersonDetailsRequest req, Callback<GetPersonDetailsResponse> cd);
+
+    @POST("/userFeedBack")
+    void userFeedBack(@Body userFeedBackRequest req, Callback<BaseResponse> cd);
+
+    @POST("/getContributorMail")
+    void getContributorMail(@Body GetContributorMailRequest req, Callback<BaseResponse> cd);
+
 }

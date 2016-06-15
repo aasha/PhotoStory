@@ -1,0 +1,68 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="224dp"
+    android:background="@drawable/dialog_background_translucent">
+
+    <TextView
+        android:text="@string/login_text"
+        android:textSize="22sp"
+        android:textAlignment="center"
+        android:paddingTop="15dp"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:contentDescription="@string/app_name"
+        android:padding="10dp"
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif-light"/>
+
+    <TextView
+        android:text="@string/login_text_2"
+        android:textSize="15sp"
+        android:textAlignment="center"
+        android:paddingTop="5dp"
+        android:layout_margin="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:contentDescription="@string/app_name"
+        android:padding="10dp"
+        android:textColor="@color/white"
+        android:fontFamily="sans-serif-light"/>
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp"
+        android:background="@drawable/round_corners_blue"
+        android:id="@+id/login_click"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="31dp"
+            android:layout_height="31dp"
+            android:scaleType="centerInside"
+            android:background="@drawable/facebook_icon"/>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/white"
+                android:text="@string/fb_login"
+                android:textAlignment="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="8dp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

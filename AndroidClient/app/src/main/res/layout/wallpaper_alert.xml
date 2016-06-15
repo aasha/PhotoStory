@@ -1,0 +1,73 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_background_translucent">
+
+    <TextView
+        android:text="Set this pixtory as your wallpaper?"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:paddingTop="15dp"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:contentDescription="@string/app_name"
+        android:padding="10dp"
+        android:textColor="@color/app_blue"
+        android:fontFamily="sans-serif-light"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/app_blue"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/yes_no_selector"
+            android:id="@+id/wallpaper_no_2"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="@drawable/blue_cross"
+                android:layout_marginLeft="67dp"
+                android:id="@+id/wallpaper_no"/>
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/app_blue"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/yes_no_selector"
+            android:id="@+id/wallpaper_yes_2">
+
+            <ImageView
+                android:layout_width="49dp"
+                android:layout_height="33dp"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:background="@drawable/right_arrow"
+                android:layout_marginLeft="53dp"
+                android:id="@+id/wallpaper_yes"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

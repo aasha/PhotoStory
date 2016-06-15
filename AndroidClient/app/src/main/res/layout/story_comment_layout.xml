@@ -1,0 +1,131 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="#fff"
+    android:visibility="visible">
+
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginLeft="20dp"
+        android:text="Steve Johnson"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/grey_3"
+        android:textSize="10sp"
+        android:id="@+id/txtPlace"/>
+    <TextView android:layout_width="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPlace"
+        android:text="Travel Enthusiast"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/app_blue"
+        android:textAllCaps="true"
+        android:id="@+id/txtDesc"/>
+
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separator_color"
+            android:id="@+id/separator"
+            android:layout_below="@+id/txtDesc"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
+
+    <RelativeLayout
+        android:visibility="visible"
+        android:id="@+id/comments_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/postBtn_ll"
+        android:layout_below="@+id/separator">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:id="@+id/comment_img"
+            android:src="@drawable/comment"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="20dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="1"
+            android:textAllCaps="true"
+            android:id="@+id/tvCount"
+            android:layout_alignBottom="@+id/comment_img"
+            android:layout_toRightOf="@+id/comment_img"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/grey_1"
+
+            android:fontFamily="sans-serif-light"
+             />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:textSize="15sp"
+            android:text="comments"
+            android:id="@+id/comment_text"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:layout_alignBottom="@+id/comment_img"
+            android:layout_toRightOf="@+id/tvCount"
+            android:layout_marginLeft="4dp"
+            android:fontFamily="sans-serif"
+            />
+
+        <android.support.v7.widget.RecyclerView
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:id="@+id/commentsList"
+           android:layout_below="@+id/comment_img"
+           android:layout_marginLeft="20dp"
+           android:layout_marginRight="20dp"
+
+            android:layout_marginBottom="10dp"
+           >
+
+       </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/loading_comments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="Loading Comments..."/>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/postBtn_ll"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:weightSum="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAlignment="center"
+                android:fontFamily="sans-serif"
+                android:textSize="14sp"
+                android:layout_centerHorizontal="true"
+                android:background="@color/app_blue"
+                android:textColor="#b3ffffff"
+                android:id="@+id/postComment"
+                android:layout_marginBottom="10dp"
+                android:text="Post A Comment"
+                android:layout_weight="0.45" />
+
+        </LinearLayout>
+
+
+</RelativeLayout>

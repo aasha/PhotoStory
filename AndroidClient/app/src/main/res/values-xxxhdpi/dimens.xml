@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="story_content">12.50sp</dimen>
+    <dimen name="fb_signin_btn_font">12sp</dimen>
+    <dimen name="fb_signin_btn_height">27dp</dimen>
+    <dimen name="fb_signin_btn_width">148dp</dimen>
+    <dimen name="fb_btn_icon_width">6.75dp</dimen>
+    <dimen name="fb_btn_icon_height">14.5dp</dimen>
+    <dimen name="pixtory_subheading_font">9.75sp</dimen>
+    <dimen name="skip_login_font">9sp</dimen>
+    <dimen name="card_name_font">8sp</dimen>
+
+
+</resources>

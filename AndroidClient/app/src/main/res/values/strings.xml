@@ -2,14 +2,14 @@
     <string name="app_name">pixtory</string>
     <string name="title_activity_app">pixtory</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_home">Home Activity</string>
     <string name="title_activity_pdpread">PDPReadActivity</string>
     <string name="title_activity_webview">WebviewActivity</string>
     <string name="title_activity_home_feed">HomeFeedActivity</string>
 
-    <string name="app_id">1084755038244044</string>
+    <string name="app_id">1207785742565519</string>
 
     <string-array name="feedback_array">
         <item>I liked this</item>
@@ -33,4 +33,34 @@
         <item>Other</item>
 
     </string-array>
+
+    <string-array name="menu_items">
+        <item>My Profile</item>
+        <item>Feedback</item>
+        <item>Invite Friends</item>
+        <item>Settings</item>
+    </string-array>
+
+
+    <string name="post_your_comment">POST YOUR COMMENT</string>
+    <string name="character_limit">CHARACTERS</string>
+    <string name="comment_textbox_hint">What do you have to say about this pixstory</string>
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
+
+    <string name="skip_login">skip login</string>
+    <string name="sign_in_fb">Sign in with Facebook</string>
+
+    <string name="send_feedback">Send feedback</string>
+    <string name="title_send_feedback">Send feedback</string>
+    <string name="mail_feedback_email">karum@pixtory.in</string>
+    <string name="mail_feedback_subject">Feedback on your app, Pixtory</string>
+    <string name="mail_feedback_message">Hi,
+\n\nYour Pixtory app is awesome! I would like to give you some feedback:</string>
+    <string name="follow">Follow</string>
+    <string name="contribute_text">Please submit your email address if you would like to contribute Pixtories</string>
+    <string name="login_text">To like a Pixtory, please log in</string>
+    <string name="login_text_2">To use this function, you must connect through one of the following ways</string>
+    <string name="fb_login">Connect with Facebook</string>
+
 </resources>

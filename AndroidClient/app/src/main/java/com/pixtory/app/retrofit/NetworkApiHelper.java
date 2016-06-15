@@ -27,15 +27,21 @@ public class NetworkApiHelper {
         return sInstance;
     }
 
+
+    private NetworkApiHelper(){
+        //Constructor is made private to ensure singleton behavior
+    }
+
     /**
      * ============================================================================================================================================================================================
      */
 
-    public void registerUser(final String userName, final String userEmail, final String userImageUrl, final NetworkApiCallback cb) {
+    public void registerUser(final String userName, final String userEmail, final String userImageUrl,final String fbId ,final NetworkApiCallback cb) {
         RegisterRequest req = new RegisterRequest();
         req.userName = userName;
         req.userEmail = userEmail;
         req.userImageUrl = userImageUrl;
+        req.fbId = fbId;
         sAPI.register(req, new Callback<RegisterResponse>() {
             @Override
             public void success(RegisterResponse registerResponse, Response response) {
@@ -171,14 +177,81 @@ public class NetworkApiHelper {
     }
 
     /**
-     * ============================================================================================================================================================================================
+     * =============================================================================================================================================================
      */
     public void getCommentDetailList(String userId, int contentId, final NetworkApiCallback cb) {
         GetCommentDetailsRequest req = new GetCommentDetailsRequest();
         req.userId = Integer.parseInt(userId);
         req.contentId = contentId;
 
-        sAPI.getCommentDetailList(req, new Callback<BaseResponse>() {
+        sAPI.getCommentDetailList(req, new Callback<GetCommentDetailsResponse>() {
+            @Override
+            public void success(GetCommentDetailsResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
+
+    public void getPersonDetails(int userId, int personId,final NetworkApiCallback cb) {
+        GetPersonDetailsRequest req = new GetPersonDetailsRequest();
+        req.userId = userId;
+        req.personId = personId;
+
+
+        sAPI.getPersonDetails(req, new Callback<GetPersonDetailsResponse>() {
+            @Override
+            public void success(GetPersonDetailsResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
+
+    public void userFeedBack(int userId, String feedBack,String category, String subCategory, String details, final NetworkApiCallback cb) {
+        userFeedBackRequest req = new userFeedBackRequest();
+        req.userId = userId;
+        req.feedBack = feedBack;
+        req.category = category;
+        req.subCategory = subCategory;
+        req.details = details;
+
+        sAPI.userFeedBack(req, new Callback<BaseResponse>() {
+            @Override
+            public void success(BaseResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
+
+    public void getContributorMail(int userId, String mailId, final NetworkApiCallback cb) {
+        GetContributorMailRequest req = new GetContributorMailRequest();
+        req.userId = userId;
+        req.mailId = mailId;
+
+        sAPI.getContributorMail(req, new Callback<BaseResponse>() {
             @Override
             public void success(BaseResponse resp, Response response) {
                 if (resp.success == true)

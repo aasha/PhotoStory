@@ -1,7 +1,6 @@
 package com.pixtory.app.retrofit;
 
 import com.pixtory.app.model.ContentData;
-
 import java.util.ArrayList;
 
 /**

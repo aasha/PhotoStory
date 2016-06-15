@@ -1,87 +1,155 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_weight="1"
-    android:background="#FFF"
     android:visibility="visible"
-                android:paddingTop="20dp">
+    android:background="@color/white">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <com.pixtory.app.views.CircularImageView
             android:layout_width="50dp"
-                     android:layout_height="50dp"
+            android:layout_height="50dp"
             android:id="@+id/imgProfile"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="25dp"/>
     <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/imgProfile"
-              android:layout_marginTop="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="7dp"
             android:text="Steve Johnson"
             android:textColor="#31aef5"
+            android:textSize="17sp"
             android:id="@+id/txtName"/>
-    <TextView android:layout_width="wrap_content"
+    <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="180dp"
+                android:layout_marginLeft="7dp"
+                android:textSize="14sp"
+                android:layout_gravity="left"
+                android:maxLines="2"
+
               android:layout_height="wrap_content"
               android:layout_toRightOf="@+id/imgProfile"
               android:layout_below="@+id/txtName"
               android:text="Travel Enthusiast"
               android:layout_marginTop="3dp"
+        android:layout_marginBottom="10dp"
+            android:textColor="@color/grey_3"
               android:textAllCaps="true"
-            android:id="@+id/txtDesc"/>
+            android:id="@+id/txtDesc"
+        android:singleLine="true"/>
 
-    <TextView android:layout_width="wrap_content"
+    <com.pixtory.app.views.RobotoLightTextView
+        android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="07 Apr"
-            android:textColor="#31aef5"
+            android:textColor="@color/app_blue"
+
             android:id="@+id/txtDate"
-            android:layout_marginRight="20dp"/>
+        android:layout_below="@+id/txtName"
+        android:text="25 Apr 12"
+        android:textSize="15sp"
+        android:layout_alignRight="@+id/separator"
+        android:layout_alignEnd="@+id/separator" />
     <View android:layout_width="match_parent"
-          android:layout_height="1dp"
-            android:background="#31aef5"
+          android:layout_height="0.67dp"
+            android:background="@color/separator_color"
             android:id="@+id/separator"
             android:layout_below="@+id/imgProfile"
             android:layout_marginTop="10dp"
-          android:layout_marginLeft="20dp"
-          android:layout_marginRight="20dp"/>
+          android:layout_marginLeft="25dp"
+          android:layout_marginRight="25dp"/>
 
-    <ScrollView android:layout_width="match_parent"
-                android:layout_height="match_parent"
-            android:layout_below="@+id/separator"
-                android:fillViewport="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="40dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-            android:id="@+id/layout_story">
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                android:orientation="vertical">
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="Abc"
-                      android:textStyle="bold"
-                      android:id="@+id/txtMainPara"
-                    />
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="Abc"
-                      android:id="@+id/txtDetailsPara"
-                    />
+            <com.pixtory.app.views.RobotoLightTextView
+                android:layout_width="match_parent"
+                android:layout_gravity="start"
+                android:layout_below="@+id/separator"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_1"
+                android:textSize="17sp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="80dp"
+                android:lineSpacingExtra="5sp"
+                android:minHeight="300dp"
+                android:text="fknvlenfk"
+                android:id="@+id/txtDetailsPara"/>
+                <!--android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. when an unknown printer took a galley of type and scrambled it to make a type specimen book Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book-->
+                <!--when an unknown printer took a galley of type and scrambled it to make a type specimen when an unknown printer took a galley of type and scrambled it to make a type specimen book unknown printer took a galley of type and when an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type-->
+                <!--specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookscrambled it to make a type specimen book-->
+                <!--when an unknown printer took a galley of type and scrambled it to make a type specimen unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen book"-->
+
+    </RelativeLayout>
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/comment_share_ll"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:weightSum="2"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:id="@+id/btnComment"
+            android:background="@color/grey_5"
+            android:layout_height="match_parent"
+            android:gravity="center"
+
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/comment" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:fontFamily="sans-serif-light"
+                android:textSize="12sp"
+                android:textColor="@color/grey_1"
+                android:text="COMMENT"/>
+
         </LinearLayout>
 
-    </ScrollView>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/black"/>
 
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
-        <Button android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/btnComment"
-                android:text="Comment"/>
-        <Button android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/btnShare"
-                android:text="Share"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:id="@+id/btnShare"
+            android:background="@color/grey_5"
+            android:layout_height="match_parent"
+            android:gravity="center"
+
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center"
+                android:src="@drawable/share" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:fontFamily="sans-serif-light"
+                android:textSize="12sp"
+                android:textColor="@color/grey_1"
+                android:text="SHARE"/>
+
+        </LinearLayout>
     </LinearLayout>
+
+
+
+
 </RelativeLayout>
