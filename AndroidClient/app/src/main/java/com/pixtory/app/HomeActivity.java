@@ -41,6 +41,7 @@ import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.model.SideMenuData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
 
@@ -936,13 +937,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        final ArrayList<Drawable> items = new ArrayList<Drawable>();
-        items.add(getResources().getDrawable(R.drawable.cross_icon));
-        items.add(getResources().getDrawable(R.drawable.profile_icon));
-        items.add(getResources().getDrawable(R.drawable.contributor_icon));
-        items.add(getResources().getDrawable(R.drawable.invite_3));
-        items.add(getResources().getDrawable(R.drawable.feedback_icon));
-        items.add(getResources().getDrawable(R.drawable.wallpaper_icon));
+        final ArrayList<SideMenuData> items = new ArrayList<SideMenuData>();
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.cross_icon),""));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.profile_icon_2),"My Profile"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.contributor_icon_2),"Become a Contributor"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.invite_icon_2),"Invite Friends"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.feedback_icon_2),"Feedback"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.wallpaper_icon_2),"Wallpaper"));
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
         DisplayMetrics dm = new DisplayMetrics();

@@ -10,24 +10,27 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.pixtory.app.R;
 import com.pixtory.app.animations.FlipAnimation;
+import com.pixtory.app.model.SideMenuData;
 
 import java.util.ArrayList;
 
 /**
  * Created by krish on 09/06/2016.
  */
-public class ImageArrayAdapter extends ArrayAdapter<Drawable> {
-    ArrayList<Drawable> items;
+public class ImageArrayAdapter extends ArrayAdapter<SideMenuData> {
+    ArrayList<SideMenuData> items;
     ImageView menuImage;
+    TextView menuText;
     Context context;
     int height;
     int itemHeight;
     private final int ANIMATION_DURATION = 175;
 
-    public ImageArrayAdapter(Context context,int resources, ArrayList<Drawable> items,int height){
+    public ImageArrayAdapter(Context context,int resources, ArrayList<SideMenuData> items,int height){
         super(context,resources,items);
         this.context=context;
         this.items=items;
@@ -40,7 +43,12 @@ public class ImageArrayAdapter extends ArrayAdapter<Drawable> {
         if(convertView==null)
             convertView = LayoutInflater.from(context).inflate(R.layout.menu_image,parent,false);
         menuImage = (ImageView)convertView.findViewById(R.id.image_menu);
-        menuImage.setImageDrawable(items.get(position));
+        menuText = (TextView)convertView.findViewById(R.id.menu_text);
+        menuImage.setImageDrawable(items.get(position).drawable);
+        if(position!=0)
+            menuText.setText(items.get(position).menuText);
+        else
+            menuText.setVisibility(View.GONE);
         Animation animation = new FlipAnimation(90,0,0,menuImage.getHeight()/2f);
         /*
         int delay = 3*ANIMATION_DURATION*position/items.size();
