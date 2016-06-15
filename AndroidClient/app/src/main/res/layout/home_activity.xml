@@ -48,10 +48,12 @@
 
     <!-- Slide Navigation Content-->
     <ListView android:id="@+id/left_drawer_list"
-        android:layout_width="80dp"
+        android:layout_width="71dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
-        android:divider="@color/app_blue"/>
+        android:divider="@color/app_blue"
+        android:dividerHeight="0dp"
+        android:background="#00ffffff" />
 
 </android.support.v4.widget.DrawerLayout>

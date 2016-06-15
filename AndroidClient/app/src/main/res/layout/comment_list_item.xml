@@ -15,7 +15,7 @@
         android:fontFamily="sans-serif-light"
         android:layout_toRightOf="@+id/avatarImg"
         android:text="Steve Johnson"
-        android:textSize="13sp"
+        android:textSize="10sp"
         android:textColor="#31aef5"
         android:id="@+id/txtName"/>
     <TextView android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
         android:fontFamily="sans-serif-light"
         android:textAllCaps="true"
         android:textColor="@color/grey_3"
-        android:textSize="11sp"
+        android:textSize="9sp"
         android:id="@+id/txtDesc"/>
 
     <TextView android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:layout_alignParentRight="true"
         android:fontFamily="sans-serif-light"
         android:text="07 Apr"
-        android:textSize="12sp"
+        android:textSize="9sp"
         android:textColor="@color/grey_3"
         android:id="@+id/txtDate"
         />
@@ -52,7 +52,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:textColor="@color/grey_2"
-        android:textSize="17sp"
+        android:textSize="15sp"
         android:fontFamily="sans-serif-light"
         android:lineSpacingExtra="4sp"/>
 

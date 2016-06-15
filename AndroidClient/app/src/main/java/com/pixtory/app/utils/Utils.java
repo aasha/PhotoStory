@@ -171,10 +171,12 @@ public class Utils {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
                 AppConstants.APP_PREFS, Context.MODE_PRIVATE);
 
-//        if(mSharedPrefs.getString("UID","") != null || m)
-        return mSharedPrefs.getString("UID", "4");
-//        Log.i("Utils class->UserId::",mSharedPrefs.getString("UID", ""));
-//        return mSharedPrefs.getString("UID", "");
+        //if(mSharedPrefs.getString("UID","") != null || m)
+        return mSharedPrefs.getString("UID", "3");
+        //return mSharedPrefs.getString("UID", "1207785742565519");
+
+        //Log.i("Utils class->UserId::",mSharedPrefs.getString("UID", ""));
+       // return mSharedPrefs.getString("UID", "");
     }
 
     public static void putUserName(Context context, String fname) {
@@ -234,14 +236,10 @@ public class Utils {
 
     }
 
-    public static boolean isNotEmpty(String str){
+    public static boolean isEmpty(String str){
         if(str == null || str.equals(""))
             return false;
 
         return true;
-    }
-
-    public static void showToastMessage(Context context , String message){
-        Toast.makeText(context , message,Toast.LENGTH_SHORT).show();
     }
 }

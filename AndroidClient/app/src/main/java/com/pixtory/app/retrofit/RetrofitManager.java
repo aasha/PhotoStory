@@ -14,6 +14,7 @@ public class RetrofitManager {
 
     private static final String APP_URL = PUBLIC_URL;
 
+
     private static RetrofitManager sInstance = null;
 
     public static RetrofitManager getInstance() {

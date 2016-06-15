@@ -58,6 +58,8 @@ public class OnBoardingActivity  extends FragmentActivity {
     private final static String OB_FBLogin_Fail = "OB_FBLogin_Fail";
     private final static String OB_Register_Success = "OB_Register_Success";
     private final static String OB_Register_Failure = "OB_Register_Failure";
+    private final static String OB_Login_Skip = "OB_Login_Skip";
+
 
     private List<String> mFBPermissions = Arrays.asList("public_profile",
             "email", "user_about_me");
@@ -120,7 +122,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Cancel)
                                 .build());
                         closeDialog();
-                        Utils.showToastMessage(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please try again later.");
+                        Toast.makeText(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please try again later.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -130,7 +132,8 @@ public class OnBoardingActivity  extends FragmentActivity {
                                 .build());
 
                         closeDialog();
-                        Utils.showToastMessage(OnBoardingActivity.this,  "Sorry, unable to login to facebook.Please check your network connection or try again later.(" + exception.getMessage() + ")");
+                        Toast.makeText(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please check your network connection or try again later.(" + exception.getMessage() + ")", Toast.LENGTH_LONG).show();
+
                     }
                 });
     }
@@ -200,9 +203,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                                     .put("MESSAGE", error.errorMessage)
                                     .build());
-                            Log.i(TAG,"RegisterResponse error::"+error.errorMessage);
                             closeDialog();
-                            Utils.showToastMessage(OnBoardingActivity.this , "Oops something went wrong, Please try logging in again after sometime");
                         }
 
                         @Override
@@ -210,9 +211,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                                     .put("MESSAGE", error.getMessage())
                                     .build());
-                            Log.i(TAG,"RegisterResponse RetrofitError error::"+error.getMessage());
                             closeDialog();
-                            Utils.showToastMessage(OnBoardingActivity.this , "Oops something went wrong, Please try logging in again after sometime");
                         }
                     });
 
@@ -279,7 +278,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                         .put("MESSAGE", error.errorMessage)
                         .build());
-                Utils.showToastMessage(OnBoardingActivity.this, "Username is taken. Please insert a new username");
+                Toast.makeText(OnBoardingActivity.this, "Username is taken. Please insert a new username", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -292,7 +291,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
                         .put("MESSAGE", error.getMessage())
                         .build());
-                Utils.showToastMessage(OnBoardingActivity.this, "Please connect to network");
+                Toast.makeText(OnBoardingActivity.this, "Please connect to network", Toast.LENGTH_SHORT).show();
 
             }
         });
