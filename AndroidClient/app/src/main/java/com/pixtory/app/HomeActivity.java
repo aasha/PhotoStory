@@ -14,11 +14,13 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -105,6 +107,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ListView mDrawerList;
     private ArrayAdapter<String> mDrawerListAdapter;
     private ImageView menuIcon;
+    private ActionBarDrawerToggle mDrawerToggle;
 
 
     @Override
@@ -917,6 +920,21 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         menuIcon = (ImageView)findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,null,R.string.drawer_open,R.string.drawer_close){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                menuIcon.setVisibility(View.GONE);
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                menuIcon.setVisibility(View.VISIBLE);
+                super.onDrawerClosed(drawerView);
+                //Toast.makeText(HomeActivity.this,"Drawer closed",Toast.LENGTH_SHORT).show();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         final ArrayList<Drawable> items = new ArrayList<Drawable>();
         items.add(getResources().getDrawable(R.drawable.cross_icon));
@@ -928,7 +946,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
         DisplayMetrics dm = new DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        if(Build.VERSION.SDK_INT>=17)
+            this.getWindowManager().getDefaultDisplay().getRealMetrics(dm);
+        else
+            this.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
         final ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(HomeActivity.this,0,items,dm.heightPixels);
         mDrawerList.setAdapter(imageArrayAdapter);
@@ -974,16 +995,21 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 switch (i){
-                    case 0:mDrawerList.setLayoutAnimation(new LayoutAnimationController(AnimationUtils.loadAnimation(HomeActivity.this,R.anim.left_out),0.2f));
+                    case 0:if(Build.VERSION.SDK_INT>=16)
+                        {
+                            mDrawerList.setLayoutAnimation(new LayoutAnimationController(AnimationUtils.loadAnimation(HomeActivity.this,R.anim.left_out),0.2f));
                             mDrawerList.postOnAnimationDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     //Toast.makeText(HomeActivity.this,"Animation done",Toast.LENGTH_SHORT).show();
                                     mDrawerLayout.closeDrawer(mDrawerList);
                                 }
-                            },600);
-                        //
+                            },560);
+                        }
+                        else
+                            mDrawerLayout.closeDrawer(mDrawerList);
                         break;
+
                     case 1:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Profile_Click")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());

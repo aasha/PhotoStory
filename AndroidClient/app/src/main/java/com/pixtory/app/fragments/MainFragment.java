@@ -909,7 +909,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         else {
             //TODO: Redirect user to login
             showLoginAlert();
-            Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT).show();
         }
     }
 
