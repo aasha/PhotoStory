@@ -1,8 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_weight="1"
     android:background="#fff"
+    android:orientation="vertical"
     android:visibility="visible">
 
 
@@ -40,7 +41,8 @@
         android:visibility="visible"
         android:id="@+id/comments_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/story_min_height"
         android:layout_above="@+id/postBtn_ll"
         android:layout_below="@+id/separator">
 
@@ -88,9 +90,7 @@
            android:layout_below="@+id/comment_img"
            android:layout_marginLeft="20dp"
            android:layout_marginRight="20dp"
-
-            android:layout_marginBottom="10dp"
-           >
+            android:layout_marginBottom="10dp">
 
        </android.support.v7.widget.RecyclerView>
 
@@ -128,4 +128,4 @@
         </LinearLayout>
 
 
-</RelativeLayout>
+</LinearLayout>

@@ -42,20 +42,6 @@ import java.util.ArrayList;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.http.HEAD;
-
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.pixtory.app.R;
-import com.pixtory.app.model.ContentData;
-import com.pixtory.app.model.PersonInfo;
-import com.pixtory.app.utils.BlurBuilder;
-import com.pixtory.app.views.CircularImageView;
-import com.pixtory.app.views.SlantView;
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 /**
  * Created by sriram on 24/05/2016.
@@ -167,8 +153,7 @@ public class UserProfileActivity extends Activity{
             recyclerView = (RecyclerView)findViewById(R.id.profile_recycler_view);
             recyclerView.setLayoutManager(gridLayout);
 
-            //intialise card layout adapter and set it to recycler view
-
+            //intialize card layout adapter and set it to recycler view
             recyclerView.setAdapter(cardLayoutAdapter);
 
             //get the screen dimesions
@@ -261,8 +246,6 @@ public class UserProfileActivity extends Activity{
                 }
             });
         }
-
-
 
         backImage.setOnClickListener(new View.OnClickListener() {
             @Override

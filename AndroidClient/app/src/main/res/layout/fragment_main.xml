@@ -112,23 +112,74 @@
                     android:layout_height="wrap_content"
                     android:background="@color/white" />
 
-
-
-                <!--<include-->
-                    <!--layout="@layout/story_view_layout"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:visibility="visible"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:id="@+id/pic_story_layout"-->
-                    <!--android:layout_below="@+id/like_layout"></include>-->
-
             </RelativeLayout>
-
-
 
         </com.pixtory.app.views.ObservableScrollView>
 
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/comment_share_ll"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:weightSum="2"
+        android:layout_alignParentBottom="true">
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:id="@+id/btnComment"
+        android:background="@color/grey_5"
+        android:layout_height="match_parent"
+        android:gravity="center"
+
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:src="@drawable/comment" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:fontFamily="sans-serif-light"
+            android:textSize="12sp"
+            android:textColor="@color/grey_1"
+            android:text="COMMENT"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/black"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:id="@+id/btnShare"
+        android:background="@color/grey_5"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="center"
+            android:src="@drawable/share" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:fontFamily="sans-serif-light"
+            android:textSize="12sp"
+            android:textColor="@color/grey_1"
+            android:text="SHARE"/>
+
+        </LinearLayout>
+    </LinearLayout>
 
     </RelativeLayout>
 

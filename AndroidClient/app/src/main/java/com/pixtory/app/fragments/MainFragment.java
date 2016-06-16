@@ -27,8 +27,6 @@ import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.*;
-
-import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -92,7 +90,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     LinearLayout mStoryParentLayout = null;
 
     RelativeLayout mStoryLayout = null;
-    RelativeLayout mCommentsLayout = null;
+    LinearLayout mCommentsLayout = null;
 
     @Bind(R.id.image_main)
     ImageView mImageMain = null;
@@ -126,15 +124,25 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.like_layout)
     RelativeLayout mTopLikeLayout = null;
 
-    View mRootView = null;
+    @Bind(R.id.comment_share_ll)
+    LinearLayout mCommentShareLayout;
+
+    @Bind(R.id.btnComment)
+    LinearLayout mCommentBtn = null;
+
+    @Bind(R.id.btnShare)
+    LinearLayout mShareBtn = null;
+
     RelativeLayout.LayoutParams imgViewLayoutParams ;
 
     private int mSoftBarHeight = 0;
     private boolean isFullScreenShown = true;
     private boolean isCommentsVisible = false;
     private int mImageExtendedHeight;
+
     private float mLikeLayoutPaddingTop;
     private int mSlantViewHtInPx;
+    private int mBottomScreenHt;
     final private float mHalfScreenPer = 0.55f;
 
     private int  scrollY,oldScrollY;
@@ -219,7 +227,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         mSlantViewHtInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
         mImageExtendedHeight = mDeviceHeightInPx +mSlantViewHtInPx;
-
+        mBottomScreenHt = (int)(0.30f*mDeviceHeightInPx);
         mDeviceHeightInPx += mSoftBarHeight;
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
@@ -231,6 +239,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      * @param savedInstanceState
      * @return
      */
+    View mRootView = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -246,6 +256,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         bindData();
         attachPixtoryContent(SHOW_PIC_STORY);
 
+        mStoryParentLayout.setMinimumHeight((int)getResources().getDimension(R.dimen.story_min_height));
+
         mImageDetailsLayout.setSmoothScrollingEnabled(true);
         mImageDetailsLayout.setScrollViewListener(this);
 
@@ -260,7 +272,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mTopLikeLayout.setLayoutParams(relativeParams);
         mTopLikeLayout  .requestLayout();
         setUpFullScreen();
-
 
         imgViewLayoutParams = (RelativeLayout.LayoutParams) mImageMain.getLayoutParams();
         return mRootView;
@@ -305,8 +316,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
         TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
         TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
-        LinearLayout mBtnShare = (LinearLayout) mStoryLayout.findViewById(R.id.btnShare);
-        LinearLayout mBtnComment = (LinearLayout) mStoryLayout.findViewById(R.id.btnComment);
+        mShareBtn = (LinearLayout) mRootView.findViewById(R.id.btnShare);
+        mCommentBtn = (LinearLayout) mRootView.findViewById(R.id.btnComment);
 
         if (cd != null) {
             if (cd.personDetails != null) {
@@ -316,6 +327,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
                 mTextDesc.setText(cd.personDetails.description);
+
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -334,31 +346,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 mTextName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
-                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                                .put("PIXTORY_ID",cd.id+"")
-                                .put("POSITION_ID",mContentIndex+"")
-                                .build());
-                        Intent intent = new Intent(mContext, UserProfileActivity.class);
-                        intent.putExtra("USER_ID",Utils.getUserId(mContext));
-                        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
-                        startActivity(intent);
+                        navigateToUserProfile(cd);
                     }
 
                 });
                 mTextDesc.setOnClickListener(new View.OnClickListener() {
-                                                 @Override
-                                                 public void onClick(View v) {
-                                                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
-                                                             .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                                                             .put("PIXTORY_ID",cd.id+"")
-                                                             .put("POSITION_ID",mContentIndex+"")
-                                                             .build());
-                                                     Intent intent = new Intent(mContext, UserProfileActivity.class);
-                                                     intent.putExtra("USER_ID",Utils.getUserId(mContext));
-                                                     intent.putExtra("PERSON_ID",cd.personDetails.id+"");
-                                                     startActivity(intent);
-                                                 }
+                     @Override
+                     public void onClick(View v) {
+                         navigateToUserProfile(cd);
+                     }
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
@@ -366,7 +362,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mTextStoryDetails.setText(cd.pictureDescription);
         }
 
-        mBtnShare.setOnClickListener(new View.OnClickListener() {
+        mShareBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 share(Uri.parse(cd.pictureUrl));
@@ -376,22 +372,24 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         .build());
             }
         });
-        mBtnComment.setOnClickListener(new View.OnClickListener() {
+        mCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
-//                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-//                .put("PIXTORY_ID",cd.id+"")
-//                .build());
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
-//                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-//                        .put("PIXTORY_ID",cd.id+"")
-//                        .build());
-//                boolean showBackArrow = true;
-//                mListener.onAnimateMenuIcon(showBackArrow);
-//                buildCommentsLayout(cd);
-//                attachPixtoryContent(SHOW_PIC_COMMENTS);
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
+                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                .put("PIXTORY_ID",cd.id+"")
+                .build());
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",cd.id+"")
+                        .build());
+
+                boolean showBackArrow = true;
+                mListener.onAnimateMenuIcon(showBackArrow);
+
+                buildCommentsLayout(cd);
+                attachPixtoryContent(SHOW_PIC_COMMENTS);
             }
         });
 
@@ -451,7 +449,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private void setUpStoryContent() {
         LayoutInflater mLayoutInflater = LayoutInflater.from(mContext);
         mStoryLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_view_layout, null);
-        mCommentsLayout = (RelativeLayout) mLayoutInflater.inflate(R.layout.story_comment_layout , null);
+        mCommentsLayout = (LinearLayout) mLayoutInflater.inflate(R.layout.story_comment_layout , null);
     }
 
     public boolean isCommentsVisible() {
@@ -460,9 +458,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     public void setCommentsVisible(boolean commentsVisible) {
         isCommentsVisible = commentsVisible;
+
+        if(isCommentsVisible)
+            mCommentShareLayout.setVisibility(View.GONE);
+        else
+            mCommentShareLayout.setVisibility(View.VISIBLE);
+
     }
-
-
 
     /**
      *
@@ -572,11 +574,28 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
             });
+
+    private void navigateToUserProfile(ContentData cd){
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
+                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                .put("PIXTORY_ID",cd.id+"")
+                .put("POSITION_ID",mContentIndex+"")
+                .build());
+        Intent intent = new Intent(mContext, UserProfileActivity.class);
+        intent.putExtra("USER_ID",Utils.getUserId(mContext));
+        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
+        startActivity(intent);
+    }
     
     private boolean modifyScreenHeight(int offset) {
 
         imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
         mImageMain.setLayoutParams(imgViewLayoutParams);
+
+        if(offset > mBottomScreenHt )
+            mCommentShareLayout.setVisibility(View.VISIBLE);
+        else
+            mCommentShareLayout.setVisibility(View.GONE);
 
         return true;
 
@@ -590,7 +609,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
+//            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
 
             isScrollingUp= (scrollY < oldScrollY)?false:true;
 
@@ -601,6 +620,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     public void run() {
                         if(isScrollingUp){
                             mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
+
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
                                     .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                     .put("PIXTORY_ID",""+mContentData.id)
@@ -614,9 +634,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
         return false;
     }
-
-
-
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
@@ -708,6 +725,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         });
 
         NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(mContext), data.id, new NetworkApiCallback<GetCommentDetailsResponse>() {
+
             @Override
             public void success(GetCommentDetailsResponse getCommentDetailsResponse, Response response) {
 
