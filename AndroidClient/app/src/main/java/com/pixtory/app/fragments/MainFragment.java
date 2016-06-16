@@ -126,12 +126,20 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.like_layout)
     RelativeLayout mTopLikeLayout = null;
 
+    View mRootView = null;
+    RelativeLayout.LayoutParams imgViewLayoutParams ;
+
     private int mSoftBarHeight = 0;
     private boolean isFullScreenShown = true;
     private boolean isCommentsVisible = false;
+    private int mImageExtendedHeight;
+    private float mLikeLayoutPaddingTop;
+    private int mSlantViewHtInPx;
+    final private float mHalfScreenPer = 0.55f;
 
-    ViewGroup.LayoutParams imageViewLayoutParams;
-
+    private int  scrollY,oldScrollY;
+    private boolean isScrollingUp = true;
+    
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
         // getRealMetrics is only available with API 17 and +
@@ -209,22 +217,26 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mDeviceHeightInPx = displayMetrics.heightPixels;
 
 
-        px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
-        newHt = mDeviceHeightInPx +px;
+        mSlantViewHtInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
+        mImageExtendedHeight = mDeviceHeightInPx +mSlantViewHtInPx;
 
-        Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
         mDeviceHeightInPx += mSoftBarHeight;
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
 
-    View mRootView = null;
-    RelativeLayout.LayoutParams imgParams ;
+    /**
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        Log.d("TAG", "onCreateView is called for index = " + mContentIndex);
+        Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
 
         mImageInfoLayoutHeight = (int)getResources().getDimension(R.dimen.image_layout_height);
@@ -232,48 +244,41 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         setUpStoryContent();
         bindData();
-
         attachPixtoryContent(SHOW_PIC_STORY);
 
+        mImageDetailsLayout.setSmoothScrollingEnabled(true);
+        mImageDetailsLayout.setScrollViewListener(this);
 
-        top = mDeviceHeightInPx - getResources().getDimension(R.dimen.image_layout_height);
-        mHalfScreenSize = (int)(0.55f*mDeviceHeightInPx);
+        /** Adjusting padding top for the Like layout so that is sticks to bottom of screen**/
+        mLikeLayoutPaddingTop = mDeviceHeightInPx - getResources().getDimension(R.dimen.image_layout_height);
+
+        mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
-        RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
 
-        relativeParams.setMargins(0, (int)top, 0, 0);
+        RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
+        relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
         mTopLikeLayout.setLayoutParams(relativeParams);
         mTopLikeLayout  .requestLayout();
         setUpFullScreen();
 
-        mImageDetailsLayout.setSmoothScrollingEnabled(true);
 
-        mImageDetailsLayout.setScrollViewListener(this);
-
-        imageViewLayoutParams = mImageMain.getLayoutParams();
-        imgParams = (RelativeLayout.LayoutParams) mImageMain.getLayoutParams();
+        imgViewLayoutParams = (RelativeLayout.LayoutParams) mImageMain.getLayoutParams();
         return mRootView;
     }
 
-
-
-
-    float top;
-    int px;
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(TAG,"OnActivityCreated");
         super.onActivityCreated(savedInstanceState);
-//        setUpStoryContent();
-//        bindData();
-//
-//        attachPixtoryContent(SHOW_PIC_STORY);
-//
-//        top = mDeviceHeightInPx - getResources().getDimension(R.dimen.image_layout_height);
-
     }
 
-
+    /**
+     * Binding story data
+     */
     private void bindData() {
         if (mContentData == null) {
             return;
@@ -295,14 +300,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
 
         //***Binding StoryContent****/
-//        ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
-//        TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
-//        TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
-//        TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
-//        TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
-//        LinearLayout mBtnShare = (LinearLayout) mStoryLayout.findViewById(R.id.btnShare);
-//        LinearLayout mBtnComment = (LinearLayout) mStoryLayout.findViewById(R.id.btnComment);
-
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
@@ -383,24 +380,27 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void onClick(View v) {
 
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
-                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                .put("PIXTORY_ID",cd.id+"")
-                .build());
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
-                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                        .put("PIXTORY_ID",cd.id+"")
-                        .build());
-                boolean showBackArrow = true;
-                mListener.onAnimateMenuIcon(showBackArrow);
-                buildCommentsLayout(cd);
-                attachPixtoryContent(SHOW_PIC_COMMENTS);
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
+//                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+//                .put("PIXTORY_ID",cd.id+"")
+//                .build());
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
+//                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+//                        .put("PIXTORY_ID",cd.id+"")
+//                        .build());
+//                boolean showBackArrow = true;
+//                mListener.onAnimateMenuIcon(showBackArrow);
+//                buildCommentsLayout(cd);
+//                attachPixtoryContent(SHOW_PIC_COMMENTS);
             }
         });
 
     }
 
-
+    /**
+     * @param story_or_comment
+     * Rationale - Adding story_view_layout fragment to MainFragment
+     */
     public void attachPixtoryContent(int story_or_comment){
         mStoryParentLayout.removeAllViews();
         if(story_or_comment == SHOW_PIC_STORY){
@@ -463,8 +463,17 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
 
-    int  scrollY,oldScrollY;
-    boolean scrollUp = true;
+
+    /**
+     *
+     * @param scrollView
+     * @param x
+     * @param y
+     * @param oldX
+     * @param oldY
+     *
+     * Rationale - OnScrollChange listener implementation for mImageDetailsLayout
+     */
     @Override
     public void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldX, int oldY) {
 //        Log.i(TAG,"x:y="+x+":"+y);
@@ -491,16 +500,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 //    public void resetFragmentState() {
 //        setUpFullScreen();
 //    }
-//
-//    public void attachStoryView(View v) {
-//        mStoryLayout.setVisibility(View.VISIBLE);
-//        mStoryLayout.removeAllViews();
-//        mStoryLayout.addView(v);
-//    }
-//
+
     /********Swipe Up and Down Logic*********************/
-    boolean mIsScrolling = false;
-    boolean mIsFling = false;
 
     final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
@@ -524,77 +525,62 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             .build());}
                 }
 
-                @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    if (distanceX < 5 && distanceX > -5) {
-                        mIsScrolling = true;
-                        mIsFling = false;
-                        Log.i(TAG, "onScroll::::"+mImageDetailsLayout.getScrollY());
+//                @Override
+//                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+//                    if (distanceX < 5 && distanceX > -5) {
+//                        mIsScrolling = true;
+//                        mIsFling = false;
+//                        Log.i(TAG, "onScroll::::"+mImageDetailsLayout.getScrollY());
+////
 //
-//                        modifyScreenHeight(mImageDetailsLayout.getScrollY());
-
-                    }
-                    return super.onScroll(e1, e2, distanceX, distanceY);
-                }
+//                    }
+//                    return super.onScroll(e1, e2, distanceX, distanceY);
+//                }
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                        float velocityY) {
-                    final int SWIPE_MIN_DISTANCE = 50;
-                    final int SWIPE_THRESHOLD_VELOCITY = 100;
-                    try {
-                        if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
-                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                            mIsFling = true;
-                            Log.i(TAG, "onFlingUp::::"+mImageDetailsLayout.getScrollY());
-
-//                            modifyScreenHeight(mImageDetailsLayout.getScrollY());
-
-                        } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                            mIsFling = true;
-                            if(!isFullScreenShown){
-                                showFullScreen();
-                                isFullScreenShown = true;
-                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
-                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                                        .put("PIXTORY_ID",""+mContentData.id)
-                                        .build());
-                            }
-
-                        } else {
-                            mIsFling = false;
-                        }
-                    } catch (Exception e) {
-                        // nothing
-                        e.printStackTrace();
-                    }
+//                    final int SWIPE_MIN_DISTANCE = 50;
+//                    final int SWIPE_THRESHOLD_VELOCITY = 100;
+//                    try {
+//                        if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
+//                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+//                            mIsFling = true;
+//                            Log.i(TAG, "onFlingUp::::"+mImageDetailsLayout.getScrollY());
+//
+////                            modifyScreenHeight(mImageDetailsLayout.getScrollY());
+//
+//                        } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
+//                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+//                            mIsFling = true;
+//                            if(!isFullScreenShown){
+//                                showFullScreen();
+//                                isFullScreenShown = true;
+//                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
+//                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+//                                        .put("PIXTORY_ID",""+mContentData.id)
+//                                        .build());
+//                            }
+//
+//                        } else {
+//                            mIsFling = false;
+//                        }
+//                    } catch (Exception e) {
+//                        // nothing
+//                        e.printStackTrace();
+//                    }
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
             });
-
-
-
-    int newHt;
+    
     private boolean modifyScreenHeight(int offset) {
 
-        imgParams.height = (newHt) -offset;
-        mImageMain.setLayoutParams(imgParams);
+        imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
+        mImageMain.setLayoutParams(imgViewLayoutParams);
 
         return true;
 
     }
-
-//    @OnTouch(R.id.image_main)
-//    public boolean onTouch(ImageView view, MotionEvent me) {
-//        if (gesture.onTouchEvent(me)) {
-//            return true;
-//        }
-//
-////        if (me.getAction() == MotionEvent.ACTION_UP) {
-////        }
-//        return false;
-//    }
 
     int mHalfScreenSize;
     @OnTouch(R.id.image_details_layout)
@@ -604,62 +590,37 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            Log.i(TAG , "MotionEvent.ACTION_UP::"+scrollUp+"::scrollY::"+scrollY);
+            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
 
-            scrollUp= (scrollY < oldScrollY)?false:true;
+            isScrollingUp= (scrollY < oldScrollY)?false:true;
 
             if(scrollY < mHalfScreenSize){
 
                 mImageDetailsLayout.post(new Runnable() {
                     @Override
                     public void run() {
-                        if(scrollUp)
+                        if(isScrollingUp){
                             mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                    .put("PIXTORY_ID",""+mContentData.id)
+                                    .build());
+                        }
                         else
                             mImageDetailsLayout.smoothScrollTo(0,0);
                     }
                 });
-
-
             }
-
-
         }
         return false;
     }
 
 
-    private void showHalfScreen(int lastScrollPos) {
-        setUpHalfScreen();
-//        modifyScreenHeight((int) (0.30 * mDeviceHeightInPx));
 
-        int fromY = 0;
-//        double toY = (-1)*0.50*mDeviceHeightInPx;
-//        int toY = -200;
-        float toY = 0.70f*mDeviceHeightInPx;
-//        float scrollBy =  (mTopLikeLayout.getTop()) - toY;
-//        mImageDetailsLayout.smoothScrollBy(0 , (int)scrollBy);
-        Log.i(TAG,"smooth scrollTo="+toY);
-        mImageDetailsLayout.smoothScrollTo(0,(int)toY);
-        modifyScreenHeight((int)toY);
-//        animateContent(mImageDetailBottomContainer, false , 0 ,  , 500);
-//        animateContent(mImageMain, false ,fromY , -500 , 500);
-    }
-
-    private void showFullScreen() {
-        int fromY     = (int)0.30*mDeviceHeightInPx;
-        int toY   = mDeviceHeightInPx - mImageInfoLayoutHeight;
-        animateContent(mImageDetailBottomContainer, true , -800 , 0 , 500);
-        if(isCommentsVisible()){
-            mListener.onAnimateMenuIcon(false);
-            attachPixtoryContent(SHOW_PIC_STORY);
-        }
-    }
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
         mSlantView.setVisibility(View.VISIBLE);
-//        mStoryLayout.setVisibility(View.GONE);
         mImageDetailsLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.VISIBLE);
     }
@@ -668,10 +629,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mSlantView.setVisibility(View.VISIBLE);
         mStoryLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.GONE);
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                .put("PIXTORY_ID",""+mContentData.id)
-                .build());
+
     }
 
     private void animateContent(View view , final boolean showContent , int fromY , int toY,int duration){
