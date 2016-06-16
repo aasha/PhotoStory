@@ -126,7 +126,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             showAlert();
         }
 
-//        setPersonDetails();
+        setPersonDetails();
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
@@ -1027,22 +1027,26 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     case 2: AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_BecomeContributor_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
+                        mDrawerLayout.closeDrawer(mDrawerList);
                         showContributeDialog();
                         break;
 
                     case 3:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_InviteFriends_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
+                        mDrawerLayout.closeDrawer(mDrawerList);
                         sendInvite();
                         break;
 
                     case 4:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Feedback_Click")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
+                        mDrawerLayout.closeDrawer(mDrawerList);
                         showFeedBackDialog();
                         break;
 
-                    case 5:showWallpaperAlert();
+                    case 5:mDrawerLayout.closeDrawer(mDrawerList);
+                        showWallpaperAlert();
                         break;
                 }
             }
