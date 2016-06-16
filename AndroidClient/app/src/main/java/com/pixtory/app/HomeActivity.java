@@ -4,33 +4,48 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
-import android.content.*;
-
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
-
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.*;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.*;
-import butterknife.ButterKnife;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.facebook.network.connectionclass.*;
+import com.facebook.network.connectionclass.ConnectionClassManager;
+import com.facebook.network.connectionclass.ConnectionQuality;
+import com.facebook.network.connectionclass.DeviceBandwidthSampler;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
@@ -41,29 +56,25 @@ import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.SideMenuData;
-import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
-
 import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
-import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
-
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
-
-import com.pixtory.app.userprofile.UserProfileActivity;
-import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import butterknife.ButterKnife;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -536,14 +547,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     }
 */
 
-    private void sendInvite(){
-        Toast.makeText(HomeActivity.this,"Invitation",Toast.LENGTH_SHORT).show();
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
-        sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, "Send Invite via"));
-    }
 
     private void setPersonDetails(){
 
@@ -1080,7 +1083,38 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.show();
     }
 
+    private void sendInvite(){
+        List<Intent> targetInviteIntents=new ArrayList<Intent>();
+        Intent inviteIntent=new Intent();
+        inviteIntent.setAction(Intent.ACTION_SEND);
+        inviteIntent.setType("text/plain");
+        List<ResolveInfo> resInfos=getPackageManager().queryIntentActivities(inviteIntent, 0);
+        if(!resInfos.isEmpty()){
 
+            for(ResolveInfo resInfo : resInfos){
+                String packageName=resInfo.activityInfo.packageName;
+                Log.i("Package Name", packageName);
+                if(packageName.contains("com.whatsapp") || packageName.contains("com.facebook.katana") || packageName.contains("mms") || packageName.contains("android.gm")){
+                    Intent intent=new Intent();
+                    intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
+                    intent.setPackage(packageName);
+                    targetInviteIntents.add(intent);
+                }
+            }
+            if(!targetInviteIntents.isEmpty()){
+
+                Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Invite via");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
+                startActivity(chooserIntent);
+            }else{
+                Toast.makeText(this,"No Apps to share",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 }
 
