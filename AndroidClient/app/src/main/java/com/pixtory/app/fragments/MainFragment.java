@@ -136,6 +136,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.btnShare)
     LinearLayout mShareBtn = null;
 
+    @Bind(R.id.story_back_click)
+    LinearLayout storyBackClick=null;
+
+    @Bind(R.id.story_back_img)
+    ImageView storyBackImg = null;
+
     RelativeLayout.LayoutParams imgViewLayoutParams ;
 
     private int mSoftBarHeight = 0;
@@ -213,13 +219,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mContext = getActivity();
         if (getArguments() != null) {
             isProfileContent = getArguments().getBoolean(ARG_PARAM4);
-            if(!isProfileContent)
+            if(!isProfileContent){
+
             try {
                 mContentIndex = getArguments().getInt(ARG_PARAM1);
                 mContentData = App.getContentData().get(mContentIndex);
                 mCIDX = getArguments().getString(ARG_PARAM3);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
             }
             else{
                 try {
@@ -260,6 +268,34 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+        storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
+        storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
+        if(!isProfileContent)
+        {
+            storyBackClick.setVisibility(View.GONE);
+            storyBackImg.setVisibility(View.GONE);
+        }
+        storyBackClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_PixtoryBack_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",mContentData.id+"")
+                        .build());
+                getActivity().onBackPressed();
+            }
+        });
+
+        storyBackImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_PixtoryBack_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",mContentData.id+"")
+                        .build());
+                getActivity().onBackPressed();
+            }
+        });
 
         Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
