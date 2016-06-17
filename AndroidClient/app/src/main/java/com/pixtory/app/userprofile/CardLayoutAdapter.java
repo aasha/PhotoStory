@@ -22,8 +22,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pixtory.app.R;
+import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.ContentData;
+import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -89,6 +92,10 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
         holder.cardFrame.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Pixtory_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(context))
+                        .put("PIXTORY_ID",cDlist.get(position).id+"")
+                        .build());
                 storyFragment = new MainFragment();
                 Bundle args = new Bundle();
                 args.putInt(MainFragment.ARG_PARAM1,position);

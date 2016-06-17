@@ -206,6 +206,7 @@ public class UserProfileFragment extends Fragment {
         recyclerView = (RecyclerView)userProfleView.findViewById(R.id.profile_recycler_view);
         mBackClick = (LinearLayout)userProfleView.findViewById(R.id.back_click);
         mBackImage = (ImageView)userProfleView.findViewById(R.id.back_img);
+        personFollow = (TextView)userProfleView.findViewById(R.id.person_follow);
 
         if(mUserId==mPersonId){
             personFollow.setVisibility(View.GONE);
@@ -333,15 +334,30 @@ public class UserProfileFragment extends Fragment {
         mBackImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
+                 .put("USER_ID",mUserId+"")
+                .build());
                 getActivity().onBackPressed();
             }});
 
         mBackClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
+                        .put("USER_ID",mUserId+"")
+                        .build());
                 getActivity().onBackPressed();
             }});
 
+        personFollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Follow_Click")
+                        .put(AppConstants.USER_ID,mUserId+"")
+                        .put("CONTRIBUTOR_ID",mPersonId+"")
+                        .build());
+            }
+        });
 
         return userProfleView;
     }
