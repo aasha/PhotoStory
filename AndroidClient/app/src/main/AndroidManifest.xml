@@ -78,7 +78,10 @@
             android:name=".userprofile.UserProfileActivity2"
             android:icon="@drawable/pixtory"
             android:label="UserProfileActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+
+        </activity>
 
         <activity
             android:name=".WebviewActivity"

@@ -41,6 +41,7 @@ import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.userprofile.UserProfileActivity;
+import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.ObservableScrollView;
@@ -67,9 +68,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";
+    public static final String ARG_PARAM4 = "PROFILE_CONTENT";
 
     // TODO: Rename and change types of parameters
     private int mContentIndex;
+    private boolean isProfileContent;
 
     private int mDeviceWidthInPx = 0;
     private int mDeviceHeightInPx = 0;
@@ -138,6 +141,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.btnShare)
     LinearLayout mShareBtn = null;
 
+    @Bind(R.id.story_back_click)
+    LinearLayout storyBackClick=null;
+
+    @Bind(R.id.story_back_img)
+    ImageView storyBackImg = null;
+
     RelativeLayout.LayoutParams imgViewLayoutParams ;
 
     private int mSoftBarHeight = 0;
@@ -189,10 +198,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         return fragment;
     }
 
-    public static MainFragment newInstance(int idx) {
+    public static MainFragment newInstance(int idx,boolean isProfileContent) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, idx);
+        args.putBoolean(ARG_PARAM4,isProfileContent);
         fragment.setArguments(args);
         return fragment;
     }
@@ -211,6 +221,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         super.onCreate(savedInstanceState);
         mContext = getActivity();
         if (getArguments() != null) {
+            isProfileContent = getArguments().getBoolean(ARG_PARAM4);
+            if(!isProfileContent){
+
             try {
                 mContentIndex = getArguments().getInt(ARG_PARAM1);
                 mContentData = App.getContentData().get(mContentIndex);
@@ -218,6 +231,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            }
+            else{
+                try {
+                    mContentIndex = getArguments().getInt(ARG_PARAM1);
+                    mContentData = App.getProfileContentData().get(mContentIndex);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
 
         mSoftBarHeight = getSoftbuttonsbarHeight();
@@ -248,6 +271,34 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+        storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
+        storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
+        if(!isProfileContent)
+        {
+            storyBackClick.setVisibility(View.GONE);
+            storyBackImg.setVisibility(View.GONE);
+        }
+        storyBackClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_PixtoryBack_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",mContentData.id+"")
+                        .build());
+                getActivity().onBackPressed();
+            }
+        });
+
+        storyBackImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_PixtoryBack_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",mContentData.id+"")
+                        .build());
+                getActivity().onBackPressed();
+            }
+        });
 
         Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
@@ -335,15 +386,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     @Override
                     public void onClick(View v) {
                         //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
-                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                                .put("PIXTORY_ID",cd.id+"")
-                                .put("POSITION_ID",mContentIndex+"")
-                                .build());
-                        Intent intent = new Intent(mContext, UserProfileActivity.class);
-                        intent.putExtra("USER_ID",Utils.getUserId(mContext));
-                        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
-                        startActivity(intent);
+                        navigateToUserProfile(cd);
                     }
                 });
                 mTextName.setOnClickListener(new View.OnClickListener() {
@@ -581,15 +624,19 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
 
     private void navigateToUserProfile(ContentData cd){
+        if(isProfileContent)
+            getActivity().onBackPressed();
+        else{
         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
                 .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                 .put("PIXTORY_ID",cd.id+"")
                 .put("POSITION_ID",mContentIndex+"")
                 .build());
-        Intent intent = new Intent(mContext, UserProfileActivity.class);
+        Intent intent = new Intent(mContext, UserProfileActivity2.class);
         intent.putExtra("USER_ID",Utils.getUserId(mContext));
         intent.putExtra("PERSON_ID",cd.personDetails.id+"");
         startActivity(intent);
+        }
     }
     
     private boolean modifyScreenHeight(int offset) {

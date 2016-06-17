@@ -22,7 +22,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pixtory.app.R;
+import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.ContentData;
+import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,6 +38,9 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
 
     private ArrayList<ContentData> cDlist;
     private Context context;
+    private MainFragment storyFragment;
+    private String ARG_PARAM1 = "PROFILE_CONTENT";
+    private String ARG_PARAM2 = "CONTENT_INDEX";
 
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -66,7 +73,7 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
         return vh;
     }
 
-    public void onBindViewHolder(ViewHolder holder, int position){
+    public void onBindViewHolder(ViewHolder holder, final int position){
 
 
 
@@ -82,7 +89,24 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
 
         //Picasso.with(context).load(R.drawable.cardimg).fit().into(holder.cardImage);
 
-        //holder.cardFrame.setOnClickListener();
+        holder.cardFrame.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Pixtory_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(context))
+                        .put("PIXTORY_ID",cDlist.get(position).id+"")
+                        .build());
+                storyFragment = new MainFragment();
+                Bundle args = new Bundle();
+                args.putInt(MainFragment.ARG_PARAM1,position);
+                args.putBoolean(MainFragment.ARG_PARAM4,true);
+                storyFragment.setArguments(args);
+                if(context!=null && context instanceof UserProfileActivity2){
+                    UserProfileActivity2 userProfileActivity2 = (UserProfileActivity2)context;
+                    userProfileActivity2.switchFragment(storyFragment);
+                }
+            }
+        });
     }
 
     public int getItemCount(){
