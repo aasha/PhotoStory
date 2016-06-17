@@ -63,4 +63,14 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
     public void onAnimateMenuIcon(boolean showBackArrow) {
 
     }
+
+    @Override
+    public void showMenuIcon(boolean showMenuIcon) {
+
+    }
+
+    @Override
+    public void showLoginAlert() {
+
+    }
 }
