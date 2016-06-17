@@ -7,8 +7,9 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.pixtory.app.R;
+import com.pixtory.app.fragments.MainFragment;
 
-public class UserProfileActivity2 extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, StoryFragment.OnStoryFragmentInteractionListener{
+public class UserProfileActivity2 extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, MainFragment.OnMainFragmentInteractionListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +52,7 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
         }
     }
 
-    public void switchFragment(StoryFragment fragment){
+    public void switchFragment(MainFragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,fragment);
         fragmentTransaction.addToBackStack(null);

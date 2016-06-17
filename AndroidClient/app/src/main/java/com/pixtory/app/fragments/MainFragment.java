@@ -66,9 +66,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
     public static final String ARG_PARAM3 = "param3";
+    public static final String ARG_PARAM4 = "PROFILE_CONTENT";
 
     // TODO: Rename and change types of parameters
     private int mContentIndex;
+    private boolean isProfileContent;
 
     private int mDeviceWidthInPx = 0;
     private int mDeviceHeightInPx = 0;
@@ -185,10 +187,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         return fragment;
     }
 
-    public static MainFragment newInstance(int idx) {
+    public static MainFragment newInstance(int idx,boolean isProfileContent) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, idx);
+        args.putBoolean(ARG_PARAM4,isProfileContent);
         fragment.setArguments(args);
         return fragment;
     }
@@ -209,6 +212,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         super.onCreate(savedInstanceState);
         mContext = getActivity();
         if (getArguments() != null) {
+            isProfileContent = getArguments().getBoolean(ARG_PARAM4);
+            if(!isProfileContent)
             try {
                 mContentIndex = getArguments().getInt(ARG_PARAM1);
                 mContentData = App.getContentData().get(mContentIndex);
@@ -216,6 +221,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            else{
+                try {
+                    mContentIndex = getArguments().getInt(ARG_PARAM1);
+                    mContentData = App.getProfileContentData().get(mContentIndex);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
 
         mSoftBarHeight = getSoftbuttonsbarHeight();
@@ -569,6 +583,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
 
     private void navigateToUserProfile(ContentData cd){
+        if(isProfileContent)
+            getActivity().onBackPressed();
+        else{
         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
                 .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                 .put("PIXTORY_ID",cd.id+"")
@@ -578,6 +595,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         intent.putExtra("USER_ID",Utils.getUserId(mContext));
         intent.putExtra("PERSON_ID",cd.personDetails.id+"");
         startActivity(intent);
+        }
     }
     
     private boolean modifyScreenHeight(int offset) {

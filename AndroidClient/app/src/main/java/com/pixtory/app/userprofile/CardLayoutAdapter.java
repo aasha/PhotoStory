@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pixtory.app.R;
+import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.ContentData;
 import com.squareup.picasso.Picasso;
 
@@ -34,7 +35,7 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
 
     private ArrayList<ContentData> cDlist;
     private Context context;
-    private StoryFragment storyFragment;
+    private MainFragment storyFragment;
     private String ARG_PARAM1 = "PROFILE_CONTENT";
     private String ARG_PARAM2 = "CONTENT_INDEX";
 
@@ -88,10 +89,10 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
         holder.cardFrame.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                storyFragment = new StoryFragment();
+                storyFragment = new MainFragment();
                 Bundle args = new Bundle();
-                args.putBoolean(ARG_PARAM1,true);
-                args.putInt(ARG_PARAM2,position);
+                args.putInt(MainFragment.ARG_PARAM1,position);
+                args.putBoolean(MainFragment.ARG_PARAM4,true);
                 storyFragment.setArguments(args);
                 if(context!=null && context instanceof UserProfileActivity2){
                     UserProfileActivity2 userProfileActivity2 = (UserProfileActivity2)context;
