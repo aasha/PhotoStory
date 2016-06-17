@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -46,7 +47,7 @@ import retrofit.client.Response;
 /**
  * Created by sriram on 24/05/2016.
  */
-public class UserProfileActivity extends Activity{
+public class UserProfileActivity extends FragmentActivity{
 
     private PersonInfo personInfo;
     private ArrayList<ContentData> contentDataList;

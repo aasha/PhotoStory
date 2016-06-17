@@ -1,6 +1,9 @@
 package com.pixtory.app.app;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by aasha.medhi on 11/05/15.
  */
@@ -37,4 +40,15 @@ public interface AppConstants {
 
     public static final String USER_ID ="USER_ID";
     public static final String CONNECTION_QUALITY ="CONNECTION_QUALITY";
+
+    final static String OB_Card_Swipe = "OB_Card_Swipe";
+    final static String OB_FBLogin_Click = "OB_FBLogin_Click";
+    final static String OB_FBLogin_Success = "OB_FBLogin_Success";
+    final static String OB_FBLogin_Cancel = "OB_FBLogin_Cancel";
+    final static String OB_FBLogin_Fail = "OB_FBLogin_Fail";
+    final static String OB_Register_Success = "OB_Register_Success";
+    final static String OB_Register_Failure = "OB_Register_Failure";
+
+    final static List<String> mFBPermissions = Arrays.asList("public_profile",
+            "email", "user_about_me");
 }

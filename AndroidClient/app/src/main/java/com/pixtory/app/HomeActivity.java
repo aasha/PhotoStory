@@ -43,6 +43,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
@@ -54,6 +63,7 @@ import com.pixtory.app.adapters.ImageArrayAdapter;
 import com.pixtory.app.adapters.OpinionViewerAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
 import com.pixtory.app.model.SideMenuData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
@@ -63,12 +73,15 @@ import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.retrofit.RegisterResponse;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,7 +94,7 @@ import retrofit.client.Response;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener{
+public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener,CommentsDialogFragment.OnAddCommentButtonClickListener{
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -89,6 +102,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private ProgressDialog mProgress = null;
     private Context mCtx = null;
+
+    private CallbackManager callbackManager;
 
     private ViewPager mPager = null;
     private int mCurrentFragmentPosition = 0;
@@ -136,13 +151,15 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
 
         setPersonDetails();
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
-
+        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
         //PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
         ParallaxPagerTransformer parallaxPagerTransformer = new ParallaxPagerTransformer(HomeActivity.this,R.id.image_main,0.5f);
         mPager.setPageTransformer(true,parallaxPagerTransformer);
@@ -172,20 +189,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 else
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
-                mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-               //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
-               if(mainFragment.isFullScreenShown())
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
-                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
-                            .put("POSITION_ID",""+previousPage)
-                            .build());
-                else
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
-                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
-                            .build());
-
             }
 
             @Override
@@ -208,6 +211,34 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 .build());
 
         menuIcon.setImageResource(R.drawable.menu_icon);
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Toast.makeText(HomeActivity.this, "FB Login Success!", Toast.LENGTH_SHORT).show();
+                        onFacebookLoginSuccess();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Cancel)
+                                .build());
+                        closeDialog();
+                        Toast.makeText(HomeActivity.this, "Sorry, unable to login to facebook.Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Fail)
+                                .put("MESSAGE", exception.getMessage() + "")
+                                .build());
+
+                        closeDialog();
+                        Toast.makeText(HomeActivity.this, "Sorry, unable to login to facebook.Please check your network connection or try again later.(" + exception.getMessage() + ")", Toast.LENGTH_LONG).show();
+
+                    }
+                });
     }
 
 
@@ -381,6 +412,25 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         Log.e("AASHA", "Connection q " + cq.toString());
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+//        //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
+//        if(mainFragment.isFullScreenShown())
+//            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
+//                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+//                    .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
+//                    .put("POSITION_ID",""+previousPage)
+//                    .build());
+//        else
+//            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
+//                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+//                    .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
+//                    .build());
+
+    }
+
     private void showAlert() {
         new AlertDialog.Builder(mCtx)
                 .setTitle("Warning")
@@ -395,12 +445,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     }
 
-//    @Override
-//    public void onAddCommentButtonClicked(String str) {
-//        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-//        if(mainFragment !=null)
-//            mainFragment.postComment(str);
-//    }
+    @Override
+    public void onAddCommentButtonClicked(String str) {
+        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+        if(mainFragment !=null)
+            mainFragment.postComment(str);
+    }
 
     private class ConnectionChangedListener
             implements ConnectionClassManager.ConnectionClassStateChangeListener {
@@ -419,133 +469,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             });*/
         }
     }
-
-
-    /**
-     * Navigation Drawer Implementation
-     */
-/*
-
-    private void setUpNavigationDrawer() {
-
-        menuIcon = (ImageView) findViewById(R.id.profileIcon);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        final NavigationView navigationView = (NavigationView)findViewById(R.id.navigation_view);
-
-        menuIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                    mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-
-                    if(!mainFragment.isCommentsVisible()) {
-                        if (mDrawerLayout.isDrawerOpen(mNavigationView))
-                            mDrawerLayout.closeDrawer(mNavigationView);
-                        else
-                            mDrawerLayout.openDrawer(mNavigationView);
-                    }else{
-                        mainFragment.onBackButtonClicked();
-                    }
-
-            }
-        });
-        PersonInfo myDetails = new PersonInfo();
-        //setPersonDetails();
-        myDetails = App.getPersonInfo();
-        View header = mNavigationView.getHeaderView(0);
-
-        final CircularImageView mPImg = (CircularImageView)header.findViewById(R.id.dr_profile_img) ;
-        final TextView mPN = (TextView)header.findViewById(R.id.dr_profile_name);
-
-        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
-            @Override
-            public void success(GetPersonDetailsResponse o, Response response) {
-
-                if (o.contentList != null) {
-                    App.setPersonConentData(o.contentList);
-                } else {
-                    Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
-                }
-
-                if (o.personDetails!=null){
-                    App.setPersonInfo(o.personDetails);
-                    if(o.personDetails.imageUrl==""||o.personDetails.imageUrl==null)
-                        Picasso.with(HomeActivity.this).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().into(mPImg);
-                    else
-                        Picasso.with(HomeActivity.this).load(o.personDetails.imageUrl).fit().centerCrop().into(mPImg);
-                    mPN.setText(o.personDetails.name);
-                }else {
-                    System.out.println("Person data null");
-                    Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void failure(GetPersonDetailsResponse error) {
-                // mProgress.dismiss();
-
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mPImg.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
-                intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
-                intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
-                startActivity(intent);
-
-            }
-        });
-
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
-
-        public boolean onNavigationItemSelected(MenuItem menuItem){
-            int id = menuItem.getItemId();
-            menuItem.setChecked(true);
-            switch (id){
-
-                case R.id.dr_feedback:showFeedBackDialog();
-                    break;
-
-                case R.id.dr_invite: sendInvite();
-                    break;
-
-                case R.id.dr_contributor:showContributeDialog();
-                    break;
-
-                case R.id.dr_wallpaper:mDrawerLayout.closeDrawer(mNavigationView);
-                    showWallpaperAlert();
-                    //setWallpaper();
-                    break;
-            }
-            return true;
-
-        }
-
-        });
-
-    }
-*/
-
-/*
-
-    private void sendFeedback() {
-        final Intent _Intent = new Intent(android.content.Intent.ACTION_SEND);
-        _Intent.setType("text/email");
-        _Intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{ getString(R.string.mail_feedback_email) });
-        _Intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.mail_feedback_subject));
-        _Intent.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.mail_feedback_message));
-        startActivity(Intent.createChooser(_Intent, getString(R.string.title_send_feedback)));
-
-    }
-*/
 
 
     private void setPersonDetails(){
@@ -650,6 +573,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
 //    TODO: test method to be removed later
 
+    @Override
+    public void showMenuIcon(boolean show){
+        if(show)
+            menuIcon.setVisibility(View.VISIBLE);
+        else
+            menuIcon.setVisibility(View.GONE);
+    }
 
     /**
      * Code to animate menu icon to back arrow
@@ -965,7 +895,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+                if(mainFragment == null)
+                    mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+
                 if(mainFragment.isFullScreenShown())
                 {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Hamburger_Click")
@@ -1056,14 +988,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         });
     }
 
-    private void showLoginAlert(){
+    @Override
+     public void showLoginAlert(){
         final Dialog dialog = new Dialog(HomeActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.login_alert);
 
         DisplayMetrics dm =  new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
@@ -1077,6 +1009,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                LoginManager.getInstance().logInWithReadPermissions(HomeActivity.this, AppConstants.mFBPermissions);
             }
         });
 
@@ -1114,6 +1047,70 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 Toast.makeText(this,"No Apps to share",Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    /**
+     *
+     */
+    private void onFacebookLoginSuccess() {
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+            @Override
+            public void onCompleted(JSONObject user, GraphResponse response) {
+                if (user != null) {
+                    final String fbId = user.optString("id");
+                    final String name = user.optString("name");
+                    final String email = user.optString("email");
+                    String accessToken = AccessToken.getCurrentAccessToken().getToken();
+                    final String imgUrl = "https://graph.facebook.com/" + fbId + "/picture?width=500&height=500";
+
+                    mProgress.setTitle("Registering user...");
+                    mProgress.show();
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Success)
+                            .put("NAME", name)
+                            .put("FBID", fbId)
+                            .build());
+                    NetworkApiHelper.getInstance().registerUser(name, email, imgUrl,fbId,new NetworkApiCallback<RegisterResponse>() {
+                        @Override
+                        public void success(RegisterResponse regResp, Response response) {
+                            Log.i(TAG, "Registering user to pixtory sucess");
+                            mProgress.dismiss();
+                            Utils.putUserId(HomeActivity.this, regResp.userId);
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Success)
+                                    .put(AppConstants.USER_ID, regResp.userId)
+                                    .build());
+                            Utils.putFbId(HomeActivity.this, fbId);
+                            Utils.putEmail(HomeActivity.this, email);
+                            Utils.putUserName(HomeActivity.this, name);
+                            Utils.putUserImage(HomeActivity.this, imgUrl);
+                            AmplitudeLog.sendUserInfo(regResp.userId);
+                        }
+
+                        @Override
+                        public void failure(RegisterResponse error) {
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
+                                    .put("MESSAGE", error.errorMessage)
+                                    .build());
+                            mProgress.dismiss();
+                        }
+
+                        @Override
+                        public void networkFailure(RetrofitError error) {
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
+                                    .put("MESSAGE", error.getMessage())
+                                    .build());
+                            mProgress.dismiss();
+                        }
+                    });
+
+                }
+            }
+        });
+        request.executeAsync();
+    }
+
+    private void closeDialog(){
+        mProgress.dismiss();
     }
 
 }

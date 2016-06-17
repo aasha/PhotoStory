@@ -172,7 +172,7 @@ public class Utils {
                 AppConstants.APP_PREFS, Context.MODE_PRIVATE);
 
         //if(mSharedPrefs.getString("UID","") != null || m)
-        return mSharedPrefs.getString("UID", "3");
+        return mSharedPrefs.getString("UID", "");
         //return mSharedPrefs.getString("UID", "1207785742565519");
 
         //Log.i("Utils class->UserId::",mSharedPrefs.getString("UID", ""));

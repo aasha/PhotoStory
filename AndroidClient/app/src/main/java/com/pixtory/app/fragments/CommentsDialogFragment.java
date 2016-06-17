@@ -103,7 +103,6 @@ public class CommentsDialogFragment extends DialogFragment{
                     Toast.makeText(getActivity(),"You have not entered any comment!!",Toast.LENGTH_SHORT).show();
                 }
                 else{
-
                     mAddCommentListener.onAddCommentButtonClicked(mCommentText.getText().toString());
                     dismiss();
                 }

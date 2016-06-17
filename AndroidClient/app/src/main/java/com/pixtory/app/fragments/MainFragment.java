@@ -14,21 +14,23 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.*;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
+import com.pixtory.app.animations.BounceAnimator;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.CommentData;
@@ -87,7 +89,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private Context mContext;
 
     @Bind(R.id.pic_story_layout)
-    LinearLayout mStoryParentLayout = null;
+    NestedScrollView mStoryParentLayout = null;
+
+    @Bind(R.id.content_layout)
+    LinearLayout mContentLayout =null;
 
     RelativeLayout mStoryLayout = null;
     LinearLayout mCommentsLayout = null;
@@ -112,8 +117,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.image_like)
     ImageView mImageLike = null;
 
-    @Bind(R.id.slant_view)
-    SlantView mSlantView = null;
+//    @Bind(R.id.slant_view)
+//    SlantView mSlantView = null;
 
     @Bind(R.id.like_count)
     TextView mLikeCountTV = null;
@@ -143,7 +148,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private float mLikeLayoutPaddingTop;
     private int mSlantViewHtInPx;
     private int mBottomScreenHt;
-    final private float mHalfScreenPer = 0.55f;
+    final private float mHalfScreenPer = 0.95f;
 
     private int  scrollY,oldScrollY;
     private boolean isScrollingUp = true;
@@ -196,8 +201,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         // Required empty public constructor
     }
 
-
-
     private ContentData mContentData = null;
 
     // Used to test indes positions. TEMP VARIABLE
@@ -227,7 +230,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         mSlantViewHtInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
         mImageExtendedHeight = mDeviceHeightInPx +mSlantViewHtInPx;
-        mBottomScreenHt = (int)(0.30f*mDeviceHeightInPx);
+        mBottomScreenHt = (int)(0.60f*mDeviceHeightInPx);
         mDeviceHeightInPx += mSoftBarHeight;
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
@@ -256,8 +259,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         bindData();
         attachPixtoryContent(SHOW_PIC_STORY);
 
-        mStoryParentLayout.setMinimumHeight((int)getResources().getDimension(R.dimen.story_min_height));
-
+        mCommentShareLayout.setVisibility(View.GONE);
         mImageDetailsLayout.setSmoothScrollingEnabled(true);
         mImageDetailsLayout.setScrollViewListener(this);
 
@@ -266,6 +268,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
+
+        mStoryParentLayout.getLayoutParams().height =  (int)(0.80f *mDeviceHeightInPx);
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
@@ -308,7 +312,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mImageLike.setImageResource(R.drawable.like);
 
         mLikeCountTV.setText(String.valueOf(cd.likeCount));
-
 
         //***Binding StoryContent****/
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
@@ -400,12 +403,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      * Rationale - Adding story_view_layout fragment to MainFragment
      */
     public void attachPixtoryContent(int story_or_comment){
-        mStoryParentLayout.removeAllViews();
+        mContentLayout.removeAllViews();
         if(story_or_comment == SHOW_PIC_STORY){
-            mStoryParentLayout.addView(mStoryLayout);
+            mContentLayout.addView(mStoryLayout);
             setCommentsVisible(false);
         }else{
-            mStoryParentLayout.addView(mCommentsLayout);
+            mContentLayout.addView(mCommentsLayout);
             setCommentsVisible(true);
         }
     }
@@ -496,6 +499,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      */
     public interface OnMainFragmentInteractionListener {
         void onAnimateMenuIcon(boolean showBackArrow);
+        void showMenuIcon(boolean showMenuIcon);
+        void showLoginAlert();
     }
 
 //
@@ -592,12 +597,40 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
         mImageMain.setLayoutParams(imgViewLayoutParams);
 
-        if(offset > mBottomScreenHt )
-            mCommentShareLayout.setVisibility(View.VISIBLE);
-        else
-            mCommentShareLayout.setVisibility(View.GONE);
+        if(offset > mBottomScreenHt ){
+            showCommentsShareLayout(true);
+            mListener.showMenuIcon(false);
+        }
+        else{
+            mListener.showMenuIcon(true);
+            showCommentsShareLayout(false);
+        }
 
         return true;
+
+    }
+
+    private void showCommentsShareLayout(boolean showCommentsShare){
+        if(!isCommentsVisible()) {
+            if (showCommentsShare)
+                mCommentShareLayout.setVisibility(View.VISIBLE);
+            else
+                mCommentShareLayout.setVisibility(View.GONE);
+        }
+
+    }
+
+    @OnTouch(R.id.pic_story_layout)
+    public boolean onTouchContent(NestedScrollView view, MotionEvent me) {
+         // Disallow the touch request for parent scroll on touch of child view
+            mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
+            if (me.getAction() == MotionEvent.ACTION_UP) {
+    //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
+                setUpHalfScreen();
+
+            }
+
+            return false;
 
     }
 
@@ -610,42 +643,62 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
+            setUpHalfScreen();
 
-            isScrollingUp= (scrollY < oldScrollY)?false:true;
-
-            if(scrollY < mHalfScreenSize){
-
-                mImageDetailsLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(isScrollingUp){
-                            mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
-
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                                    .put("PIXTORY_ID",""+mContentData.id)
-                                    .build());
-                        }
-                        else
-                            mImageDetailsLayout.smoothScrollTo(0,0);
-                    }
-                });
-            }
         }
         return false;
     }
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
-        mSlantView.setVisibility(View.VISIBLE);
+//        mSlantView.setVisibility(View.VISIBLE);
         mImageDetailsLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.VISIBLE);
     }
 
     private void setUpHalfScreen(){
-        mSlantView.setVisibility(View.VISIBLE);
-        mStoryLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.GONE);
+
+        isScrollingUp= (scrollY < oldScrollY)?false:true;
+//        Log.i(TAG,"scrollY::"+scrollY+"::mHalfSCreenSize::"+mHalfScreenSize);
+        if(scrollY < mHalfScreenSize){
+
+//            mImageDetailsLayout.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if(isScrollingUp){
+//                        mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
+//
+////                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+////                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+////                                    .put("PIXTORY_ID",""+mContentData.id)
+////                                    .build());
+//                    }
+//                    else
+//                        mImageDetailsLayout.smoothScrollTo(0,0);
+//                }
+//            });
+            new CountDownTimer(50, 50) {
+                public void onTick(long millisUntilFinished) {
+                    // Nothing...
+                }
+
+                // When over, start smoothScroll
+                public void onFinish() {
+                    if(isScrollingUp){
+                        mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
+//
+////                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+////                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+////                                    .put("PIXTORY_ID",""+mContentData.id)
+////                                    .build());
+                    }
+                    else
+                        mImageDetailsLayout.smoothScrollTo(0,0);
+
+                    }
+            }.start();
+        }
 
     }
 
@@ -664,7 +717,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void onAnimationEnd(Animator animator) {
                 if(showContent){
-                    mSlantView.setVisibility(View.GONE);
+//                    mSlantView.setVisibility(View.GONE);
                     mTextExpert.setVisibility(View.VISIBLE);
                 }
             }
@@ -902,9 +955,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             sendLikeToBackend(mContentData.id, mContentData.likedByUser);
         }
         else {
-            //TODO: Redirect user to login
-            showLoginAlert();
-            //Toast.makeText(mContext,"Please login",Toast.LENGTH_SHORT).show();
+            mListener.showLoginAlert();
+//            showLoginAlert();
         }
     }
 
@@ -953,32 +1005,35 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     public  boolean isFullScreenShown(){return isFullScreenShown;}
 
-    private void showLoginAlert(){
-        final Dialog dialog = new Dialog(mContext);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.login_alert);
-
-        DisplayMetrics dm =  new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = (int)(0.9*dm.widthPixels);
-        lp.gravity = Gravity.CENTER;
-
-        dialog.getWindow().setLayout(lp.width,lp.height);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        LinearLayout loginClick = (LinearLayout) dialog.findViewById(R.id.login_click);
-        loginClick.setOnClickListener(new TextView.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
+//    private void showLoginAlert(){
+//        final Dialog dialog = new Dialog(mContext);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.login_alert);
+//
+//        DisplayMetrics dm =  new DisplayMetrics();
+//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+//
+//
+//        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+//        lp.copyFrom(dialog.getWindow().getAttributes());
+//        lp.width = (int)(0.9*dm.widthPixels);
+//        lp.gravity = Gravity.CENTER;
+//
+//        dialog.getWindow().setLayout(lp.width,lp.height);
+//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        LinearLayout loginClick = (LinearLayout) dialog.findViewById(R.id.login_click);
+//        loginClick.setOnClickListener(new TextView.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                dialog.dismiss();
+//                if(mListener != null){
+//                    mListener.loginToFacebook();
+//                }
+//            }
+//        });
+//
+//        dialog.show();
+//    }
 
     private void showWallpaperAlert(){
         final Dialog dialog = new Dialog(mContext);

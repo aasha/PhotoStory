@@ -3,18 +3,12 @@ package com.pixtory.app.onboarding;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageInstaller;
-import android.graphics.Bitmap;
-import android.graphics.Color;
+
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
+
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -52,17 +46,7 @@ public class OnBoardingActivity  extends FragmentActivity {
     //Analytics
     final static String SCREEN_NAME = "Onboard";
     final static String OB_Card_Swipe = "OB_Card_Swipe";
-    private final static String OB_FBLogin_Click = "OB_FBLogin_Click";
-    private final static String OB_FBLogin_Success = "OB_FBLogin_Success";
-    private final static String OB_FBLogin_Cancel = "OB_FBLogin_Cancel";
-    private final static String OB_FBLogin_Fail = "OB_FBLogin_Fail";
-    private final static String OB_Register_Success = "OB_Register_Success";
-    private final static String OB_Register_Failure = "OB_Register_Failure";
-    private final static String OB_Login_Skip = "OB_Login_Skip";
 
-
-    private List<String> mFBPermissions = Arrays.asList("public_profile",
-            "email", "user_about_me");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +75,9 @@ public class OnBoardingActivity  extends FragmentActivity {
         imageViewFb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Click)
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Click)
                         .build());
-                LoginManager.getInstance().logInWithReadPermissions(OnBoardingActivity.this, mFBPermissions);
+                LoginManager.getInstance().logInWithReadPermissions(OnBoardingActivity.this, AppConstants.mFBPermissions);
             }
         });
 
@@ -119,7 +103,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                     @Override
                     public void onCancel() {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Cancel)
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Cancel)
                                 .build());
                         closeDialog();
                         Toast.makeText(OnBoardingActivity.this, "Sorry, unable to login to facebook.Please try again later.", Toast.LENGTH_SHORT).show();
@@ -127,7 +111,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                     @Override
                     public void onError(FacebookException exception) {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Fail)
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Fail)
                                 .put("MESSAGE", exception.getMessage() + "")
                                 .build());
 
@@ -177,7 +161,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                     mProgressDialog.setTitle("Registering user...");
                     mProgressDialog.show();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_FBLogin_Success)
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Success)
                             .put("NAME", name)
                             .put("FBID", fbId)
                             .build());
@@ -187,7 +171,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             Log.i(TAG, "Registering user to pixtory sucess");
                             closeDialog();
                             Utils.putUserId(OnBoardingActivity.this, regResp.userId);
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Success)
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Success)
                                     .put(AppConstants.USER_ID, regResp.userId)
                                     .build());
                             Utils.putFbId(OnBoardingActivity.this, fbId);
@@ -200,7 +184,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                         @Override
                         public void failure(RegisterResponse error) {
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                                     .put("MESSAGE", error.errorMessage)
                                     .build());
                             closeDialog();
@@ -208,7 +192,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                         @Override
                         public void networkFailure(RetrofitError error) {
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                                     .put("MESSAGE", error.getMessage())
                                     .build());
                             closeDialog();
@@ -259,7 +243,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 Utils.putUserId(OnBoardingActivity.this, regResp.userId);
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Success)
 //                        .build());
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Success)
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Success)
                         .put("USER_ID", regResp.userId)
                         .build());
                 Utils.putUserName(OnBoardingActivity.this, name);
@@ -275,7 +259,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                     mProgressDialog.dismiss();
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
 //                        .build());
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                         .put("MESSAGE", error.errorMessage)
                         .build());
                 Toast.makeText(OnBoardingActivity.this, "Username is taken. Please insert a new username", Toast.LENGTH_SHORT).show();
@@ -288,7 +272,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                     mProgressDialog.dismiss();
 //                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
 //                        .build());
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_Register_Failure)
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                         .put("MESSAGE", error.getMessage())
                         .build());
                 Toast.makeText(OnBoardingActivity.this, "Please connect to network", Toast.LENGTH_SHORT).show();

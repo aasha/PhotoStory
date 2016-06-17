@@ -72,7 +72,7 @@
                 android:paddingLeft="25dp"
                 android:paddingRight="25dp"
                 android:paddingTop="20dp"
-                android:paddingBottom="80dp"
+                android:paddingBottom="60dp"
                 android:lineSpacingExtra="5sp"
                 android:minHeight="@dimen/story_min_height"
                 android:text="fknvlenfk"
