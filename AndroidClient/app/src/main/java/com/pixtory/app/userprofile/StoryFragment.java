@@ -1,9 +1,12 @@
-package com.pixtory.app.fragments;
+package com.pixtory.app.userprofile;
 
-import android.animation.*;
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
@@ -14,32 +17,42 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.*;
+import android.view.GestureDetector;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
-import butterknife.*;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.retrofit.AddCommentResponse;
 import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
-import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
-import com.pixtory.app.userprofile.UserProfileActivity;
-import com.pixtory.app.userprofile.UserProfileActivity2;
+import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.ObservableScrollView;
@@ -51,21 +64,27 @@ import com.squareup.picasso.Target;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTouch;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by aasha.medhi on 12/23/15.
+ * Created by krish on 16/06/2016.
  */
-public class MainFragment extends Fragment implements ScrollViewListener{
 
-    private static final String TAG = MainFragment.class.getName();
+
+
+public class StoryFragment extends android.support.v4.app.Fragment implements ScrollViewListener {
+
+    private static final String TAG = StoryFragment.class.getName();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final String ARG_PARAM1 = "param1";
-    public static final String ARG_PARAM2 = "param2";
-    public static final String ARG_PARAM3 = "param3";
+    public static final String ARG_PARAM1 = "PROFILE_CONTENT";
+    public static final String ARG_PARAM2 = "CONTENT_INDEX";
 
     // TODO: Rename and change types of parameters
     private int mContentIndex;
@@ -73,7 +92,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private int mDeviceWidthInPx = 0;
     private int mDeviceHeightInPx = 0;
 
-    private OnMainFragmentInteractionListener mListener;
+    private OnStoryFragmentInteractionListener mListener;
 
     private static final String Vid_Tap_Like = "Vid_Tap_Like";
     private static final String Vid_Tap_Unlike = "Vid_Tap_Unlike";
@@ -148,7 +167,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private int  scrollY,oldScrollY;
     private boolean isScrollingUp = true;
-    
+
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
         // getRealMetrics is only available with API 17 and +
@@ -170,30 +189,19 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param idx    Parameter 1.
-     * @param param3 Parameter 2.
-     * @return A new instance of fragment MainFragment.
+     * @return A new instance of fragment StoryFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MainFragment newInstance(int idx, String contentJson, String param3) {
-        MainFragment fragment = new MainFragment();
+    public static StoryFragment newInstance(boolean isProfileContent,int contentIndex) {
+        StoryFragment fragment = new StoryFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, idx);
-        args.putString(ARG_PARAM2, contentJson);
-        args.putString(ARG_PARAM3, param3);
+        args.putBoolean(ARG_PARAM1, isProfileContent);
+        args.putInt(ARG_PARAM2,contentIndex);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static MainFragment newInstance(int idx) {
-        MainFragment fragment = new MainFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, idx);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public MainFragment() {
+    public StoryFragment() {
         // Required empty public constructor
     }
 
@@ -210,9 +218,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mContext = getActivity();
         if (getArguments() != null) {
             try {
-                mContentIndex = getArguments().getInt(ARG_PARAM1);
-                mContentData = App.getContentData().get(mContentIndex);
-                mCIDX = getArguments().getString(ARG_PARAM3);
+                if(getArguments().getBoolean(ARG_PARAM1)) {
+                    mContentIndex = getArguments().getInt(ARG_PARAM2);
+                    mContentData = App.getProfileContentData().get(mContentIndex);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -332,7 +341,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
                         navigateToUserProfile(cd);
                     }
                 });
@@ -344,11 +352,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                 });
                 mTextDesc.setOnClickListener(new View.OnClickListener() {
-                     @Override
-                     public void onClick(View v) {
-                         navigateToUserProfile(cd);
-                     }
-            });
+                    @Override
+                    public void onClick(View v) {
+                        navigateToUserProfile(cd);
+                    }
+                });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextDate.setText(cd.date);
@@ -370,9 +378,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             public void onClick(View v) {
 
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
-                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                .put("PIXTORY_ID",cd.id+"")
-                .build());
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",cd.id+"")
+                        .build());
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                         .put("PIXTORY_ID",cd.id+"")
@@ -390,7 +398,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     /**
      * @param story_or_comment
-     * Rationale - Adding story_view_layout fragment to MainFragment
+     * Rationale - Adding story_view_layout fragment to StoryFragment
      */
     public void attachPixtoryContent(int story_or_comment){
         mStoryParentLayout.removeAllViews();
@@ -407,10 +415,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnMainFragmentInteractionListener) activity;
+            mListener = (OnStoryFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnMainFragmentInteractionListener");
+                    + " must implement OnStoryFragmentInteractionListener");
         }
 
     }
@@ -487,7 +495,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnMainFragmentInteractionListener {
+    public interface OnStoryFragmentInteractionListener {
         void onAnimateMenuIcon(boolean showBackArrow);
     }
 
@@ -513,11 +521,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
                     if(isFullScreenShown){
                         showWallpaperAlert();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
-                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                            .put("PIXTORY_ID",mContentData.id+"")
-                            .put("POSITION_ID",mContentIndex+"")
-                            .build());}
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
+                                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",mContentData.id+"")
+                                .put("POSITION_ID",mContentIndex+"")
+                                .build());}
                 }
 
 //                @Override
@@ -569,17 +577,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
 
     private void navigateToUserProfile(ContentData cd){
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
-                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                .put("PIXTORY_ID",cd.id+"")
-                .put("POSITION_ID",mContentIndex+"")
-                .build());
-        Intent intent = new Intent(mContext, UserProfileActivity2.class);
-        intent.putExtra("USER_ID",Utils.getUserId(mContext));
-        intent.putExtra("PERSON_ID",cd.personDetails.id+"");
-        startActivity(intent);
+        getActivity().onBackPressed();
     }
-    
+
     private boolean modifyScreenHeight(int offset) {
 
         imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
@@ -753,38 +753,38 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      */
     public void postComment(String comment) {
 
-            InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-            int content_id = mContentData.id;
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        int content_id = mContentData.id;
 
-            if(!((Utils.getFbID(mContext)).equals(""))) {
-                //User is allowed to comment only if loggedIn
-                NetworkApiHelper.getInstance().addComment(Utils.getUserId(mContext), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
+        if(!((Utils.getFbID(mContext)).equals(""))) {
+            //User is allowed to comment only if loggedIn
+            NetworkApiHelper.getInstance().addComment(Utils.getUserId(mContext), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
 
-                    @Override
-                    public void success(AddCommentResponse addCommentResponse, Response response) {
-                        Log.i(TAG, "Add Comment Request Success");
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_SubmitComment_Click")
-                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                                .put("PIXTORY_ID",mContentData.id+"")
-                                .build());
-                        if (mCommentsRecyclerViewAdapter != null)
-                            mCommentsRecyclerViewAdapter.notifyDataSetChanged();
-                    }
+                @Override
+                public void success(AddCommentResponse addCommentResponse, Response response) {
+                    Log.i(TAG, "Add Comment Request Success");
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_SubmitComment_Click")
+                            .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                            .put("PIXTORY_ID",mContentData.id+"")
+                            .build());
+                    if (mCommentsRecyclerViewAdapter != null)
+                        mCommentsRecyclerViewAdapter.notifyDataSetChanged();
+                }
 
-                    @Override
-                    public void failure(AddCommentResponse addCommentResponse) {
-                        Log.i(TAG, "Add Comment Request Failure");
-                    }
-                    @Override
-                    public void networkFailure(RetrofitError error) {
-                        Log.i(TAG, "Add Comment Request Network Failure, Error Type::" + error.getMessage());
-                    }
-                });
-            }else{
-                //TODO: Redirect user to facebook login page
-                Toast.makeText(getActivity(),"Please login",Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void failure(AddCommentResponse addCommentResponse) {
+                    Log.i(TAG, "Add Comment Request Failure");
+                }
+                @Override
+                public void networkFailure(RetrofitError error) {
+                    Log.i(TAG, "Add Comment Request Network Failure, Error Type::" + error.getMessage());
+                }
+            });
+        }else{
+            //TODO: Redirect user to facebook login page
+            Toast.makeText(getActivity(),"Please login",Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -847,11 +847,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 anim.start();
                 if(isFullScreenShown)
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Like_Click")
-                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put("PIXTORY_ID", "" + mContentData.id)
-                        .put("POSITION_ID",""+mContentIndex)
-                        .put("BOOLEAN","True")
-                        .build());
+                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                            .put("PIXTORY_ID", "" + mContentData.id)
+                            .put("POSITION_ID",""+mContentIndex)
+                            .put("BOOLEAN","True")
+                            .build());
                 else
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_Like")
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
@@ -1045,3 +1045,4 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
 
 }
+

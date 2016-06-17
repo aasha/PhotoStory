@@ -39,6 +39,8 @@ public class App extends Application implements AppConstants {
 
     private static ArrayList<ContentData> mPersonConentData;
 
+    private static ArrayList<ContentData> mProfileContentData;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -111,4 +113,10 @@ public class App extends Application implements AppConstants {
     }
 
     public static ArrayList<ContentData> getPersonConentData(){ return mPersonConentData; }
+
+    public static void setProfileContentData(ArrayList<ContentData> contentData){
+        mProfileContentData = contentData;
+    }
+
+    public static ArrayList<ContentData> getProfileContentData(){return mProfileContentData;}
 }

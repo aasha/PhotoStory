@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,8 @@ import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.transformations.BlurTransformation;
+import com.pixtory.app.transformations.GrayscaleTransformation;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.utils.Utils;
@@ -131,23 +134,12 @@ public class UserProfileFragment extends Fragment {
     @Bind(R.id.profile_recycler_view)
     RecyclerView recyclerView = null;
 
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (java.net.MalformedURLException e) {
-            // Log exception
-            return null;
-        } catch (IOException e){
+    @Bind(R.id.back_img)
+    ImageView mBackImage = null;
 
-            return null;
-        }
-    }
+    @Bind(R.id.back_click)
+    LinearLayout mBackClick = null;
+
 
     private void setPersonDetails(){
         NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId ,new NetworkApiCallback<GetPersonDetailsResponse>() {
@@ -202,36 +194,154 @@ public class UserProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         userProfleView = inflater.inflate(R.layout.user_profile,container,false);
 
-        setPersonDetails();
+        mPersonInfo = new PersonInfo();
+        mContentDataList = new ArrayList<ContentData>();
 
-        //blur the image
-        Bitmap blurredimage = BlurBuilder.blur(super.getActivity(), getBitmapFromURL(mPersonInfo.imageUrl));
-        blurrPersonImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        blurrPersonImage.setImageBitmap(blurredimage);
+        personFollow = (TextView)userProfleView.findViewById(R.id.person_follow);
+        personName = (TextView)userProfleView.findViewById(R.id.person_name);
+        personDesc = (TextView)userProfleView.findViewById(R.id.person_desc);
+        blurrPersonImage = (ImageView)userProfleView.findViewById(R.id.blur_person_image);
+        profileImage = (CircularImageView)userProfleView.findViewById(R.id.person_image);
+        profileImageBorder = (CircularImageView)userProfleView.findViewById(R.id.person_image_boarder);
+        recyclerView = (RecyclerView)userProfleView.findViewById(R.id.profile_recycler_view);
+        mBackClick = (LinearLayout)userProfleView.findViewById(R.id.back_click);
+        mBackImage = (ImageView)userProfleView.findViewById(R.id.back_img);
+
+        if(mUserId==mPersonId){
+            personFollow.setVisibility(View.GONE);
+            mPersonInfo = App.getPersonInfo();
+            mContentDataList = App.getPersonConentData();
+            for(ContentData cd:mContentDataList)
+                cd.personDetails=mPersonInfo;
+            App.setProfileContentData(mContentDataList);
+            cardLayoutAdapter = new CardLayoutAdapter(getContext(), mContentDataList);
+            personName.setText(mPersonInfo.name);
+            personDesc.setText(mPersonInfo.description);
+
+            if (mPersonInfo.imageUrl != null && mPersonInfo.imageUrl!="") {
+                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+            } else {
+                Picasso.with(getContext()).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                Picasso.with(getContext()).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                Picasso.with(getContext()).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().into(profileImage);
+            }
+
+            //initialise recyclerview and set its layout as grid layout
+            gridLayout = new GridLayoutManager(getContext(),2);
+            recyclerView.setLayoutManager(gridLayout);
+
+            //intialize card layout adapter and set it to recycler view
+            recyclerView.setAdapter(cardLayoutAdapter);
+
+            //get the screen dimesions
+            DisplayMetrics dm =  new DisplayMetrics();
+            getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+            //set spacing proportional to width of the the screen (0.063 times the screen width
+            double spacing = 0.063*dm.widthPixels;
+            SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
+            recyclerView.addItemDecoration(decoration);
+
+        }
+        else {
+            NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId, new NetworkApiCallback<GetPersonDetailsResponse>() {
+                @Override
+                public void success(GetPersonDetailsResponse o, Response response) {
+                    Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
+                    if (o.personDetails != null) {
+                        mPersonInfo = o.personDetails;
+                        personName.setText(mPersonInfo.name);
+                        personDesc.setText(mPersonInfo.description);
+
+                        if (mPersonInfo.imageUrl != null) {
+                            Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                            Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                            Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                        } else {
+                            Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                            Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                            Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
+                        }
+                    } else {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                                .put("MESSAGE", "No Data")
+                                .build());
+                        System.out.println("Person data null");
+                        Toast.makeText(getContext(), "No person data!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    if (o.contentList != null) {
+                        mContentDataList = o.contentList;
+                        for(ContentData cd:mContentDataList)
+                            cd.personDetails=mPersonInfo;
+                        App.setProfileContentData(mContentDataList);
+                        cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
+                        Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
+                    } else {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                                .put("MESSAGE", "No Data")
+                                .build());
+                        Toast.makeText(getContext(), "No content data!", Toast.LENGTH_SHORT).show();
+                    }
 
 
-        Picasso.with(super.getActivity()).load(mPersonInfo.imageUrl).fit().into(profileImage);
-        personName.setText(mPersonInfo.name);
-        personDesc.setText(mPersonInfo.desc);
-        // blurrPersonImage.setImageResource(R.drawable.pixtory);
+                    //initialise recyclerview and set its layout as grid layout
+                    gridLayout = new GridLayoutManager(getContext(),2);
+                    recyclerView.setLayoutManager(gridLayout);
 
-        //initialise recyclerview and set its layout as grid layout
-        gridLayout = new GridLayoutManager(super.getActivity(),2);
-        //recyclerView = (RecyclerView)findViewById(R.id.profile_recycler_view);
-        recyclerView.setLayoutManager(gridLayout);
+                    //intialise card layout adapter and set it to recycler view
 
-        //intialise card layout adapter and set it to recycler view
-        cardLayoutAdapter = new CardLayoutAdapter(getActivity(),mContentDataList);
-        recyclerView.setAdapter(cardLayoutAdapter);
+                    recyclerView.setAdapter(cardLayoutAdapter);
 
-        //get the screen the screen dimesions
-        DisplayMetrics dm =  new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+                    //get the screen dimesions
+                    DisplayMetrics dm =  new DisplayMetrics();
+                    getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-        //set spacing between cards proportional to width of the the screen (0.063 times the screen width
-        double spacing = 0.063*dm.widthPixels;
-        SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
-        recyclerView.addItemDecoration(decoration);
+                    //set spacing proportional to width of the the screen (0.063 times the screen width
+                    double spacing = 0.063*dm.widthPixels;
+                    SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
+                    recyclerView.addItemDecoration(decoration);
+                }
+
+                @Override
+                public void failure(GetPersonDetailsResponse error) {
+
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                            .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                            .put("MESSAGE", error.errorMessage)
+                            .build());
+                    Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void networkFailure(RetrofitError error) {
+
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                            .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                            .put("MESSAGE", error.getMessage())
+                            .build());
+                    Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
+        mBackImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }});
+
+        mBackClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }});
+
 
         return userProfleView;
     }
@@ -265,6 +375,6 @@ public class UserProfileFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+
     }
 }

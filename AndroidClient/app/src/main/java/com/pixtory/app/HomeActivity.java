@@ -65,6 +65,7 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
+import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -147,19 +148,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         ParallaxPagerTransformer parallaxPagerTransformer = new ParallaxPagerTransformer(HomeActivity.this,R.id.image_main,0.5f);
         mPager.setPageTransformer(true,parallaxPagerTransformer);
         mPager.setPageMargin(6);
-        mPager.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(HomeActivity.this,"Clicked",Toast.LENGTH_SHORT).show();
-            }
-        });
-        mPager.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toast.makeText(HomeActivity.this,"Long press detected",Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
+
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -174,7 +163,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mCurrentFragmentPosition = position;
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
                //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
-               if(mainFragment.isFullScreenShown())
+               if(mainFragment!=null && mainFragment.isFullScreenShown())
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
@@ -1021,10 +1010,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     case 1:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Profile_Click")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
-                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
+                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
                         intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                         intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
                         startActivity(intent);
+                       // mDrawerLayout.closeDrawer(mDrawerList);
                         break;
 
                     case 2: AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_BecomeContributor_Click")
