@@ -103,7 +103,7 @@ public class UserProfileFragment extends Fragment {
         if (getArguments() != null) {
             mUserId = Integer.parseInt(getArguments().getString(ARG_PARAM1));
             mPersonId = Integer.parseInt(getArguments().getString(ARG_PARAM2));
-            setPersonDetails();
+            //setPersonDetails();
             //mPersonInfo = App.getPersonInfo(mUserId);
             // mContentDataList = App.getContentData();
             //  mParam1 = getArguments().getString(ARG_PARAM1);
@@ -139,55 +139,6 @@ public class UserProfileFragment extends Fragment {
 
     @Bind(R.id.back_click)
     LinearLayout mBackClick = null;
-
-
-    private void setPersonDetails(){
-        NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId ,new NetworkApiCallback<GetPersonDetailsResponse>() {
-            @Override
-            public void success(GetPersonDetailsResponse o, Response response) {
-                //mProgress.dismiss();
-                if (o.contentList != null) {
-                    mContentDataList = o.contentList;
-                } else {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                            .put(AppConstants.USER_ID,Integer.toString(mUserId))
-                            .put("MESSAGE", "No Data")
-                            .build());
-                    // Toast.makeText(this.getAcitvity(), "No content data!", Toast.LENGTH_SHORT).show();
-                }
-
-                if (o.personDetails!=null){
-                    mPersonInfo = o.personDetails;
-                }else {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                            .put(AppConstants.USER_ID,Integer.toString(mUserId))
-                            .put("MESSAGE", "No Data")
-                            .build());
-                    //   Toast.makeText(super.get, "No person data!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void failure(GetPersonDetailsResponse error) {
-                // mProgress.dismiss();
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                        .put(AppConstants.USER_ID, Integer.toString(mUserId))
-                        .put("MESSAGE", error.errorMessage)
-                        .build());
-                //Toast.makeText(this.getActivity(), "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-                //mProgress.dismiss();
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                        .put(AppConstants.USER_ID,Integer.toString(mUserId))
-                        .put("MESSAGE", error.getMessage())
-                        .build());
-                //Toast.makeText(super.getActivity(), "Please check your network connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -246,90 +197,132 @@ public class UserProfileFragment extends Fragment {
             recyclerView.addItemDecoration(decoration);
 
         }
-        else {
-            NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId, new NetworkApiCallback<GetPersonDetailsResponse>() {
-                @Override
-                public void success(GetPersonDetailsResponse o, Response response) {
-                    Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
-                    if (o.personDetails != null) {
-                        mPersonInfo = o.personDetails;
-                        personName.setText(mPersonInfo.name);
-                        personDesc.setText(mPersonInfo.description);
+        else{
+            if((mPersonInfo = App.getProfileInfoFromCache(mPersonId))!=null )
+            {
+                personName.setText(mPersonInfo.name);
+                personDesc.setText(mPersonInfo.description);
 
-                        if (mPersonInfo.imageUrl != null) {
-                            Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                            Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                            Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                if (mPersonInfo.imageUrl != null) {
+                    Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                    Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                    Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                } else {
+                    Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                    Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                    Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
+                }
+                mContentDataList = App.getProfileContentFromCache(mPersonId);
+                for(ContentData cd:mContentDataList)
+                    cd.personDetails=mPersonInfo;
+                App.setProfileContentData(mContentDataList);
+                cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
+                Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
+                //initialise recyclerview and set its layout as grid layout
+                gridLayout = new GridLayoutManager(getContext(),2);
+                recyclerView.setLayoutManager(gridLayout);
+
+                //intialise card layout adapter and set it to recycler view
+
+                recyclerView.setAdapter(cardLayoutAdapter);
+
+                //get the screen dimesions
+                DisplayMetrics dm =  new DisplayMetrics();
+                getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                //set spacing proportional to width of the the screen (0.063 times the screen width
+                double spacing = 0.063*dm.widthPixels;
+                SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
+                recyclerView.addItemDecoration(decoration);
+            }
+            else
+            {
+                NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId, new NetworkApiCallback<GetPersonDetailsResponse>() {
+                    @Override
+                    public void success(GetPersonDetailsResponse o, Response response) {
+                        Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
+                        if (o.personDetails != null) {
+                            mPersonInfo = o.personDetails;
+                            App.addToProfileCache(mPersonInfo);
+                            personName.setText(mPersonInfo.name);
+                            personDesc.setText(mPersonInfo.description);
+
+                            if (mPersonInfo.imageUrl != null) {
+                                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                            } else {
+                                Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
+                                Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
+                                Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
+                            }
                         } else {
-                            Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                            Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                            Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                    .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                                    .put("MESSAGE", "No Data")
+                                    .build());
+                            System.out.println("Person data null");
+                            Toast.makeText(getContext(), "No person data!", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                                .put(AppConstants.USER_ID, Integer.toString(mPersonId))
-                                .put("MESSAGE", "No Data")
-                                .build());
-                        System.out.println("Person data null");
-                        Toast.makeText(getContext(), "No person data!", Toast.LENGTH_SHORT).show();
+
+                        if (o.contentList != null) {
+                            mContentDataList = o.contentList;
+                            for(ContentData cd:mContentDataList)
+                                cd.personDetails=mPersonInfo;
+                            App.addToProfileContentCache(mPersonId,mContentDataList);
+                            App.setProfileContentData(mContentDataList);
+                            cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
+                            Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
+                        } else {
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                    .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                                    .put("MESSAGE", "No Data")
+                                    .build());
+                            Toast.makeText(getContext(), "No content data!", Toast.LENGTH_SHORT).show();
+                        }
+
+
+                        //initialise recyclerview and set its layout as grid layout
+                        gridLayout = new GridLayoutManager(getContext(),2);
+                        recyclerView.setLayoutManager(gridLayout);
+
+                        //intialise card layout adapter and set it to recycler view
+
+                        recyclerView.setAdapter(cardLayoutAdapter);
+
+                        //get the screen dimesions
+                        DisplayMetrics dm =  new DisplayMetrics();
+                        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                        //set spacing proportional to width of the the screen (0.063 times the screen width
+                        double spacing = 0.063*dm.widthPixels;
+                        SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
+                        recyclerView.addItemDecoration(decoration);
                     }
 
-                    if (o.contentList != null) {
-                        mContentDataList = o.contentList;
-                        for(ContentData cd:mContentDataList)
-                            cd.personDetails=mPersonInfo;
-                        App.setProfileContentData(mContentDataList);
-                        cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
-                        Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
-                    } else {
+                    @Override
+                    public void failure(GetPersonDetailsResponse error) {
+
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
                                 .put(AppConstants.USER_ID, Integer.toString(mPersonId))
-                                .put("MESSAGE", "No Data")
+                                .put("MESSAGE", error.errorMessage)
                                 .build());
-                        Toast.makeText(getContext(), "No content data!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
                     }
 
+                    @Override
+                    public void networkFailure(RetrofitError error) {
 
-                    //initialise recyclerview and set its layout as grid layout
-                    gridLayout = new GridLayoutManager(getContext(),2);
-                    recyclerView.setLayoutManager(gridLayout);
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
+                                .put(AppConstants.USER_ID, Integer.toString(mPersonId))
+                                .put("MESSAGE", error.getMessage())
+                                .build());
+                        Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-                    //intialise card layout adapter and set it to recycler view
-
-                    recyclerView.setAdapter(cardLayoutAdapter);
-
-                    //get the screen dimesions
-                    DisplayMetrics dm =  new DisplayMetrics();
-                    getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-                    //set spacing proportional to width of the the screen (0.063 times the screen width
-                    double spacing = 0.063*dm.widthPixels;
-                    SpacesItemDecoration decoration = new SpacesItemDecoration((int)spacing);
-                    recyclerView.addItemDecoration(decoration);
-                }
-
-                @Override
-                public void failure(GetPersonDetailsResponse error) {
-
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                            .put(AppConstants.USER_ID, Integer.toString(mPersonId))
-                            .put("MESSAGE", error.errorMessage)
-                            .build());
-                    Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void networkFailure(RetrofitError error) {
-
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
-                            .put(AppConstants.USER_ID, Integer.toString(mPersonId))
-                            .put("MESSAGE", error.getMessage())
-                            .build());
-                    Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
-                }
-            });
         }
-
 
         mBackImage.setOnClickListener(new View.OnClickListener() {
             @Override

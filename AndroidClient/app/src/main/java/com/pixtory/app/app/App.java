@@ -15,6 +15,8 @@ import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by aasha.medhi on 12/05/15.
@@ -40,6 +42,22 @@ public class App extends Application implements AppConstants {
     private static ArrayList<ContentData> mPersonConentData;
 
     private static ArrayList<ContentData> mProfileContentData;
+
+    private static int MAX_CAPACITY = 10;
+
+    private static Map<String,PersonInfo> mProfileCache = new LinkedHashMap<String, PersonInfo>(MAX_CAPACITY+1,0.75F,true){
+        @Override
+        protected boolean removeEldestEntry(Entry<String, PersonInfo> eldest) {
+            return super.removeEldestEntry(eldest);
+        }
+    };
+
+    private static Map<String,ArrayList<ContentData> > mProfileContentCache = new LinkedHashMap<String, ArrayList<ContentData>>(MAX_CAPACITY+1,0.75f,true){
+        @Override
+        protected boolean removeEldestEntry(Entry<String, ArrayList<ContentData>> eldest) {
+            return super.removeEldestEntry(eldest);
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -119,4 +137,26 @@ public class App extends Application implements AppConstants {
     }
 
     public static ArrayList<ContentData> getProfileContentData(){return mProfileContentData;}
+
+    public static void addToProfileCache(PersonInfo personInfo){
+        if(mProfileCache.isEmpty() || !mProfileCache.containsKey(personInfo.id+""))
+            mProfileCache.put(personInfo.id+"", personInfo);
+    }
+
+    public static PersonInfo getProfileInfoFromCache(int userID){
+        if(!mProfileCache.isEmpty() && mProfileCache.containsKey(userID+""))
+            return mProfileCache.get(userID+"");
+        return null;
+    }
+
+    public static void addToProfileContentCache(int userID,ArrayList<ContentData> contentDataArrayList){
+        if(mProfileContentCache.isEmpty() || !mProfileContentCache.containsKey(userID+""))
+            mProfileContentCache.put(userID+"",contentDataArrayList);
+    }
+
+    public static ArrayList<ContentData> getProfileContentFromCache(int userID){
+        if(!mProfileContentCache.isEmpty() && mProfileContentCache.containsKey(userID+""))
+            return mProfileContentCache.get(userID+"");
+        return null;
+    }
 }
