@@ -83,10 +83,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private static final String Vid_Tap_Unlike = "Vid_Tap_Unlike";
     private static final String Vid_Reco_Tap = "Vid_Reco_Tap";
 
-    private static final int SHOW_PIC_STORY = 88;
-    private static final int SHOW_PIC_COMMENTS = 89;
-
-
     public static final String Vid_Reco_VideoExpand = "Vid_Reco_VideoExpand";
 
     private Context mContext;
@@ -157,7 +153,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private float mLikeLayoutPaddingTop;
     private int mSlantViewHtInPx;
     private int mBottomScreenHt;
-    final private float mHalfScreenPer = 0.95f;
+    final private float mHalfScreenPer = 0.9f;
 
     private int  scrollY,oldScrollY;
     private boolean isScrollingUp = true;
@@ -308,7 +304,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         setUpStoryContent();
         bindData();
-        attachPixtoryContent(SHOW_PIC_STORY);
+        attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
         mCommentShareLayout.setVisibility(View.GONE);
         mImageDetailsLayout.setSmoothScrollingEnabled(true);
@@ -320,12 +316,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
 
-        mStoryParentLayout.getLayoutParams().height =  (int)(0.80f *mDeviceHeightInPx);
+        mStoryParentLayout.getLayoutParams().height =  (int)(0.75f *mDeviceHeightInPx);
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
         mTopLikeLayout.setLayoutParams(relativeParams);
-        mTopLikeLayout  .requestLayout();
+        mTopLikeLayout.requestLayout();
         setUpFullScreen();
 
         imgViewLayoutParams = (RelativeLayout.LayoutParams) mImageMain.getLayoutParams();
@@ -435,7 +431,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 mListener.onAnimateMenuIcon(showBackArrow);
 
                 buildCommentsLayout(cd);
-                attachPixtoryContent(SHOW_PIC_COMMENTS);
+                attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
             }
         });
 
@@ -447,7 +443,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      */
     public void attachPixtoryContent(int story_or_comment){
         mContentLayout.removeAllViews();
-        if(story_or_comment == SHOW_PIC_STORY){
+        if(story_or_comment == AppConstants.SHOW_PIC_STORY){
             mContentLayout.addView(mStoryLayout);
             setCommentsVisible(false);
         }else{
@@ -710,41 +706,41 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 //        Log.i(TAG,"scrollY::"+scrollY+"::mHalfSCreenSize::"+mHalfScreenSize);
         if(scrollY < mHalfScreenSize){
 
-//            mImageDetailsLayout.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if(isScrollingUp){
-//                        mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
-//
-////                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-////                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-////                                    .put("PIXTORY_ID",""+mContentData.id)
-////                                    .build());
-//                    }
-//                    else
-//                        mImageDetailsLayout.smoothScrollTo(0,0);
-//                }
-//            });
-            new CountDownTimer(50, 50) {
-                public void onTick(long millisUntilFinished) {
-                    // Nothing...
-                }
-
-                // When over, start smoothScroll
-                public void onFinish() {
+            mImageDetailsLayout.post(new Runnable() {
+                @Override
+                public void run() {
                     if(isScrollingUp){
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
-//
-////                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-////                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-////                                    .put("PIXTORY_ID",""+mContentData.id)
-////                                    .build());
+
+//                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+//                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+//                                    .put("PIXTORY_ID",""+mContentData.id)
+//                                    .build());
                     }
                     else
                         mImageDetailsLayout.smoothScrollTo(0,0);
-
-                    }
-            }.start();
+                }
+            });
+//            new CountDownTimer(50, 50) {
+//                public void onTick(long millisUntilFinished) {
+//                    // Nothing...
+//                }
+//
+//                // When over, start smoothScroll
+//                public void onFinish() {
+//                    if(isScrollingUp){
+//                        mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
+////
+//////                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+//////                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+//////                                    .put("PIXTORY_ID",""+mContentData.id)
+//////                                    .build());
+//                    }
+//                    else
+//                        mImageDetailsLayout.smoothScrollTo(0,0);
+//
+//                    }
+//            }.start();
         }
 
     }
@@ -796,6 +792,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private void buildCommentsLayout(ContentData data){
 
         Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
+        ImageView mCommentCloseBtn = (ImageView)mCommentsLayout.findViewById(R.id.closeBtn);
 
         TextView mPlace = (TextView)mCommentsLayout.findViewById(R.id.txtPlace);
         TextView mDesc = (TextView)mCommentsLayout.findViewById(R.id.txtDesc);
@@ -849,6 +846,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                 commentDataList = null;
                 setCommentListVisibility();
+            }
+        });
+
+        mCommentCloseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
             }
         });
 
@@ -1046,7 +1050,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(isCommentsVisible()){
             setCommentsVisible(false);
             mListener.onAnimateMenuIcon(false);
-            attachPixtoryContent(SHOW_PIC_STORY);
+            attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
         }
     }
 

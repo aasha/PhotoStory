@@ -1117,6 +1117,16 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mProgress.dismiss();
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        if(mainFragment == null)
+//            mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+//
+//        if(mainFragment.isCommentsVisible()){
+//            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
+//        }
+//    }
 }
 
 
