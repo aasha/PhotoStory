@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.pixtory.app.R;
+import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
 
-public class UserProfileActivity2 extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, MainFragment.OnMainFragmentInteractionListener{
+public class UserProfileActivity2 extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, MainFragment.OnMainFragmentInteractionListener
+, CommentsDialogFragment.OnAddCommentButtonClickListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +56,7 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
 
     public void switchFragment(MainFragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,fragment);
+        fragmentTransaction.replace(R.id.fragment_container,fragment,"MAIN_FRAGMENT");
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -71,6 +73,11 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
 
     @Override
     public void showLoginAlert() {
+
+    }
+
+    @Override
+    public void onAddCommentButtonClicked(String str) {
 
     }
 }
