@@ -32,9 +32,7 @@
                     android:layout_width="match_parent"
                     android:id="@+id/like_layout"
                     android:background="@drawable/dim_background"
-                    android:paddingTop="100dp"
-                    android:paddingBottom="60dp"
-                    android:translationY="40dp"
+                    android:paddingTop="120dp"
                     android:layout_height="@dimen/image_layout_height">
                         <View android:layout_width="match_parent"
                             android:layout_height="0.1dp"
@@ -49,10 +47,10 @@
                         <TextView android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-thin"
-                            android:layout_marginTop="15dp"
+                            android:layout_marginTop="20dp"
                             android:layout_marginLeft="30dp"
                             android:id="@+id/text_place"
-
+                            android:text="RAJASTHAN INDIA"
                             android:textSize="12sp"
                             android:textAllCaps="true"
                             android:textColor="@color/grey_5"/>
@@ -63,6 +61,7 @@
                             android:layout_marginLeft="30dp"
                             android:id="@+id/text_title"
                             android:textSize="17sp"
+                            android:text="RAJASTHAN INDIA IN Q NUTSHELL INDIA BAGALORE"
                             android:lineSpacingExtra="-4sp"
                             android:textColor="#31aef5"
                             android:layout_gravity="left"
@@ -70,11 +69,10 @@
                         <TextView android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-thin"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginBottom="30dp"
-                            android:layout_marginLeft="30dp"
+                            android:layout_below="@+id/text_title"
+                            android:layout_marginLeft="40dp"
                             android:id="@+id/text_expert"
-
+                            android:text="sonali kakrayne"
                             android:textSize="11sp"
                             android:textColor="@color/white"/>
                         <ImageView android:layout_width="30dp"
@@ -89,12 +87,13 @@
                             android:fontFamily="sans-serif-light"
                             android:layout_width="30dp"
                             android:layout_height="wrap_content"
-
+                            android:text="2344"
                             android:textColor="@color/white"
                             android:textSize="13sp"
                             android:id="@+id/like_count"
                             android:gravity="center"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="5dp"
+                            android:paddingBottom="10dp"
                             android:layout_alignLeft="@+id/image_like"
                             android:layout_below="@+id/image_like"/>
                     
@@ -116,6 +115,13 @@
                         android:gravity="center_horizontal"
                         android:id="@+id/swipe_up_arrow"/>
 
+                    <com.pixtory.app.views.SlantView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:id="@+id/slant_view"
+                        android:layout_below="@+id/like_count"
+                        android:visibility="visible"/>
+
                     </RelativeLayout>
 
                 <android.support.v4.widget.NestedScrollView
@@ -134,11 +140,7 @@
                         android:background="@color/transparent"
                         android:layout_height="wrap_content">
 
-                        <com.pixtory.app.views.SlantView
-                            android:layout_width="match_parent"
-                            android:layout_height="40dp"
-                            android:id="@+id/slant_view"
-                            android:visibility="visible"/>
+
 
                         <LinearLayout
                             android:orientation="vertical"

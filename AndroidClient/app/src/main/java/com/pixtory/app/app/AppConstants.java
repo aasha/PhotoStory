@@ -49,6 +49,9 @@ public interface AppConstants {
     final static String OB_Register_Success = "OB_Register_Success";
     final static String OB_Register_Failure = "OB_Register_Failure";
 
+    static final int SHOW_PIC_STORY = 88;
+    static final int SHOW_PIC_COMMENTS = 89;
+
     final static List<String> mFBPermissions = Arrays.asList("public_profile",
             "email", "user_about_me");
 }
