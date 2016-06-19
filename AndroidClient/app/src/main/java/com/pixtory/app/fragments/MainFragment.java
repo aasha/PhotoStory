@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,8 +17,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,8 +58,12 @@ import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -430,7 +439,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mShareBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                share(Uri.parse(cd.pictureUrl));
+                //share(Uri.parse(cd.pictureUrl));
+                sharePixtory(cd);
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Share_Click")
                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                         .put("PIXTORY_ID",cd.id+"")
@@ -1180,5 +1190,82 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         });
     }
 
+    public void sharePixtory(final ContentData contentData)
+    {
+        Picasso.with(mContext).load(contentData.pictureUrl).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                try {
 
+                    File cachePath = new File(mContext.getCacheDir(), "images");
+                    cachePath.mkdirs(); // don't forget to make the directory
+                    FileOutputStream stream = new FileOutputStream(cachePath + "/"+contentData.name+".png"); // overwrites this image every time
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    stream.close();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                File imagePath = new File(mContext.getCacheDir(), "images");
+                File newFile = new File(imagePath, contentData.name+".png");
+                Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
+
+                if (contentUri != null) {
+
+                    Intent shareIntent = new Intent();
+                    /*
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                    shareIntent.setType("image*//*");
+                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
+                    List<ResolveInfo> resInfos=getActivity().getPackageManager().queryIntentActivities(shareIntent, 0);
+                    if(!resInfos.isEmpty()){
+                        for(ResolveInfo resInfo : resInfos){
+                            String packageName=resInfo.activityInfo.packageName;
+                            Log.i("Package Name", packageName);
+                            if(packageName.contains("com.whatsapp") || packageName.contains("com.facebook.katana") ){
+                                Intent intent=new Intent();
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                //intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
+                        }
+                        if(!targetInviteIntents.isEmpty()){
+
+                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share pixtory via");
+                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
+                            startActivity(chooserIntent);
+                        }else{
+                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
+                        }
+                    }*/
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                    shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT,contentData.name);
+                    startActivity(Intent.createChooser(shareIntent, "Share pixtory via"));
+
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+    }
 }
