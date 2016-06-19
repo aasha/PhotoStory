@@ -99,6 +99,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
+    private static String Is_First_Run = "FirstRun";
     private final static String TAG = HomeActivity.class.getName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private ProgressDialog mProgress = null;
@@ -139,6 +140,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ImageView menuIcon;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    private LinearLayout mTopOverlay;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +162,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
+        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay);
+        if(!isFirstTimeOpen())
+         mTopOverlay.setVisibility(View.INVISIBLE);
+       /* mTopOverlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay.setVisibility(View.INVISIBLE);
+            }
+        });*/
+
+
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
         //PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
@@ -1115,6 +1129,25 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void closeDialog(){
         mProgress.dismiss();
+    }
+
+    private boolean isFirstTimeOpen(){
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
+        if(firstRun){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(Is_First_Run,false);
+            editor.commit();
+            mTopOverlay.setVisibility(View.VISIBLE);
+            mTopOverlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mTopOverlay.setVisibility(View.INVISIBLE);
+                }
+            });
+
+        }
+        return firstRun;
     }
 
 }

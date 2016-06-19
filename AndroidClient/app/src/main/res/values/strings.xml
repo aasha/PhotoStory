@@ -62,5 +62,6 @@
     <string name="login_text">To like a Pixtory, please log in</string>
     <string name="login_text_2">To use this function, you must connect through one of the following ways</string>
     <string name="fb_login">Connect with Facebook</string>
+    <string name="wallpaper_coach_mark_text">Long press on an image to set it as your wallpaper</string>
 
 </resources>

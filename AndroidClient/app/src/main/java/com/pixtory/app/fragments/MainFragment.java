@@ -24,7 +24,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.*;
@@ -146,6 +149,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     @Bind(R.id.story_back_img)
     ImageView storyBackImg = null;
+
+    @Bind(R.id.swipe_up_sign)
+    TextView swipeUpSign = null;
+
+    ImageView swipeUpArrow;
 
     RelativeLayout.LayoutParams imgViewLayoutParams ;
 
@@ -273,6 +281,21 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
         storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
         storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
+        swipeUpSign = (TextView)mRootView.findViewById(R.id.swipe_up_sign);
+        //Animation animation = AnimationUtils.loadAnimation(mContext,R.anim.bounce);
+        Animation   mAnimation = new TranslateAnimation(
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, -0.1f);
+        mAnimation.setDuration(300);
+        mAnimation.setRepeatCount(-1);
+        mAnimation.setRepeatMode(Animation.REVERSE);
+        mAnimation.setInterpolator(new LinearInterpolator());
+        swipeUpArrow = (ImageView)mRootView.findViewById(R.id.swipe_up_arrow);
+        swipeUpArrow.setAnimation(mAnimation);
+        //swipeUpSign.setAnimation(animation);
+        //swipeUpSign.startAnimation(animation);
         if(!isProfileContent)
         {
             storyBackClick.setVisibility(View.GONE);
@@ -559,6 +582,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 @Override
                 public boolean onDown(MotionEvent e) {
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
+                    swipeUpArrow.clearAnimation();
                     return true;
                 }
 
