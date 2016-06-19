@@ -155,7 +155,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
+//        FacebookSdk.sdkInitialize(this.getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
         setPersonDetails();
@@ -460,6 +460,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -1130,16 +1136,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private void closeDialog(){
         mProgress.dismiss();
     }
-    //    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        if(mainFragment == null)
-//            mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-//
-//        if(mainFragment.isCommentsVisible()){
-//            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
-//        }
-//    }
+
     private boolean isFirstTimeOpen(){
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
