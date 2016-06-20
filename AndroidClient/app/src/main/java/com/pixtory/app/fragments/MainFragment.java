@@ -31,6 +31,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
@@ -289,12 +290,32 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
         swipeUpSign = (TextView)mRootView.findViewById(R.id.swipe_up_sign);
         //Animation animation = AnimationUtils.loadAnimation(mContext,R.anim.bounce);
+        Animation upAnimation = new TranslateAnimation(
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, -0.03f);
+        Animation downAnimation = new TranslateAnimation(
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0.03f);
+        upAnimation.setStartOffset(500);
+        upAnimation.setInterpolator(new LinearInterpolator());
         Animation   mAnimation = new TranslateAnimation(
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.RELATIVE_TO_PARENT, 0f,
-                TranslateAnimation.RELATIVE_TO_PARENT, -0.06f);
-        mAnimation.setDuration(300);
+                TranslateAnimation.RELATIVE_TO_PARENT, -0.03f);
+        Animation upDown = AnimationUtils.loadAnimation(mContext,R.anim.up_down);
+        //upDown.setStartOffset(5000);
+        upDown.setInterpolator(new LinearInterpolator());
+        upDown.setRepeatCount(Animation.INFINITE);
+       /* AnimationSet mAnimation = new AnimationSet(true);
+        mAnimation.addAnimation(upAnimation);
+        mAnimation.addAnimation(downAnimation);*/
+        //mAnimation.setStartOffset(500);
+        mAnimation.setDuration(400);
         mAnimation.setRepeatCount(-1);
         mAnimation.setRepeatMode(Animation.REVERSE);
         mAnimation.setInterpolator(new LinearInterpolator());
