@@ -32,7 +32,7 @@
         android:scaleType="center"
         android:contentDescription="@string/app_name"
         android:padding="10dp"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:fontFamily="sans-serif-light"/>
     
     <LinearLayout

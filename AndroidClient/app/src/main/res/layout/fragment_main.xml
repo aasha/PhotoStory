@@ -107,9 +107,9 @@
                             android:layout_alignParentBottom="true"
                             android:text="Swipe Up" />
                     <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="20dp"
-                        android:layout_marginLeft="140dp"
+                        android:layout_width="40dp"
+                        android:layout_height="10dp"
+                        android:layout_marginLeft="160dp"
                         android:layout_below="@+id/swipe_up_sign"
                         android:src="@drawable/up_arrow"
                         android:gravity="center_horizontal"

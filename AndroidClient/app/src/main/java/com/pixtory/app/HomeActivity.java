@@ -153,7 +153,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
         if (Utils.isConnectedViaWifi(mCtx) == false) {
-            showAlert();
+           // showAlert();
         }
 //        FacebookSdk.sdkInitialize(this.getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -162,7 +162,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
-        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay);
+        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay_1);
         if(!isFirstTimeOpen())
          mTopOverlay.setVisibility(View.INVISIBLE);
        /* mTopOverlay.setOnClickListener(new View.OnClickListener() {

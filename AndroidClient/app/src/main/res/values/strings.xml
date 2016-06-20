@@ -59,9 +59,9 @@
 \n\nYour Pixtory app is awesome! I would like to give you some feedback:</string>
     <string name="follow">Follow</string>
     <string name="contribute_text">Please submit your email address if you would like to contribute Pixtories</string>
-    <string name="login_text">To like a Pixtory, please log in</string>
-    <string name="login_text_2">To use this function, you must connect through one of the following ways</string>
+    <string name="login_text">To use this function, please log in</string>
+    <string name="login_text_2">Connect through one of the following ways</string>
     <string name="fb_login">Connect with Facebook</string>
     <string name="wallpaper_coach_mark_text">Long press on an image to set it as your wallpaper</string>
-
+    <string name="swipe_up_coach_mark_text">Swipe up to read the full story</string>
 </resources>

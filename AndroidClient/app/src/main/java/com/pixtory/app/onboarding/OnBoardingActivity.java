@@ -89,6 +89,7 @@ public class OnBoardingActivity  extends FragmentActivity {
             public void onClick(View v) {
                 registerUserName("User");
                 mProgressDialog.show();
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("OB_Login_Skip").build());
 //                gotoNextScreen();
             }
         });

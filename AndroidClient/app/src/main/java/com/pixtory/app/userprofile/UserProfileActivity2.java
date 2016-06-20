@@ -1,12 +1,23 @@
 package com.pixtory.app.userprofile;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.facebook.login.LoginManager;
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
+import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
 
@@ -72,8 +83,31 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
     }
 
     @Override
-    public void showLoginAlert() {
+    public void showLoginAlert(){
+        final Dialog dialog = new Dialog(UserProfileActivity2.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.login_alert);
 
+        DisplayMetrics dm =  new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(0.9*dm.widthPixels);
+        lp.gravity = Gravity.CENTER;
+
+        dialog.getWindow().setLayout(lp.width,lp.height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        LinearLayout loginClick = (LinearLayout) dialog.findViewById(R.id.login_click);
+        loginClick.setOnClickListener(new TextView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                LoginManager.getInstance().logInWithReadPermissions(UserProfileActivity2.this, AppConstants.mFBPermissions);
+            }
+        });
+
+        dialog.show();
     }
 
     @Override
