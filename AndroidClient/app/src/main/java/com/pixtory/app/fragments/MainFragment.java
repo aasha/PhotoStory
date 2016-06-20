@@ -1228,10 +1228,48 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
 
                     PackageManager packageManager = getActivity().getPackageManager();
+                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
+                    List<ResolveInfo> resInfos=packageManager.queryIntentActivities(shareIntent, 0);
+                    if(!resInfos.isEmpty()){
 
+                        for(ResolveInfo resInfo : resInfos){
+                            String packageName=resInfo.activityInfo.packageName;
+                            Log.i("Package Name", packageName);
+                            if(packageName.contains("com.facebook.katana") || packageName.contains("android.gm") || packageName.contains("com.instagram.android")){
+                                Intent intent=new Intent();
+                                intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+contentData.pictureDescription);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
+                            else if(packageName.contains("com.whatsapp")){
+                                Intent intent=new Intent();
+                                intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+contentData.pictureDescription);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
+                        }
+                        if(!targetInviteIntents.isEmpty()){
 
-                    shareIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+contentData.pictureDescription);
-                    startActivity(Intent.createChooser(shareIntent, "Share pixtory via"));
+                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
+                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
+                            startActivity(chooserIntent);
+                        }else{
+                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    //shareIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+contentData.pictureDescription);
+                    //startActivity(Intent.createChooser(shareIntent, "Share pixtory via"));
 
                 }
             }
