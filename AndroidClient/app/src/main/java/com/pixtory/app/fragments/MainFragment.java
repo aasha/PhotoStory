@@ -593,7 +593,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
                     swipeUpArrow.clearAnimation();
                     swipeUpArrow.setVisibility(View.GONE);
-                    isFullScreenShown=false;
+                    //isFullScreenShown=false;
                     return true;
                 }
 
@@ -601,13 +601,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
                     //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
-                    if(isFullScreenShown){
+                    Log.i(TAG, "Long Tap");
+                    if (isFullScreenShown) {
                         showWallpaperAlert();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
-                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                            .put("PIXTORY_ID",mContentData.id+"")
-                            .put("POSITION_ID",mContentIndex+"")
-                            .build());}
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
+                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                                .put("PIXTORY_ID", mContentData.id + "")
+                                .put("POSITION_ID", mContentIndex + "")
+                                .build());
+                    }
                 }
 
 //                @Override
@@ -708,7 +710,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
             if (me.getAction() == MotionEvent.ACTION_UP) {
                 Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
-                isFullScreenShown=true;
+                //isFullScreenShown=true;
                 setUpHalfScreen();
 
             }
