@@ -46,7 +46,7 @@
 
         <activity
             android:name=".onboarding.OnBoardingActivity"
-            android:icon="@drawable/pixtory"
+            android:icon="@drawable/app_icon_2"
             android:label="Pixtory">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

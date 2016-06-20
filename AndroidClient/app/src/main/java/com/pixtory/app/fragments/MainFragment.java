@@ -8,6 +8,7 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -30,6 +31,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
@@ -286,12 +288,32 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
         swipeUpSign = (TextView)mRootView.findViewById(R.id.swipe_up_sign);
         //Animation animation = AnimationUtils.loadAnimation(mContext,R.anim.bounce);
+        Animation upAnimation = new TranslateAnimation(
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, -0.03f);
+        Animation downAnimation = new TranslateAnimation(
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0.03f);
+        upAnimation.setStartOffset(500);
+        upAnimation.setInterpolator(new LinearInterpolator());
         Animation   mAnimation = new TranslateAnimation(
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.RELATIVE_TO_PARENT, 0f,
-                TranslateAnimation.RELATIVE_TO_PARENT, -0.1f);
-        mAnimation.setDuration(300);
+                TranslateAnimation.RELATIVE_TO_PARENT, -0.03f);
+        Animation upDown = AnimationUtils.loadAnimation(mContext,R.anim.up_down);
+        //upDown.setStartOffset(5000);
+        upDown.setInterpolator(new LinearInterpolator());
+        upDown.setRepeatCount(Animation.INFINITE);
+       /* AnimationSet mAnimation = new AnimationSet(true);
+        mAnimation.addAnimation(upAnimation);
+        mAnimation.addAnimation(downAnimation);*/
+        //mAnimation.setStartOffset(500);
+        mAnimation.setDuration(400);
         mAnimation.setRepeatCount(-1);
         mAnimation.setRepeatMode(Animation.REVERSE);
         mAnimation.setInterpolator(new LinearInterpolator());
@@ -347,7 +369,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
 
-        mStoryParentLayout.getLayoutParams().height =  (int)(0.70f *mDeviceHeightInPx);
+        mStoryParentLayout.getLayoutParams().height =  (int)(0.75f *mDeviceHeightInPx);
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
@@ -452,10 +474,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void onClick(View v) {
 
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
-                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                .put("PIXTORY_ID",cd.id+"")
-                .build());
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                         .put("PIXTORY_ID",cd.id+"")
@@ -603,13 +621,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
                     //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
-                    if(isFullScreenShown){
+                    Log.i(TAG, "Long Tap");
+                    if (isFullScreenShown) {
                         showWallpaperAlert();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
-                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                            .put("PIXTORY_ID",mContentData.id+"")
-                            .put("POSITION_ID",mContentIndex+"")
-                            .build());}
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
+                                .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                                .put("PIXTORY_ID", mContentData.id + "")
+                                .put("POSITION_ID", mContentIndex + "")
+                                .build());
+                    }
                 }
 
 //                @Override
@@ -709,7 +729,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
          // Disallow the touch request for parent scroll on touch of child view
             mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
             if (me.getAction() == MotionEvent.ACTION_UP) {
-    //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
+                Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
+                //isFullScreenShown=true;
                 setUpHalfScreen();
 
             }
@@ -862,6 +883,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     CommentsDialogFragment commentsDialogFragment = CommentsDialogFragment.newInstance("Some title");
                     commentsDialogFragment.show(fm, "fragment_alert");
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_AddComment_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                            .put("PIXTORY_ID",mContentData.id+"")
+                            .build());
                 }
                 else{
                     mListener.showLoginAlert();
@@ -1210,8 +1235,50 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
                     shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
                     shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT,contentData.name);
-                    startActivity(Intent.createChooser(shareIntent, "Share pixtory via"));
+
+                    PackageManager packageManager = getActivity().getPackageManager();
+                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
+                    List<ResolveInfo> resInfos=packageManager.queryIntentActivities(shareIntent, 0);
+                    if(!resInfos.isEmpty()){
+
+                        for(ResolveInfo resInfo : resInfos){
+                            String packageName=resInfo.activityInfo.packageName;
+                            Log.i("Package Name", packageName);
+                            if(packageName.contains("com.facebook.katana") || packageName.contains("android.gm") || packageName.contains("com.instagram.android")){
+                                Intent intent=new Intent();
+                                intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+contentData.pictureDescription);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
+                            else if(packageName.contains("com.whatsapp")){
+                                Intent intent=new Intent();
+                                intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+contentData.pictureDescription);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
+                        }
+                        if(!targetInviteIntents.isEmpty()){
+
+                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
+                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
+                            startActivity(chooserIntent);
+                        }else{
+                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    //shareIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+contentData.pictureDescription);
+                    //startActivity(Intent.createChooser(shareIntent, "Share pixtory via"));
 
                 }
             }
@@ -1226,5 +1293,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
             }
         });
+        }
     }
 }

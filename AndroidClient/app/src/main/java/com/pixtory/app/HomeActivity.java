@@ -47,7 +47,6 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
@@ -75,7 +74,6 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.RegisterResponse;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
-import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
@@ -100,6 +98,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
     private static String Is_First_Run = "FirstRun";
+    private static String Swipe_Count = "SwipeCount";
     private final static String TAG = HomeActivity.class.getName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private ProgressDialog mProgress = null;
@@ -141,6 +140,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ActionBarDrawerToggle mDrawerToggle;
 
     private LinearLayout mTopOverlay;
+    private LinearLayout mTopOverlay_wallpaper;
 
 
     @Override
@@ -153,7 +153,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
         if (Utils.isConnectedViaWifi(mCtx) == false) {
-            showAlert();
+           // showAlert();
         }
 //        FacebookSdk.sdkInitialize(this.getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -162,7 +162,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
-        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay);
+        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay_1);
         if(!isFirstTimeOpen())
          mTopOverlay.setVisibility(View.INVISIBLE);
        /* mTopOverlay.setOnClickListener(new View.OnClickListener() {
@@ -171,7 +171,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mTopOverlay.setVisibility(View.INVISIBLE);
             }
         });*/
-
+        mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
@@ -205,7 +205,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
                             .build());
-
+                swipeCount();
+                Log.i(TAG,"Page swipe");
             }
 
             @Override
@@ -1118,6 +1119,28 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         }
         return firstRun;
+    }
+
+    private int swipeCount(){
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        int count = sharedPreferences.getInt(Swipe_Count,1);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(count<10)
+        {
+         editor.putInt(Swipe_Count,count+1);
+         editor.commit();
+        }
+        if(count==5){
+            mTopOverlay_wallpaper.setVisibility(View.VISIBLE);
+            mTopOverlay_wallpaper.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mTopOverlay_wallpaper.setVisibility(View.INVISIBLE);
+                }
+            });
+
+        }
+        return count;
     }
 
 }

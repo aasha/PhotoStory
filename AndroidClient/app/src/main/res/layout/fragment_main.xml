@@ -122,13 +122,15 @@
                             android:layout_alignParentBottom="true"
                             android:text="Swipe Up" />
                     <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="20dp"
-                        android:layout_marginLeft="140dp"
+                        android:layout_width="20dp"
+                        android:layout_height="5dp"
+                        android:layout_marginLeft="170dp"
                         android:layout_below="@+id/swipe_up_sign"
                         android:src="@drawable/up_arrow"
+                        android:scaleType="fitXY"
                         android:gravity="center_horizontal"
-                        android:id="@+id/swipe_up_arrow"/>
+                        android:id="@+id/swipe_up_arrow"
+                        android:layout_marginTop="15dp"/>
 
                     <com.pixtory.app.views.SlantView
                         android:layout_width="match_parent"
