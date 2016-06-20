@@ -62,11 +62,6 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
     }
 
     @Override
-    public void onAnimateMenuIcon(boolean showBackArrow) {
-
-    }
-
-    @Override
     public void showMenuIcon(boolean showMenuIcon) {
 
     }

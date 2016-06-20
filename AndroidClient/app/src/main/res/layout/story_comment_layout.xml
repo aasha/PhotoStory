@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
@@ -54,8 +53,7 @@
         android:visibility="visible"
         android:id="@+id/comments_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="370dp"
+        android:layout_height="380dp"
         android:layout_above="@+id/postBtn_ll"
         android:layout_below="@+id/separator">
 
@@ -126,7 +124,7 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="40dp"
                 android:textAlignment="center"
                 android:fontFamily="sans-serif"
                 android:textSize="14sp"
@@ -134,8 +132,8 @@
                 android:background="@color/app_blue"
                 android:textColor="#b3ffffff"
                 android:id="@+id/postComment"
-                android:layout_marginBottom="12dp"
                 android:text="Post A Comment"
+                android:layout_marginBottom="6dp"
                 android:layout_weight="0.45" />
 
         </LinearLayout>

@@ -1,6 +1,10 @@
 [
     {
-        "merged": "C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\vpi__tab_indicator.xml",
-        "source": "C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable\\vpi__tab_indicator.xml"
+        "merged": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/res/merged/androidTest/debug/drawable/vpi__tab_indicator.xml",
+        "source": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/bundles/debug/res/drawable/vpi__tab_indicator.xml"
+    },
+    {
+        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\vpi__tab_indicator.xml",
+        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable\\vpi__tab_indicator.xml"
     }
 ]

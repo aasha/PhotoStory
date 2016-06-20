@@ -604,42 +604,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             menuIcon.setVisibility(View.GONE);
     }
 
-    /**
-     * Code to animate menu icon to back arrow
-     * @param showBackArrow
-     */
-    @Override
-    public void onAnimateMenuIcon(final boolean showBackArrow){
-
-        ObjectAnimator anim = null;
-
-        if(showBackArrow)
-            anim  = (ObjectAnimator) AnimatorInflater.loadAnimator(HomeActivity.this, R.animator.flip_out);
-        else
-            anim = (ObjectAnimator) AnimatorInflater.loadAnimator(HomeActivity.this, R.animator.flip_in);
-
-        anim.setTarget(menuIcon);
-        anim.setDuration(200);
-        anim.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {}
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if(showBackArrow)
-                    menuIcon.setImageResource(R.drawable.back_arrow);
-                else
-                    menuIcon.setImageResource(R.drawable.menu_icon);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {}
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {}
-        });
-        anim.start();
-    }
 
 //TODO: test method to be removed later
 

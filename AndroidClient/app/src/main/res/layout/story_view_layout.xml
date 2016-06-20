@@ -11,8 +11,8 @@
         android:layout_height="match_parent">
 
     <com.pixtory.app.views.CircularImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:id="@+id/imgProfile"
             android:layout_marginLeft="25dp"/>
     <TextView android:layout_width="wrap_content"
@@ -22,44 +22,32 @@
             android:layout_marginLeft="7dp"
             android:text="Steve Johnson"
             android:textColor="#31aef5"
-            android:textSize="17sp"
+            android:textSize="13sp"
             android:id="@+id/txtName"/>
     <com.pixtory.app.views.RobotoLightTextView
-            android:layout_width="180dp"
+            android:layout_width="wrap_content"
                 android:layout_marginLeft="7dp"
-                android:textSize="14sp"
+                android:layout_marginTop="3dp"
+                android:layout_marginRight="20dp"
+                android:textSize="11sp"
                 android:layout_gravity="left"
-                android:maxLines="2"
-
+                android:maxLines="1"
+                android:ellipsize="end"
               android:layout_height="wrap_content"
               android:layout_toRightOf="@+id/imgProfile"
               android:layout_below="@+id/txtName"
-              android:text="Travel Enthusiast"
-              android:layout_marginTop="3dp"
-        android:layout_marginBottom="10dp"
+              android:text="Travel Enthusiast Travel Enthusiast Travel Enthusiast Travel Enthusiast st Travel Enthusiast Travel Enthusiast"
             android:textColor="@color/grey_3"
               android:textAllCaps="true"
-            android:id="@+id/txtDesc"
-        android:singleLine="true"/>
+            android:id="@+id/txtDesc" />
 
-    <com.pixtory.app.views.RobotoLightTextView
-        android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-            android:textColor="@color/app_blue"
-
-            android:id="@+id/txtDate"
-        android:layout_below="@+id/txtName"
-        android:text="25 Apr 12"
-        android:textSize="15sp"
-        android:layout_alignRight="@+id/separator"
-        android:layout_alignEnd="@+id/separator" />
     <View android:layout_width="match_parent"
           android:layout_height="0.67dp"
             android:background="@color/separator_color"
             android:id="@+id/separator"
             android:layout_below="@+id/imgProfile"
-            android:layout_marginTop="10dp"
           android:layout_marginLeft="25dp"
+        android:layout_marginTop="12dp"
           android:layout_marginRight="25dp"/>
 
             <com.pixtory.app.views.RobotoLightTextView

@@ -13,7 +13,7 @@ public class ContentData {
     public int likeCount = 0;
     public String place = null;
     public String date = null;
-    public String pictureDescription = null;
+    public String pictureDescription = "";
     public String pictureFirstPara = null;
     public boolean likedByUser = false;
     public PersonInfo personDetails = null;

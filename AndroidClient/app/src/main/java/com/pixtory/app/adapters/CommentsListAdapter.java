@@ -68,7 +68,13 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         else
             holder.mImgAvatar.setImageResource(R.drawable.hexagon_bg);
 
-        holder.mTVShortDesc.setText(data.personDetails.description);
+        if(Utils.isNotEmpty(data.personDetails.description)){
+            holder.mTVShortDesc.setVisibility(View.VISIBLE);
+            holder.mTVShortDesc.setText(data.personDetails.description);
+        }else{
+            holder.mTVShortDesc.setVisibility(View.GONE);
+        }
+
         holder.mTVDate.setText(Utils.getFormattedDate(data.ingestionTime));
         holder.mTVCommentText.setText(data.comment);
     }

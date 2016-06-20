@@ -48,13 +48,11 @@ import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
-import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
-import com.pixtory.app.views.SlantView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -349,7 +347,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
 
-        mStoryParentLayout.getLayoutParams().height =  (int)(0.75f *mDeviceHeightInPx);
+        mStoryParentLayout.getLayoutParams().height =  (int)(0.70f *mDeviceHeightInPx);
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
@@ -383,7 +381,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain);
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
-        String name = (!(cd.personDetails.name.equals("")))? "By "+cd.personDetails.name : "";
+        String name = (!(cd.personDetails.name.equals("")))? "By , "+cd.personDetails.name : " ";
         mTextExpert.setText(name);
 
         if (mContentData.likedByUser == true)
@@ -397,7 +395,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
-        TextView mTextDate = (TextView) mStoryLayout.findViewById(R.id.txtDate);
         TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
         mShareBtn = (LinearLayout) mRootView.findViewById(R.id.btnShare);
         mCommentBtn = (LinearLayout) mRootView.findViewById(R.id.btnComment);
@@ -410,7 +407,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
                 mTextDesc.setText(cd.personDetails.description);
-
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -433,8 +429,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
-            mTextDate.setText(cd.date);
-            mTextStoryDetails.setText(cd.pictureDescription);
+            mTextStoryDetails.setText(cd.pictureDescription+"\n \n \n\n \n \n");
         }
 
         mShareBtn.setOnClickListener(new View.OnClickListener() {
@@ -467,7 +462,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         .build());
 
                 boolean showBackArrow = true;
-                mListener.onAnimateMenuIcon(showBackArrow);
 
                 buildCommentsLayout(cd);
                 attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
@@ -485,9 +479,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(story_or_comment == AppConstants.SHOW_PIC_STORY){
             mContentLayout.addView(mStoryLayout);
             setCommentsVisible(false);
+            mStoryParentLayout.setNestedScrollingEnabled(true);
+            mImageDetailsLayout.setScrollingEnabled(true);
+
         }else{
+            mImageDetailsLayout.setScrollingEnabled(false);
             mContentLayout.addView(mCommentsLayout);
             setCommentsVisible(true);
+            mStoryParentLayout.setNestedScrollingEnabled(false);
+            mImageDetailsLayout.setScrollingEnabled(false);
+
         }
     }
 
@@ -576,7 +577,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnMainFragmentInteractionListener {
-        void onAnimateMenuIcon(boolean showBackArrow);
         void showMenuIcon(boolean showMenuIcon);
         void showLoginAlert();
     }
@@ -758,8 +758,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 //                                    .put("PIXTORY_ID",""+mContentData.id)
 //                                    .build());
                     }
-                    else
-                        mImageDetailsLayout.smoothScrollTo(0,0);
+                    else {
+                        mImageDetailsLayout.smoothScrollTo(0, 0);
+                        mTextExpert.setVisibility(View.VISIBLE);
+                    }
                 }
             });
 //            new CountDownTimer(50, 50) {
@@ -849,7 +851,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mCommentsRecyclerView = (RecyclerView)mCommentsLayout.findViewById(R.id.commentsList);
         mLayoutManager = new LinearLayoutManager(mContext);
         mCommentsRecyclerView.setLayoutManager(mLayoutManager);
-        mCommentsRecyclerView.setHasFixedSize(true);
 
         setCommentsVisible(true);
 
@@ -1058,12 +1059,18 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
     }
 
-    private void sendLikeToBackend(int contentId, boolean isLiked) {
+    private void sendLikeToBackend(int contentId, final boolean isLiked) {
         NetworkApiHelper.getInstance().likeContent(Utils.getUserId(getActivity()), contentId, isLiked, new NetworkApiCallback<BaseResponse>() {
 
             @Override
             public void success(BaseResponse baseResponse, Response response) {
-
+                if(isLiked) {
+                    mContentData.likeCount += 1;
+                }else{
+                    if(mContentData.likeCount>0)
+                        mContentData.likeCount -= 1;
+                }
+                mLikeCountTV.setText(String.valueOf(mContentData.likeCount));
             }
 
             @Override
@@ -1096,7 +1103,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public void onBackButtonClicked(){
         if(isCommentsVisible()){
             setCommentsVisible(false);
-            mListener.onAnimateMenuIcon(false);
+//            mListener.onAnimateMenuIcon(false);
             attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
         }
     }
@@ -1199,37 +1206,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 if (contentUri != null) {
 
                     Intent shareIntent = new Intent();
-                    /*
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                    shareIntent.setType("image*//*");
-                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
-                    List<ResolveInfo> resInfos=getActivity().getPackageManager().queryIntentActivities(shareIntent, 0);
-                    if(!resInfos.isEmpty()){
-                        for(ResolveInfo resInfo : resInfos){
-                            String packageName=resInfo.activityInfo.packageName;
-                            Log.i("Package Name", packageName);
-                            if(packageName.contains("com.whatsapp") || packageName.contains("com.facebook.katana") ){
-                                Intent intent=new Intent();
-                                intent.setAction(Intent.ACTION_SEND);
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                                //intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-
-                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name);
-                                intent.setPackage(packageName);
-                                targetInviteIntents.add(intent);
-                            }
-                        }
-                        if(!targetInviteIntents.isEmpty()){
-
-                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share pixtory via");
-                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
-                            startActivity(chooserIntent);
-                        }else{
-                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
-                        }
-                    }*/
                     shareIntent.setAction(Intent.ACTION_SEND);
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
                     shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
