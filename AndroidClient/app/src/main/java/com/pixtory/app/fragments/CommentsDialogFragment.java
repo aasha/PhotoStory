@@ -93,7 +93,6 @@ public class CommentsDialogFragment extends DialogFragment{
         params.gravity = Gravity.BOTTOM;
         getDialog().getWindow().setAttributes(params);
 
-
         mCommentText.requestFocus();
         mPostCommentBtn = (Button)view.findViewById(R.id.postCommentBtn);
         mPostCommentBtn.setOnClickListener(new View.OnClickListener() {

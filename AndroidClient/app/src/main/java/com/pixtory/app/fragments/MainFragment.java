@@ -297,6 +297,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mAnimation.setRepeatCount(-1);
         mAnimation.setRepeatMode(Animation.REVERSE);
         mAnimation.setInterpolator(new LinearInterpolator());
+
         swipeUpArrow = (ImageView)mRootView.findViewById(R.id.swipe_up_arrow);
         swipeUpArrow.setAnimation(mAnimation);
         //swipeUpSign.setAnimation(animation);
@@ -439,12 +440,17 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mShareBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //share(Uri.parse(cd.pictureUrl));
-                sharePixtory(cd);
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Share_Click")
-                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                        .put("PIXTORY_ID",cd.id+"")
-                        .build());
+
+                if(Utils.isNotEmpty(Utils.getFbID(mContext))) {
+
+                    sharePixtory(cd);
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Share_Click")
+                            .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                            .put("PIXTORY_ID", cd.id + "")
+                            .build());
+                }else {
+                    mListener.showLoginAlert();
+                }
             }
         });
         mCommentBtn.setOnClickListener(new View.OnClickListener() {
@@ -589,6 +595,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public boolean onDown(MotionEvent e) {
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
                     swipeUpArrow.clearAnimation();
+                    swipeUpArrow.setVisibility(View.GONE);
                     return true;
                 }
 
@@ -849,9 +856,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mPostComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                CommentsDialogFragment commentsDialogFragment = CommentsDialogFragment.newInstance("Some title");
-                commentsDialogFragment.show(fm, "fragment_alert");
+
+                if(Utils.isNotEmpty(Utils.getFbID(mContext))) {
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    CommentsDialogFragment commentsDialogFragment = CommentsDialogFragment.newInstance("Some title");
+                    commentsDialogFragment.show(fm, "fragment_alert");
+                }
+                else{
+                    mListener.showLoginAlert();
+                }
+
             }
         });
 
@@ -962,7 +976,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      */
     @OnClick(R.id.image_like)
     public void onLikeClick(ImageView view) {
-        if(Utils.isEmpty(Utils.getFbID(mContext))) {
+        if(Utils.isNotEmpty(Utils.getFbID(mContext))) {
             if (mContentData.likedByUser == false) {
                 ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_in);
                 anim.setTarget(mImageLike);
@@ -1041,7 +1055,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
         else {
             mListener.showLoginAlert();
-//            showLoginAlert();
         }
     }
 
@@ -1089,37 +1102,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public  boolean isFullScreenShown(){return isFullScreenShown;}
-
-//    private void showLoginAlert(){
-//        final Dialog dialog = new Dialog(mContext);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.login_alert);
-//
-//        DisplayMetrics dm =  new DisplayMetrics();
-//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-//
-//
-//        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-//        lp.copyFrom(dialog.getWindow().getAttributes());
-//        lp.width = (int)(0.9*dm.widthPixels);
-//        lp.gravity = Gravity.CENTER;
-//
-//        dialog.getWindow().setLayout(lp.width,lp.height);
-//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        LinearLayout loginClick = (LinearLayout) dialog.findViewById(R.id.login_click);
-//        loginClick.setOnClickListener(new TextView.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                dialog.dismiss();
-//                if(mListener != null){
-//                    mListener.loginToFacebook();
-//                }
-//            }
-//        });
-//
-//        dialog.show();
-//    }
-
+    
     private void showWallpaperAlert(){
         final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

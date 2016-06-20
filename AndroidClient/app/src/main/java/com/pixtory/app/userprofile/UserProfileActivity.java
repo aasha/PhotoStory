@@ -32,6 +32,7 @@ import com.pixtory.app.transformations.GrayscaleTransformation;
 import com.pixtory.app.typeface.Dekar;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
+import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -133,6 +134,17 @@ public class UserProfileActivity extends FragmentActivity{
 
         if(userId==personId){
             personFollow.setVisibility(View.GONE);
+
+            personFollow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Utils.isNotEmpty(Utils.getFbID(UserProfileActivity.this))) {
+                        //TODO: Follow Logic goes here
+                    }else{
+                        //TODO: If user is not loggedIn then user should be redirected to facebook login
+                    }
+                }
+            });
             personInfo = App.getPersonInfo();
             contentDataList = App.getPersonConentData();
             cardLayoutAdapter = new CardLayoutAdapter(this, contentDataList);

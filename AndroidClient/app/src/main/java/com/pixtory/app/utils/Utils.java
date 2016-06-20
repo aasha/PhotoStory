@@ -236,7 +236,7 @@ public class Utils {
 
     }
 
-    public static boolean isEmpty(String str){
+    public static boolean isNotEmpty(String str){
         if(str == null || str.equals(""))
             return false;
 
