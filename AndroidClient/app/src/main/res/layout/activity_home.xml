@@ -53,7 +53,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/translucent_menu"
+            android:background="@color/translucent_white"
             android:orientation="vertical"
             android:visibility="invisible"
             android:id="@+id/top_overlay">
@@ -64,7 +64,7 @@
                 android:layout_marginTop="100dp"
                 android:background="@drawable/text_background"
                 android:text="@string/wallpaper_coach_mark_text"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textAlignment="center"
                 android:paddingTop="30dp"
                 android:paddingBottom="30dp"
@@ -77,13 +77,13 @@
                 android:layout_height="211dp"
                 android:layout_gravity="center|bottom"
                 android:layout_marginTop="60dp"
-                android:src="@drawable/blue_hand"/>
+                android:src="@drawable/long_tap_hand"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/translucent_menu"
+            android:background="@color/translucent_white"
             android:orientation="vertical"
             android:id="@+id/top_overlay_1">
             <TextView
@@ -93,7 +93,7 @@
                 android:layout_marginTop="100dp"
                 android:background="@drawable/text_background"
                 android:text="@string/swipe_up_coach_mark_text"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textAlignment="center"
                 android:paddingTop="30dp"
                 android:paddingBottom="30dp"
@@ -106,7 +106,7 @@
                 android:layout_height="300dp"
                 android:layout_gravity="center|bottom"
                 android:layout_marginTop="60dp"
-                android:src="@drawable/swipe_up_coach"/>
+                android:src="@drawable/swipe_up_hand"/>
         </LinearLayout>
 
 
