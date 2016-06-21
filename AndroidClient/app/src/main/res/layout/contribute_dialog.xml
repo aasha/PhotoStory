@@ -20,20 +20,51 @@
         android:layout_height="2dp"
         android:background="@color/app_blue"
         android:layout_marginRight="3dp"/>
-
+    <EditText
+        android:id="@+id/c_name"
+        android:layout_width="match_parent"
+        android:textSize="20sp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_marginBottom="4dp"
+        android:lines="1"
+        android:hint="Your name"
+        style="@style/EditTextCustom"
+        android:textColor="@color/app_blue"
+        android:paddingBottom="5dp"/>
     <EditText
         android:id="@+id/c_email"
         android:layout_width="match_parent"
         android:textSize="20sp"
-        android:layout_height="128dp"
+        android:layout_height="40dp"
         android:layout_marginTop="16dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
         android:layout_marginBottom="4dp"
-        android:lines="2"
+        android:lines="1"
         android:hint="Your email id"
         style="@style/EditTextCustom"
-        android:textColor="@color/app_blue"/>
+        android:textColor="@color/app_blue"
+        android:inputType="textEmailAddress"
+        android:paddingBottom="5dp"/>
+
+    <EditText
+        android:id="@+id/c_phone"
+        android:layout_width="match_parent"
+        android:textSize="20sp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_marginBottom="16dp"
+        android:lines="1"
+        android:hint="Your phone number"
+        style="@style/EditTextCustom"
+        android:textColor="@color/app_blue"
+        android:inputType="phone"
+        android:paddingBottom="5dp"/>
 
     <View android:layout_width="match_parent"
         android:layout_height="2dp"
