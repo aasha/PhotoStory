@@ -704,10 +704,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(offset > mBottomScreenHt ){
             showCommentsShareLayout(true);
             mListener.showMenuIcon(false);
+            storyBackImg.setVisibility(View.GONE);
         }
         else{
             mListener.showMenuIcon(true);
             showCommentsShareLayout(false);
+            storyBackImg.setVisibility(View.VISIBLE);
         }
 
         return true;
@@ -1295,4 +1297,4 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         });
         }
     }
-}
+

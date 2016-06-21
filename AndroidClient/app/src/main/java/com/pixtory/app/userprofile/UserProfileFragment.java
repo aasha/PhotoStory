@@ -163,6 +163,7 @@ public class UserProfileFragment extends Fragment {
             personFollow.setVisibility(View.GONE);
             mPersonInfo = App.getPersonInfo();
             mContentDataList = App.getPersonConentData();
+            if(mContentDataList!=null)
             for(ContentData cd:mContentDataList)
                 cd.personDetails=mPersonInfo;
             App.setProfileContentData(mContentDataList);
@@ -240,7 +241,7 @@ public class UserProfileFragment extends Fragment {
                 NetworkApiHelper.getInstance().getPersonDetails(mUserId, mPersonId, new NetworkApiCallback<GetPersonDetailsResponse>() {
                     @Override
                     public void success(GetPersonDetailsResponse o, Response response) {
-                        Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
+                       // Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
                         if (o.personDetails != null) {
                             mPersonInfo = o.personDetails;
                             App.addToProfileCache(mPersonInfo);
@@ -261,7 +262,7 @@ public class UserProfileFragment extends Fragment {
                                     .put(AppConstants.USER_ID, Integer.toString(mPersonId))
                                     .put("MESSAGE", "No Data")
                                     .build());
-                            System.out.println("Person data null");
+                            //System.out.println("Person data null");
                             Toast.makeText(getContext(), "No person data!", Toast.LENGTH_SHORT).show();
                         }
 
@@ -272,7 +273,7 @@ public class UserProfileFragment extends Fragment {
                             App.addToProfileContentCache(mPersonId,mContentDataList);
                             App.setProfileContentData(mContentDataList);
                             cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
-                            Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
+                           // Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
                         } else {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
                                     .put(AppConstants.USER_ID, Integer.toString(mPersonId))
@@ -307,7 +308,7 @@ public class UserProfileFragment extends Fragment {
                                 .put(AppConstants.USER_ID, Integer.toString(mPersonId))
                                 .put("MESSAGE", error.errorMessage)
                                 .build());
-                        Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Please check your network connection", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -317,7 +318,7 @@ public class UserProfileFragment extends Fragment {
                                 .put(AppConstants.USER_ID, Integer.toString(mPersonId))
                                 .put("MESSAGE", error.getMessage())
                                 .build());
-                        Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Please check your network connection", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -345,6 +346,8 @@ public class UserProfileFragment extends Fragment {
         personFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                personFollow.setText("FOLLOWING");
+                personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Follow_Click")
                         .put(AppConstants.USER_ID,mUserId+"")
                         .put("CONTRIBUTOR_ID",mPersonId+"")
