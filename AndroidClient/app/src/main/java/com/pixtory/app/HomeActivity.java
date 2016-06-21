@@ -30,6 +30,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
@@ -38,9 +39,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,6 +88,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -140,8 +144,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ImageView menuIcon;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private LinearLayout mTopOverlay;
+    private FrameLayout mTopOverlay;
+    private FrameLayout mTopOverlay3;
     private LinearLayout mTopOverlay_wallpaper;
+    private TextView mWallpaperYes;
+    private TextView mWallpaperNo;
 
 
     @Override
@@ -163,16 +170,40 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
-        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay_1);
+        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_2);
+        mTopOverlay3 = (FrameLayout) findViewById(R.id.top_overlay_3);
         if(!isFirstTimeOpen())
          mTopOverlay.setVisibility(View.INVISIBLE);
-       /* mTopOverlay.setOnClickListener(new View.OnClickListener() {
+       /* mTopOverlay.setVisibility(View.VISIBLE);
+        mTopOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mTopOverlay.setVisibility(View.INVISIBLE);
             }
-        });*/
+    });*/
         mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
+
+        mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
+        mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
+        mWallpaperYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+            }
+        });
+        mWallpaperNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        mTopOverlay3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+            }
+        });
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
@@ -554,6 +585,64 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         LinearLayout feedbackCancel = (LinearLayout)dialog.findViewById(R.id.feedback_cancel);
         LinearLayout feedbackSend =(LinearLayout) dialog.findViewById(R.id.feedback_send);
 
+        final Spinner spinnerFeedback = (Spinner)dialog.findViewById(R.id.spinner_feedback);
+        final Spinner spinnerCategory = (Spinner)dialog.findViewById(R.id.spinner_category);
+        final Spinner spinnerSubcategory = (Spinner)dialog.findViewById(R.id.spinner_subcateogry);
+
+        final String feedbacks[] = new String[]{"FEEDBACK","I liked this","I disliked this","I'm reporting a problem"};
+        String categories[] = new String[]{"CATEGORY","App On-boarding","Image Screen","Story Screen","Profile screen","Comments","Sharing"};
+        String subcategories[] = new String[]{"SUB CATEGORY","Images are slow to load","App crashing","App sluggish","Layout looks messed up","Others"};
+
+        final List<String> feedbackList = new ArrayList<>(Arrays.asList(feedbacks));
+        final List<String> categoryList = new ArrayList<>(Arrays.asList(categories));
+        final List<String> subcategoryList = new ArrayList<>(Arrays.asList(subcategories));
+
+        ArrayAdapter<String> spinnerFeedbackAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item,feedbackList){
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position==0){
+                    tv.setBackgroundColor(getResources().getColor(R.color.grey_3));
+                    tv.setTextColor(getResources().getColor(R.color.white));
+                }
+                return view;
+            }
+        };
+        ArrayAdapter<String> spinnerCategoryAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item,categoryList){
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position==0){
+                    tv.setBackgroundColor(getResources().getColor(R.color.grey_3));
+                    tv.setTextColor(getResources().getColor(R.color.white));
+                }
+                return view;
+            }
+        };
+        ArrayAdapter<String> spinnerSubcategoryAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item,subcategoryList){
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position==0){
+                    tv.setBackgroundColor(getResources().getColor(R.color.grey_3));
+                    tv.setTextColor(getResources().getColor(R.color.white));
+                }
+                return view;
+            }
+        };
+
+        spinnerFeedbackAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinnerCategoryAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinnerSubcategoryAdapter.setDropDownViewResource(R.layout.spinner_item);
+
+        spinnerFeedback.setPrompt("Feedback");
+
+        spinnerFeedback.setAdapter(spinnerFeedbackAdapter);
+        spinnerCategory.setAdapter(spinnerCategoryAdapter);
+        spinnerSubcategory.setAdapter(spinnerSubcategoryAdapter);
 
         feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
@@ -567,7 +656,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void onClick(View v) {
 
-                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), feedbackText.getText().toString(),"","","",new NetworkApiCallback<BaseResponse>() {
+                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), feedbackText.getText().toString(),spinnerFeedback.getSelectedItem().toString(),spinnerCategory.getSelectedItem().toString(),spinnerSubcategory.getSelectedItem().toString(),new NetworkApiCallback<BaseResponse>() {
                     @Override
                     public void success(BaseResponse o, Response response) {
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("FeedBack_Submit_Click")
@@ -973,7 +1062,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         break;
 
                     case 5:mDrawerLayout.closeDrawer(mDrawerList);
-                        showWallpaperAlert();
+                        mTopOverlay3.setVisibility(View.VISIBLE);
                         break;
                 }
             }

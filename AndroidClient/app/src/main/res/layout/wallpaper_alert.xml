@@ -41,7 +41,7 @@
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:background="@drawable/blue_cross"
                 android:layout_marginLeft="67dp"
-                android:id="@+id/wallpaper_no"/>
+                android:id="@+id/set_wallpaper_no"/>
         </LinearLayout>
 
 
@@ -63,7 +63,7 @@
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:background="@drawable/right_arrow"
                 android:layout_marginLeft="53dp"
-                android:id="@+id/wallpaper_yes"/>
+                android:id="@+id/set_wallpaper_yes"/>
 
         </LinearLayout>
 

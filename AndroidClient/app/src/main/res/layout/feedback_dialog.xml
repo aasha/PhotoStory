@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/dialog_background_translucent">
     <TextView
-        android:text="Feedback"
+        android:text="Feedback on Pixtory"
         android:textSize="25sp"
         android:textAlignment="center"
         android:paddingTop="15dp"
@@ -18,19 +18,45 @@
         android:layout_height="2dp"
         android:background="@color/app_blue"
         android:layout_marginRight="3dp"/>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:background="@drawable/spinner_background"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:id="@+id/spinner_feedback"></Spinner>
+
+    <Spinner
+    android:layout_width="match_parent"
+    android:layout_height="41dp"
+    android:background="@drawable/spinner_background"
+    android:layout_marginTop="20dp"
+    android:layout_marginLeft="17dp"
+    android:layout_marginRight="17dp"
+    android:id="@+id/spinner_category"></Spinner>
+
+    <Spinner
+    android:layout_width="match_parent"
+    android:layout_height="41dp"
+    android:background="@drawable/spinner_background"
+    android:layout_marginTop="20dp"
+    android:layout_marginLeft="17dp"
+    android:layout_marginRight="17dp"
+    android:id="@+id/spinner_subcateogry"></Spinner>
 
     <EditText
         android:id="@+id/feedback_text"
         android:inputType="textMultiLine"
         android:layout_width="match_parent"
         android:textSize="20sp"
-        android:layout_height="200dp"
+        android:layout_height="124dp"
         android:layout_marginTop="16dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_marginBottom="16dp"
         android:lines="6"
-        android:hint="Description"
+        android:hint="Please share your thoughts with us!"
         android:fontFamily="sans-serif"
         android:textColor="@color/app_blue"
         style="@style/EditTextCustom" />
@@ -62,7 +88,7 @@
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:background="@drawable/blue_cross"
                 android:layout_marginLeft="67dp"
-                android:id="@+id/wallpaper_no"/>
+                android:id="@+id/feedback_no"/>
         </LinearLayout>
 
 
@@ -84,7 +110,7 @@
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:background="@drawable/right_arrow"
                 android:layout_marginLeft="53dp"
-                android:id="@+id/wallpaper_yes"/>
+                android:id="@+id/feedback_yes"/>
 
         </LinearLayout>
 

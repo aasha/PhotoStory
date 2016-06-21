@@ -53,7 +53,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/translucent_white"
+            android:background="@color/coach_mark_background_color"
             android:orientation="vertical"
             android:visibility="invisible"
             android:id="@+id/top_overlay">
@@ -85,12 +85,13 @@
             android:layout_height="match_parent"
             android:background="@color/translucent_white"
             android:orientation="vertical"
-            android:id="@+id/top_overlay_1">
+            android:id="@+id/top_overlay_1"
+            android:visibility="gone">
             <TextView
                 android:layout_width="274dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="43dp"
                 android:background="@drawable/text_background"
                 android:text="@string/swipe_up_coach_mark_text"
                 android:textColor="@color/black"
@@ -107,8 +108,138 @@
                 android:layout_gravity="center|bottom"
                 android:layout_marginTop="60dp"
                 android:src="@drawable/swipe_up_hand"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:background="#80ffffff"/>
         </LinearLayout>
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/top_overlay_2"
+            android:background="@color/coach_mark_background_color"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="274dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center"
+                android:layout_marginTop="43dp"
+                android:background="@drawable/text_background"
+                android:text="@string/swipe_up_coach_mark_text"
+                android:textColor="@color/black"
+                android:textAlignment="center"
+                android:paddingTop="30dp"
+                android:paddingBottom="30dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-light"/>
+            <ImageView
+                android:layout_width="112dp"
+                android:layout_height="300dp"
+                android:layout_gravity="top|center"
+                android:layout_marginTop="180dp"
+                android:src="@drawable/swipe_up_hand"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="#80ffffff"
+                android:textColor="@color/black"
+                android:paddingBottom="30dp"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-regular"
+                android:paddingTop="20dp"
+                android:text="@string/swipe_up_coach_mark_text_2"
+                android:textAlignment="center"
+                android:paddingRight="20dp"
+                android:paddingLeft="20dp"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/top_overlay_3"
+            android:background="@color/coach_mark_background_color"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center"
+                android:layout_marginTop="80dp"
+                android:text="We've got something new!"
+                android:textColor="@color/app_blue"
+                android:textAlignment="center"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:textSize="27sp"
+                android:fontFamily="sans-serif-regular"
+                android:textStyle="italic"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center"
+                android:layout_marginTop="150dp"
+                android:text="@string/wallpaper_text"
+                android:textColor="@color/app_blue"
+                android:textAlignment="center"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:textSize="27sp"
+                android:fontFamily="sans-serif-regular"/>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_blue"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="170dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_height="wrap_content"
+                    android:text="Yes please!"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="0dp"
+                    android:id="@+id/wallpaper_yes"
+                    android:textAlignment="center"/>
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:textSize="20sp"
+                android:layout_height="wrap_content"
+                android:text="Not now"
+                android:textColor="@color/black"
+                android:fontFamily="sans-serif"
+                android:layout_gravity="bottom|center"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginBottom="125dp"
+                android:id="@+id/wallpaper_no"
+                android:paddingBottom="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="#80ffffff"
+                android:textColor="@color/black"
+                android:paddingBottom="30dp"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-regular"
+                android:paddingTop="20dp"
+                android:text="@string/wallpaper_text_2"
+                android:textAlignment="center"
+                android:paddingRight="20dp"
+                android:paddingLeft="20dp"/>
+        </FrameLayout>
 
     </FrameLayout>
 
