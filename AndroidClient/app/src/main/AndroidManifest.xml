@@ -42,23 +42,8 @@
             android:label="@string/app_name"
             android:largeHeap="true"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
-
-        <activity
-            android:name=".onboarding.OnBoardingActivity"
-            android:icon="@drawable/app_icon_2"
-            android:label="Pixtory">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".TestActivity"
-            android:icon="@drawable/pixtory"
-            android:label="Pixtory">
-
-        </activity>
+            android:theme="@style/AppTheme.Launcher"
+            >
 
         <activity
             android:name=".userprofile.UserProfileActivity"

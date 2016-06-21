@@ -630,50 +630,53 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                 }
 
-//                @Override
-//                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-//                    if (distanceX < 5 && distanceX > -5) {
+                @Override
+                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                    if (distanceX < 5 && distanceX > -5) {
 //                        mIsScrolling = true;
 //                        mIsFling = false;
-//                        Log.i(TAG, "onScroll::::"+mImageDetailsLayout.getScrollY());
-////
+                        Log.i(TAG, "gesture->OnScroll::::");
 //
-//                    }
-//                    return super.onScroll(e1, e2, distanceX, distanceY);
-//                }
+
+                    }
+                    return super.onScroll(e1, e2, distanceX, distanceY);
+                }
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                        float velocityY) {
-//                    final int SWIPE_MIN_DISTANCE = 50;
-//                    final int SWIPE_THRESHOLD_VELOCITY = 100;
-//                    try {
-//                        if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
-//                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.i(TAG, "gesture->OnFling::::");
+
+
+                    final int SWIPE_MIN_DISTANCE = 50;
+                    final int SWIPE_THRESHOLD_VELOCITY = 100;
+                    try {
+                        if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
+                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 //                            mIsFling = true;
 //                            Log.i(TAG, "onFlingUp::::"+mImageDetailsLayout.getScrollY());
-//
-////                            modifyScreenHeight(mImageDetailsLayout.getScrollY());
-//
-//                        } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-//                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+
+//                            modifyScreenHeight(mImageDetailsLayout.getScrollY());
+
+                        } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
+                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 //                            mIsFling = true;
 //                            if(!isFullScreenShown){
-//                                showFullScreen();
+////                                showFullScreen();
 //                                isFullScreenShown = true;
 //                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
 //                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
 //                                        .put("PIXTORY_ID",""+mContentData.id)
 //                                        .build());
-//                            }
-//
-//                        } else {
+
+                        } else {
 //                            mIsFling = false;
-//                        }
-//                    } catch (Exception e) {
-//                        // nothing
-//                        e.printStackTrace();
-//                    }
+                        return false;
+                        }
+                    } catch (Exception e) {
+                        // nothing
+                        e.printStackTrace();
+                    }
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
             });
@@ -726,22 +729,35 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     @OnTouch(R.id.pic_story_layout)
     public boolean onTouchContent(NestedScrollView view, MotionEvent me) {
-         // Disallow the touch request for parent scroll on touch of child view
-            mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
-            if (me.getAction() == MotionEvent.ACTION_UP) {
-                Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
-                //isFullScreenShown=true;
-                setUpHalfScreen();
 
-            }
-
+        //if comment section is visible , swipe up and down gesture for story and content is disabled
+        if(isCommentsVisible()){
             return false;
+        }
+
+        if (gesture.onTouchEvent(me)) {
+            return true;
+        }
+
+        // Disallow the touch request for parent scroll on touch of child view
+        mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
+        if (me.getAction() == MotionEvent.ACTION_UP) {
+            setUpHalfScreen();
+        }
+
+        return false;
 
     }
 
     int mHalfScreenSize;
     @OnTouch(R.id.image_details_layout)
     public boolean onTouchStory(ScrollView view, MotionEvent me) {
+
+        //if comment section is visible , swipe up and down gesture for story and content is disabled
+        if(isCommentsVisible()){
+            return false;
+        }
+
         if (gesture.onTouchEvent(me)) {
             return true;
         }
@@ -749,14 +765,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
             setUpHalfScreen();
-
         }
+
         return false;
     }
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
-//        mSlantView.setVisibility(View.VISIBLE);
         mImageDetailsLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.VISIBLE);
     }
@@ -788,26 +803,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                 }
             });
-//            new CountDownTimer(50, 50) {
-//                public void onTick(long millisUntilFinished) {
-//                    // Nothing...
-//                }
-//
-//                // When over, start smoothScroll
-//                public void onFinish() {
-//                    if(isScrollingUp){
-//                        mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
-////
-//////                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-//////                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-//////                                    .put("PIXTORY_ID",""+mContentData.id)
-//////                                    .build());
-//                    }
-//                    else
-//                        mImageDetailsLayout.smoothScrollTo(0,0);
-//
-//                    }
-//            }.start();
         }
 
     }
@@ -898,33 +893,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
         });
 
-        NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(mContext), data.id, new NetworkApiCallback<GetCommentDetailsResponse>() {
-
-            @Override
-            public void success(GetCommentDetailsResponse getCommentDetailsResponse, Response response) {
-
-                Log.i(TAG , "GetCommentDetails Request Success");
-
-                commentDataList = getCommentDetailsResponse.getCommentList();
-                setCommentListVisibility();
-            }
-
-            @Override
-            public void failure(GetCommentDetailsResponse getCommentDetailsResponse) {
-                Log.i(TAG , "GetCommentDetails Request Failure::"+getCommentDetailsResponse.toString());
-
-                commentDataList = null;
-                setCommentListVisibility();
-            }
-
-            @Override
-            public void networkFailure(RetrofitError error) {
-                Log.i(TAG , "GetCommentDetails Request Network Failure Error::"+error.getMessage());
-
-                commentDataList = null;
-                setCommentListVisibility();
-            }
-        });
+        fetchCommentList(data.id);
 
         mCommentCloseBtn.setOnClickListener(new View.OnClickListener() {
             @Override

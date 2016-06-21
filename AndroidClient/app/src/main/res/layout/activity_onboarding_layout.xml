@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
-    android:background="@drawable/layer_2">
+    android:background="@drawable/onboarding_bg">
 
 
     <ImageView
@@ -17,11 +17,12 @@
     <com.pixtory.app.views.RobotoLightTextView
         android:layout_width="wrap_content"
         android:textAllCaps="true"
-        android:textColor="#B900efff"
+        android:textStyle="bold"
+        android:textColor="@color/black"
         android:layout_below="@+id/pixtory_img"
         android:layout_height="wrap_content"
         android:layout_marginBottom="45dp"
-        android:textSize="@dimen/pixtory_subheading_font"
+        android:textSize="13sp"
         android:text="Every Picture has a story"
         android:id="@+id/pixtory_txt"
         android:layout_centerInParent="true"/>
@@ -59,13 +60,12 @@
 </LinearLayout>
 
 
-    <TextView
+    <com.pixtory.app.views.RobotoLightTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/app_blue_light"
+        android:textColor="@color/black"
         android:textAllCaps="true"
         android:id="@+id/skipLogin"
-        android:textStyle="bold"
         android:textSize="@dimen/skip_login_font"
         android:gravity="bottom"
         android:paddingBottom="10dp"
