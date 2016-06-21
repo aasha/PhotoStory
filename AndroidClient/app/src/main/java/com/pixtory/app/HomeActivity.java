@@ -80,6 +80,7 @@ import com.pixtory.app.retrofit.RegisterResponse;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -147,6 +148,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private FrameLayout mTopOverlay;
     private FrameLayout mTopOverlay3;
     private LinearLayout mTopOverlay_wallpaper;
+    private ImageView mBlurLayer;
     private TextView mWallpaperYes;
     private TextView mWallpaperNo;
 
@@ -170,40 +172,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
-        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_2);
-        mTopOverlay3 = (FrameLayout) findViewById(R.id.top_overlay_3);
-        if(!isFirstTimeOpen())
-         mTopOverlay.setVisibility(View.INVISIBLE);
-       /* mTopOverlay.setVisibility(View.VISIBLE);
-        mTopOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTopOverlay.setVisibility(View.INVISIBLE);
-            }
-    });*/
-        mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
 
-        mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
-        mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
-        mWallpaperYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTopOverlay3.setVisibility(View.INVISIBLE);
-            }
-        });
-        mWallpaperNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTopOverlay3.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        mTopOverlay3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTopOverlay3.setVisibility(View.INVISIBLE);
-            }
-        });
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
@@ -252,6 +221,50 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
         mListener = new ConnectionChangedListener();
         prepareFeed();
+
+        mBlurLayer = (ImageView)findViewById(R.id.blur_layer);
+        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_2);
+        mTopOverlay3 = (FrameLayout) findViewById(R.id.top_overlay_3);
+        if(!isFirstTimeOpen()){
+            mTopOverlay.setVisibility(View.INVISIBLE);
+           // mBlurLayer.setVisibility(View.INVISIBLE);
+        }
+        mTopOverlay.setVisibility(View.VISIBLE);
+        mTopOverlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay.setVisibility(View.INVISIBLE);
+               // mBlurLayer.setVisibility(View.INVISIBLE);
+            }
+        });
+        mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
+
+        mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
+        mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
+        mWallpaperYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+                mBlurLayer.setVisibility(View.GONE);
+            }
+        });
+        mWallpaperNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+                mBlurLayer.setVisibility(View.GONE);
+            }
+        });
+
+        mTopOverlay3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+                mBlurLayer.setVisibility(View.GONE);
+            }
+        });
+
+
 
         //Register for push notifs
         registerForPushNotification();
@@ -1063,6 +1076,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
                     case 5:mDrawerLayout.closeDrawer(mDrawerList);
                         mTopOverlay3.setVisibility(View.VISIBLE);
+                        mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+                        mBlurLayer.setVisibility(View.VISIBLE);
                         break;
                 }
             }
@@ -1202,10 +1217,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             editor.putBoolean(Is_First_Run,false);
             editor.commit();
             mTopOverlay.setVisibility(View.VISIBLE);
+           // mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+           // mBlurLayer.setVisibility(View.VISIBLE);
             mTopOverlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mTopOverlay.setVisibility(View.INVISIBLE);
+                    mBlurLayer.setVisibility(View.INVISIBLE);
                 }
             });
 
@@ -1224,10 +1242,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
         if(count==5){
             mTopOverlay_wallpaper.setVisibility(View.VISIBLE);
+            //mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+            //mBlurLayer.setVisibility(View.VISIBLE);
             mTopOverlay_wallpaper.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mTopOverlay_wallpaper.setVisibility(View.INVISIBLE);
+            //        mBlurLayer.setVisibility(View.INVISIBLE);
                 }
             });
 

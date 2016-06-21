@@ -21,7 +21,8 @@
         <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="@null">
+            android:background="@null"
+            android:id="@+id/whole_frame">
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="fill_parent"
@@ -49,7 +50,10 @@
                 android:visibility="gone"/>
         </FrameLayout>
     </LinearLayout>
-
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/blur_layer"></ImageView>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -119,7 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/top_overlay_2"
-            android:background="@color/coach_mark_background_color"
+            android:background="#ccffffff"
             android:visibility="gone">
             <TextView
                 android:layout_width="274dp"
@@ -229,7 +233,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:background="#80ffffff"
+                android:background="#30ffffff"
                 android:textColor="@color/black"
                 android:paddingBottom="30dp"
                 android:textSize="16sp"
