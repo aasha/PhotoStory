@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -102,8 +103,10 @@ public class CommentsDialogFragment extends DialogFragment{
                     Toast.makeText(getActivity(),"You have not entered any comment!!",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    mAddCommentListener.onAddCommentButtonClicked(mCommentText.getText().toString());
                     dismiss();
+                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    mAddCommentListener.onAddCommentButtonClicked(" "+mCommentText.getText().toString());
                 }
 
             }

@@ -35,6 +35,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -476,6 +477,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     @Override
     public void onAddCommentButtonClicked(String str) {
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+
         if(mainFragment !=null)
             mainFragment.postComment(str);
     }

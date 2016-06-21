@@ -15,6 +15,8 @@ import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -86,6 +88,14 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
 
     public void setData(ArrayList<CommentData> contentList) {
         mDataSetList = contentList;
+
+        Collections.sort(mDataSetList, new Comparator<CommentData>() {
+            @Override
+            public int compare(CommentData commentData1, CommentData commentData2) {
+                return commentData1.compareTo(commentData2);
+            }
+        });
+
         notifyDataSetChanged();
     }
 }

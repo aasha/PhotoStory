@@ -88,8 +88,8 @@
         android:id="@+id/postCommentBtn"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginTop="20dp"
         android:text="Submit"
         android:textSize="12sp"
         />

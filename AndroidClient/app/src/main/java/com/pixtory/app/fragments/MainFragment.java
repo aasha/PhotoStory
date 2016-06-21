@@ -479,8 +479,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         .put("PIXTORY_ID",cd.id+"")
                         .build());
 
-                boolean showBackArrow = true;
-
                 buildCommentsLayout(cd);
                 attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
             }
@@ -766,6 +764,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private void setUpHalfScreen(){
         mTextExpert.setVisibility(View.GONE);
 
+        if(isCommentsVisible())
+            attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
+
         isScrollingUp= (scrollY < oldScrollY)?false:true;
 //        Log.i(TAG,"scrollY::"+scrollY+"::mHalfSCreenSize::"+mHalfScreenSize);
         if(scrollY < mHalfScreenSize){
@@ -940,32 +941,34 @@ public class MainFragment extends Fragment implements ScrollViewListener{
      */
     public void postComment(String comment) {
 
-            InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-            int content_id = mContentData.id;
+            final int content_id = mContentData.id;
 
             if(!((Utils.getFbID(mContext)).equals(""))) {
                 //User is allowed to comment only if loggedIn
-                NetworkApiHelper.getInstance().addComment(Utils.getUserId(mContext), content_id, comment, new NetworkApiCallback<AddCommentResponse>() {
+                NetworkApiHelper.getInstance().addComment(Utils.getUserId(mContext), content_id, comment.trim(), new NetworkApiCallback<AddCommentResponse>() {
 
                     @Override
                     public void success(AddCommentResponse addCommentResponse, Response response) {
-                        Log.i(TAG, "Add Comment Request Success");
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_SubmitComment_Click")
                                 .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                                 .put("PIXTORY_ID",mContentData.id+"")
                                 .build());
-                        if (mCommentsRecyclerViewAdapter != null)
-                            mCommentsRecyclerViewAdapter.notifyDataSetChanged();
+
+                        fetchCommentList(content_id);
+                        Log.i(TAG , "Comment Succes/sfully Posted");
+                        Toast.makeText(getActivity(),"Comment Successfully Posted",Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void failure(AddCommentResponse addCommentResponse) {
+                        Toast.makeText(getActivity(),"Oops Something went wrong!!",Toast.LENGTH_SHORT).show();
+
                         Log.i(TAG, "Add Comment Request Failure");
                     }
                     @Override
                     public void networkFailure(RetrofitError error) {
                         Log.i(TAG, "Add Comment Request Network Failure, Error Type::" + error.getMessage());
+                        Toast.makeText(getActivity(),"Please check your network connection",Toast.LENGTH_SHORT).show();
                     }
                 });
             }else{
@@ -995,6 +998,40 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
         mTVLoading.setVisibility(View.GONE);
         mRLCommentList.setVisibility(View.VISIBLE);
+    }
+
+    private void fetchCommentList(int story_id){
+
+        mTVLoading.setVisibility(View.VISIBLE);
+        mRLCommentList.setVisibility(View.INVISIBLE);
+
+        NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(mContext), story_id , new NetworkApiCallback<GetCommentDetailsResponse>() {
+
+            @Override
+            public void success(GetCommentDetailsResponse getCommentDetailsResponse, Response response) {
+                Log.i(TAG , "GetCommentDetails Request Success");
+
+                commentDataList = getCommentDetailsResponse.getCommentList();
+                setCommentListVisibility();
+            }
+
+            @Override
+            public void failure(GetCommentDetailsResponse getCommentDetailsResponse) {
+                Log.i(TAG , "GetCommentDetails Request Failure::"+getCommentDetailsResponse.toString());
+
+                commentDataList = null;
+                setCommentListVisibility();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Log.i(TAG , "GetCommentDetails Request Network Failure Error::"+error.getMessage());
+
+                commentDataList = null;
+                setCommentListVisibility();
+            }
+        });
+
     }
 
     /**
@@ -1296,5 +1333,5 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
         });
         }
-    }
 
+}

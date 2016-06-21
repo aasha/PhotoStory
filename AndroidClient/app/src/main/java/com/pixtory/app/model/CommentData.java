@@ -3,7 +3,7 @@ package com.pixtory.app.model;
 /**
  * Created by aasha.medhi on 5/2/16.
  */
-public class CommentData {
+public class CommentData implements Comparable<CommentData>{
 
     public int commentId;
     public String comment;
@@ -51,4 +51,12 @@ public class CommentData {
         this.comment = comment;
     }
 
+    @Override
+    public int compareTo(CommentData commentData) {
+        if(this.ingestionTime < commentData.ingestionTime){
+            return 1;
+        }else{
+            return -1;
+        }
+    }
 }
