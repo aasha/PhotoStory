@@ -51,11 +51,16 @@
 
     <RelativeLayout
         android:visibility="visible"
-        android:id="@+id/comments_layout"
         android:layout_width="match_parent"
-        android:layout_height="380dp"
+        android:layout_height="387dp"
         android:layout_above="@+id/postBtn_ll"
         android:layout_below="@+id/separator">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:visibility="visible"
+            android:id="@+id/comments_layout"
+            android:layout_height="match_parent">
 
         <ImageView
             android:layout_width="20dp"
@@ -63,7 +68,7 @@
             android:src="@drawable/comment"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:layout_height="20dp"
             />
 
@@ -105,15 +110,17 @@
 
        </android.support.v7.widget.RecyclerView>
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-    <TextView
-        android:id="@+id/loading_comments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone"
-        android:text="Loading Comments..."/>
+        <TextView
+            android:id="@+id/loading_comments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="Loading Comments..."/>
+
+    </RelativeLayout>
 
         <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
