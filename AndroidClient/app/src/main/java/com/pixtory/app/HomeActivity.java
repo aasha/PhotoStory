@@ -39,6 +39,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -143,8 +144,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ImageView menuIcon;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private LinearLayout mTopOverlay;
+    private FrameLayout mTopOverlay;
+    private FrameLayout mTopOverlay3;
     private LinearLayout mTopOverlay_wallpaper;
+    private TextView mWallpaperYes;
+    private TextView mWallpaperNo;
 
 
     @Override
@@ -166,16 +170,40 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setUpNavigationDrawer();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
-        mTopOverlay = (LinearLayout)findViewById(R.id.top_overlay_1);
+        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_2);
+        mTopOverlay3 = (FrameLayout) findViewById(R.id.top_overlay_3);
         if(!isFirstTimeOpen())
          mTopOverlay.setVisibility(View.INVISIBLE);
-       /* mTopOverlay.setOnClickListener(new View.OnClickListener() {
+       /* mTopOverlay.setVisibility(View.VISIBLE);
+        mTopOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mTopOverlay.setVisibility(View.INVISIBLE);
             }
-        });*/
+    });*/
         mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
+
+        mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
+        mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
+        mWallpaperYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+            }
+        });
+        mWallpaperNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        mTopOverlay3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTopOverlay3.setVisibility(View.INVISIBLE);
+            }
+        });
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
@@ -1034,7 +1062,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         break;
 
                     case 5:mDrawerLayout.closeDrawer(mDrawerList);
-                        showWallpaperAlert();
+                        mTopOverlay3.setVisibility(View.VISIBLE);
                         break;
                 }
             }
