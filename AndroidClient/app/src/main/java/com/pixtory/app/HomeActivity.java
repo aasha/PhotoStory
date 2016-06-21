@@ -229,6 +229,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             mTopOverlay.setVisibility(View.INVISIBLE);
            // mBlurLayer.setVisibility(View.INVISIBLE);
         }
+        /*
         mTopOverlay.setVisibility(View.VISIBLE);
         mTopOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,6 +238,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                // mBlurLayer.setVisibility(View.INVISIBLE);
             }
         });
+        */
         mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
 
         mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
