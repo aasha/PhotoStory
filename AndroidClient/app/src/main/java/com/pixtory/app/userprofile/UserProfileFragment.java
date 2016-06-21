@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -347,7 +348,8 @@ public class UserProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 personFollow.setText("FOLLOWING");
-                personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                if(Build.VERSION.SDK_INT>=21)
+                    personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Follow_Click")
                         .put(AppConstants.USER_ID,mUserId+"")
                         .put("CONTRIBUTOR_ID",mPersonId+"")
