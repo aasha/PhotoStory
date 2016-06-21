@@ -702,10 +702,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(offset > mBottomScreenHt ){
             showCommentsShareLayout(true);
             mListener.showMenuIcon(false);
+            storyBackImg.setVisibility(View.GONE);
         }
         else{
             mListener.showMenuIcon(true);
             showCommentsShareLayout(false);
+            storyBackImg.setVisibility(View.VISIBLE);
         }
 
         return true;
@@ -896,7 +898,33 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
         });
 
-        fetchCommentList(data.id);
+        NetworkApiHelper.getInstance().getCommentDetailList(Utils.getUserId(mContext), data.id, new NetworkApiCallback<GetCommentDetailsResponse>() {
+
+            @Override
+            public void success(GetCommentDetailsResponse getCommentDetailsResponse, Response response) {
+
+                Log.i(TAG , "GetCommentDetails Request Success");
+
+                commentDataList = getCommentDetailsResponse.getCommentList();
+                setCommentListVisibility();
+            }
+
+            @Override
+            public void failure(GetCommentDetailsResponse getCommentDetailsResponse) {
+                Log.i(TAG , "GetCommentDetails Request Failure::"+getCommentDetailsResponse.toString());
+
+                commentDataList = null;
+                setCommentListVisibility();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Log.i(TAG , "GetCommentDetails Request Network Failure Error::"+error.getMessage());
+
+                commentDataList = null;
+                setCommentListVisibility();
+            }
+        });
 
         mCommentCloseBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -13,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
 import com.pixtory.app.HomeActivity;
@@ -23,6 +24,8 @@ import com.pixtory.app.fragments.MainFragment;
 
 public class UserProfileActivity2 extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, MainFragment.OnMainFragmentInteractionListener
 , CommentsDialogFragment.OnAddCommentButtonClickListener{
+
+    private MainFragment mainFragment;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,7 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
     }
 
     public void switchFragment(MainFragment fragment){
+        this.mainFragment=fragment;
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,fragment,"MAIN_FRAGMENT");
         fragmentTransaction.addToBackStack(null);
@@ -107,6 +111,7 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
 
     @Override
     public void onAddCommentButtonClicked(String str) {
-
+        if(mainFragment!=null)
+            mainFragment.postComment(str);
     }
 }
