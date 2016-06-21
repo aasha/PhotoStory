@@ -152,9 +152,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         ButterKnife.bind(this);
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
-        if (Utils.isConnectedViaWifi(mCtx) == false) {
-           // showAlert();
-        }
+       /* if (Utils.isConnectedViaWifi(mCtx) == false) {
+            showAlert();
+        }*/
 //        FacebookSdk.sdkInitialize(this.getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
@@ -329,6 +329,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         };
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
+            Log.i("SRIRAM","PushNotifications");
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
@@ -863,12 +864,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         final ArrayList<SideMenuData> items = new ArrayList<SideMenuData>();
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.cross_icon),""));
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.profile_icon_2),"My Profile"));
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.contributor_icon_2),"Become a Contributor"));
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.invite_icon_2),"Invite Friends"));
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.feedback_icon_2),"Feedback"));
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.wallpaper_icon_2),"Wallpaper"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.cross_icon_3),""));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.profile_icon_3),"My Profile"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.contributor_icon_3),"Become a Contributor"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.invite_icon_3),"Invite Friends"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.feedback_icon_3),"Feedback"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.wallpaper_icon_3),"Wallpaper setting"));
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
         DisplayMetrics dm = new DisplayMetrics();
