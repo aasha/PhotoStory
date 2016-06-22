@@ -153,9 +153,9 @@ public class UserProfileFragment extends Fragment {
             personFollow.setVisibility(View.GONE);
             mPersonInfo = App.getPersonInfo();
             mContentDataList = App.getPersonConentData();
-            if(mContentDataList!=null)
+            /*if(mContentDataList!=null)
             for(ContentData cd:mContentDataList)
-                cd.personDetails=mPersonInfo;
+                cd.personDetails=mPersonInfo;*/
             App.setProfileContentData(mContentDataList);
             cardLayoutAdapter = new CardLayoutAdapter(getContext(), mContentDataList);
             personName.setText(mPersonInfo.name);
@@ -232,8 +232,8 @@ public class UserProfileFragment extends Fragment {
                     @Override
                     public void success(GetPersonDetailsResponse o, Response response) {
                        // Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
-                        if (o.personDetails != null) {
-                            mPersonInfo = o.personDetails;
+                        if (o.userDetails != null) {
+                            mPersonInfo = o.userDetails;
                             App.addToProfileCache(mPersonInfo);
                             personName.setText(mPersonInfo.name);
                             personDesc.setText(mPersonInfo.description);

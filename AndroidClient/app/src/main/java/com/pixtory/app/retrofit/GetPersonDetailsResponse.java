@@ -12,6 +12,6 @@ public class GetPersonDetailsResponse {
     public boolean success;
     public int errorCode;
     public String errorMessage;
-    public PersonInfo personDetails;
+    public PersonInfo userDetails;
     public ArrayList<ContentData> contentList;
 }
