@@ -825,6 +825,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final EditText cEmail = (EditText)dialog.findViewById(R.id.c_email);
+        final EditText cName = (EditText)dialog.findViewById(R.id.c_name);
+        final EditText cNumber = (EditText)dialog.findViewById(R.id.c_phone);
         LinearLayout contributeCancel = (LinearLayout)dialog.findViewById(R.id.contribute_cancel);
         LinearLayout contriuteSubmit =(LinearLayout) dialog.findViewById(R.id.contribute_submit);
 
@@ -843,7 +845,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 if (!isEmailValid(cEmail.getText().toString()))
                     Toast.makeText(HomeActivity.this, "Please enter a valid email id.", Toast.LENGTH_SHORT).show();
                 else{
-                    NetworkApiHelper.getInstance().getContributorMail(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(),  new NetworkApiCallback<BaseResponse>() {
+                    NetworkApiHelper.getInstance().getContributorMail(Integer.parseInt(Utils.getUserId(HomeActivity.this)), cEmail.getText().toString(),cName.getText().toString(),cNumber.getText().toString(),  new NetworkApiCallback<BaseResponse>() {
                         @Override
                         public void success(BaseResponse o, Response response) {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("BecomeContributor_Submit_Click")
