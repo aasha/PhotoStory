@@ -1185,7 +1185,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                     intent.setAction(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, "Hey there. Try this new app PIXTORY.\n\n www.pixtory.in");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, you may want to try this new App Pixtory. It gives you some great photographs and the story behind each. I liked it and think you will as well.\n");
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);

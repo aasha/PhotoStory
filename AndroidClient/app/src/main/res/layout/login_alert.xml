@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="34dp"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="20dp"
+        android:layout_margin="15dp"
         android:background="@drawable/round_corners_blue"
         android:id="@+id/login_click"
         android:orientation="horizontal">
