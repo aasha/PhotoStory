@@ -14,6 +14,8 @@ public class ContentData {
     public String place = null;
     public String date = null;
     public String pictureDescription = "";
+    public String pictureSummary = "";
+    public boolean editorsPick = false;
     public String pictureFirstPara = null;
     public boolean likedByUser = false;
     public PersonInfo personDetails = null;
