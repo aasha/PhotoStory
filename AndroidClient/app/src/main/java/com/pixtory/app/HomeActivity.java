@@ -600,8 +600,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
                 }
 
-                if (o.personDetails!=null){
-                    App.setPersonInfo(o.personDetails);
+                if (o.userDetails!=null){
+                    App.setPersonInfo(o.userDetails);
                 }else {
                     System.out.println("Person data null");
                     Toast.makeText(HomeActivity.this, "No person data!", Toast.LENGTH_SHORT).show();

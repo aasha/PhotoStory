@@ -196,8 +196,8 @@ public class UserProfileActivity extends FragmentActivity{
                         Toast.makeText(UserProfileActivity.this, "No content data!", Toast.LENGTH_SHORT).show();
                     }
 
-                    if (o.personDetails != null) {
-                        personInfo = o.personDetails;
+                    if (o.userDetails != null) {
+                        personInfo = o.userDetails;
                         personName.setText(personInfo.name);
                         personDesc.setText(personInfo.description);
 
