@@ -246,10 +246,12 @@ public class NetworkApiHelper {
         });
     }
 
-    public void getContributorMail(int userId, String mailId, final NetworkApiCallback cb) {
+    public void getContributorMail(int userId, String mailId, String userName, String userMobileNumber, final NetworkApiCallback cb) {
         GetContributorMailRequest req = new GetContributorMailRequest();
         req.userId = userId;
-        req.mailId = mailId;
+        req.userEmail = mailId;
+        req.userName = userName;
+        req.mobileNumber = userMobileNumber;
 
         sAPI.getContributorMail(req, new Callback<BaseResponse>() {
             @Override

@@ -5,5 +5,7 @@ package com.pixtory.app.retrofit;
  */
 public class GetContributorMailRequest {
     public int userId;
-    public String mailId;
+    public String userEmail;
+    public String userName;
+    public String mobileNumber;
 }
