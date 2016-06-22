@@ -4,6 +4,7 @@ import android.animation.*;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
@@ -55,6 +57,7 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -160,6 +163,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     ImageView swipeUpArrow;
 
+    ProgressDialog mProgressDialog;
+
     RelativeLayout.LayoutParams imgViewLayoutParams ;
 
     private int mSoftBarHeight = 0;
@@ -232,7 +237,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.i(TAG,"callback->main fragment on create");
         mContext = getActivity();
+
+        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog.setMessage("Loading Pixstory For You...!!");
+        mProgressDialog.setCanceledOnTouchOutside(false);
+
+        mProgressDialog.show();
+
         if (getArguments() != null) {
             isProfileContent = getArguments().getBoolean(ARG_PARAM4);
             if(!isProfileContent){
@@ -263,11 +277,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mDeviceWidthInPx = displayMetrics.widthPixels;
         mDeviceHeightInPx = displayMetrics.heightPixels;
 
-
         mSlantViewHtInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
         mImageExtendedHeight = mDeviceHeightInPx +mSlantViewHtInPx;
         mBottomScreenHt = (int)(0.60f*mDeviceHeightInPx);
         mDeviceHeightInPx += mSoftBarHeight;
+
+
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
 
@@ -287,6 +302,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
         storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
         swipeUpSign = (TextView)mRootView.findViewById(R.id.swipe_up_sign);
+
         //Animation animation = AnimationUtils.loadAnimation(mContext,R.anim.bounce);
         Animation upAnimation = new TranslateAnimation(
                 TranslateAnimation.ABSOLUTE, 0f,
@@ -306,6 +322,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 TranslateAnimation.RELATIVE_TO_PARENT, 0f,
                 TranslateAnimation.RELATIVE_TO_PARENT, -0.03f);
         Animation upDown = AnimationUtils.loadAnimation(mContext,R.anim.up_down);
+
         //upDown.setStartOffset(5000);
         upDown.setInterpolator(new LinearInterpolator());
         upDown.setRepeatCount(Animation.INFINITE);
@@ -391,6 +408,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         super.onActivityCreated(savedInstanceState);
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG,"callback->main fragment on view created");
+
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     /**
      * Binding story data
      */
@@ -400,7 +424,19 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
 
         final ContentData cd = mContentData;
-        Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain);
+        Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain
+                ,new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        mProgressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError() {
+                        mProgressDialog.dismiss();
+
+                    }
+                });
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
         String name = (!(cd.personDetails.name.equals("")))? "By , "+cd.personDetails.name : " ";
@@ -630,21 +666,21 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                 }
 
-                @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    if (distanceX < 5 && distanceX > -5) {
-//                        mIsScrolling = true;
-//                        mIsFling = false;
-                        Log.i(TAG, "gesture->OnScroll::::");
+//                @Override
+//                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+//                    if (distanceX < 5 && distanceX > -5) {
+////                        mIsScrolling = true;
+////                        mIsFling = false;
+//                        Log.i(TAG, "gesture->OnScroll::::");
+////
 //
-
-                    }
-                    return super.onScroll(e1, e2, distanceX, distanceY);
-                }
+//                    }
+//                    return super.onScroll(e1, e2, distanceX, distanceY);
+//                }
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                                       float velocityY) {
+                                        float velocityY) {
                     Log.i(TAG, "gesture->OnFling::::");
 
 
@@ -675,7 +711,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         }
                     } catch (Exception e) {
                         // nothing
-                        e.printStackTrace();
+//                        e.printStackTrace();
                     }
                     return super.onFling(e1, e2, velocityX, velocityY);
                 }
@@ -735,10 +771,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             return false;
         }
 
-        if (gesture.onTouchEvent(me)) {
-            return true;
-        }
-
+//        if (gesture.onTouchEvent(me)) {
+//            return true;
+//        }
         // Disallow the touch request for parent scroll on touch of child view
         mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
         if (me.getAction() == MotionEvent.ACTION_UP) {
@@ -1302,5 +1337,26 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
         });
         }
+
+    /**
+     * Callback to show loading progress bar when image is loaded
+     */
+    private class ImageLoadedCallback implements Callback {
+        ProgressDialog progressBar;
+
+        public  ImageLoadedCallback(ProgressDialog progDialog){
+            progressBar = progDialog;
+        }
+
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError() {
+
+        }
+    }
 
 }
