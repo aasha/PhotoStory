@@ -8,6 +8,7 @@
              android:layout_height="match_parent"
              android:id="@+id/layout_complete"
              android:background="@drawable/gradient"
+        android:visibility="visible"
              tools:context="com.pixtory.app.fragments.MainFragment">
 
     <ImageView
@@ -20,6 +21,7 @@
         <com.pixtory.app.views.ObservableScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:scrollbars="none"
             android:id="@+id/image_details_layout">
 
             <RelativeLayout
@@ -151,14 +153,7 @@
                     android:visibility="visible"
                     android:layout_below="@+id/like_layout"
                     android:background="@color/transparent">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:orientation="vertical"
-                        android:background="@color/transparent"
-                        android:layout_height="wrap_content">
-
-
+S
 
                         <LinearLayout
                             android:orientation="vertical"
@@ -166,9 +161,10 @@
                             android:layout_below="@+id/slant_view"
                             android:background="@color/white"
                             android:layout_height="wrap_content"
-                            android:id="@+id/content_layout"></LinearLayout>
+                            android:id="@+id/content_layout">
 
-                            </LinearLayout>
+                        </LinearLayout>
+
 
                 </android.support.v4.widget.NestedScrollView>
 

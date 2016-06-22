@@ -163,7 +163,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
        /* if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }*/
-//        FacebookSdk.sdkInitialize(this.getApplicationContext());
+
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("pixtory coming up for you");
+        mProgress.setCanceledOnTouchOutside(false);
+
+        mProgress.show();
         callbackManager = CallbackManager.Factory.create();
 
         setPersonDetails();
@@ -297,9 +302,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 //    }
 
     private void prepareFeed() {
-        mProgress = new ProgressDialog(this);
-        mProgress.setMessage("pixtory coming up for you");
-        mProgress.setCanceledOnTouchOutside(false);
 
         NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
@@ -344,6 +346,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         });
     }
 
+
     private void registerForPushNotification() {
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -381,35 +384,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
     }
-
-
-
-
-
-//    /**
-//     * Method to hide loading comments progressbar and show comments list
-//     */
-//    public void setCommentListVisibility(){
-//
-//        if(commentDataList!= null && commentDataList.size()>0){
-//
-//            Log.i(TAG,"Comment Count::"+commentDataList.size());
-//            mTVCommentCount.setText(String.valueOf(commentDataList.size()));
-//            mCommentText.setVisibility(View.VISIBLE);
-//            mCommentsRecyclerViewAdapter = new CommentsListAdapter(HomeActivity.this);
-//            mCommentsRecyclerViewAdapter.setData(commentDataList);
-//            mCommentsRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
-//
-//        }else{
-//            Log.i(TAG,"No Comment Yet for this story");
-//            mTVCommentCount.setText(" NO COMMENT YET ");
-//            mCommentText.setVisibility(View.GONE);
-//        }
-//
-//        mTVLoading.setVisibility(View.GONE);
-//        mRLCommentList.setVisibility(View.VISIBLE);
-//    }
-
 
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -460,6 +434,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                 .put(AppConstants.CONNECTION_QUALITY, cq.toString())
                 .build());*/
+
+        if(mProgress.isShowing()){
+            mProgress.dismiss();
+        }
         Log.e("AASHA", "Connection q " + cq.toString());
     }
 

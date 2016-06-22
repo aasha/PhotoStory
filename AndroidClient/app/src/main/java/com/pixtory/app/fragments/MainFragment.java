@@ -13,17 +13,16 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,16 +32,13 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import butterknife.*;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
-import com.pixtory.app.animations.BounceAnimator;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.CommentData;
@@ -245,8 +241,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mProgressDialog.setMessage("Loading Pixstory For You...!!");
         mProgressDialog.setCanceledOnTouchOutside(false);
 
-        mProgressDialog.show();
-
+//        mProgressDialog.show();
         if (getArguments() != null) {
             isProfileContent = getArguments().getBoolean(ARG_PARAM4);
             if(!isProfileContent){
@@ -281,7 +276,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mImageExtendedHeight = mDeviceHeightInPx +mSlantViewHtInPx;
         mBottomScreenHt = (int)(0.60f*mDeviceHeightInPx);
         mDeviceHeightInPx += mSoftBarHeight;
-
 
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
@@ -374,10 +368,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         setUpStoryContent();
         bindData();
-        attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
-        mCommentShareLayout.setVisibility(View.GONE);
         mImageDetailsLayout.setSmoothScrollingEnabled(true);
+//        mStoryParentLayout.setSmoothScrollingEnabled(true);
         mImageDetailsLayout.setScrollViewListener(this);
 
         /** Adjusting padding top for the Like layout so that is sticks to bottom of screen**/
@@ -392,6 +385,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
         mTopLikeLayout.setLayoutParams(relativeParams);
         mTopLikeLayout.requestLayout();
+
         setUpFullScreen();
 
         imgViewLayoutParams = (RelativeLayout.LayoutParams) mImageMain.getLayoutParams();
@@ -425,18 +419,19 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         final ContentData cd = mContentData;
         Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain
-                ,new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        mProgressDialog.dismiss();
-                    }
-
-                    @Override
-                    public void onError() {
-                        mProgressDialog.dismiss();
-
-                    }
-                });
+//                ,new com.squareup.picasso.Callback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        mProgressDialog.dismiss();
+//                    }
+//
+//                    @Override
+//                    public void onError() {
+//                        mProgressDialog.dismiss();
+//
+//                    }
+//                }
+    );
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
         String name = (!(cd.personDetails.name.equals("")))? "By , "+cd.personDetails.name : " ";
@@ -574,10 +569,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (mContentData == null)
             return;
 
-        // Make sure that we are currently visible
-//        if (this.isVisible()) {
-//            resetFragmentState();
-//        }
+//         Make sure that we are currently visible
+        if (this.isVisible()) {
+            Log.i(TAG,"user visible hint");
+            resetFragmentState();
+        }
     }
 
     private void setUpStoryContent() {
@@ -618,6 +614,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         modifyScreenHeight(y);
     }
 
+    boolean isNestedViewScrolling = false;
+//    @Override
+//    public void onScrollChanged(ObservableObservableNestedScrollView scrollView, int x, int y, int oldx, int oldy) {
+//        Log.i(TAG,"Nested view Scrolling::: x:y:oldx:oldy::--"+x+":"+y+":"+oldx+":"+oldy);
+//    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -633,10 +635,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         void showLoginAlert();
     }
 
-//
-//    public void resetFragmentState() {
-//        setUpFullScreen();
-//    }
+
+    public void resetFragmentState() {
+        setUpFullScreen();
+    }
 
     /********Swipe Up and Down Logic*********************/
 
@@ -665,18 +667,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                 .build());
                     }
                 }
-
-//                @Override
-//                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-//                    if (distanceX < 5 && distanceX > -5) {
-////                        mIsScrolling = true;
-////                        mIsFling = false;
-//                        Log.i(TAG, "gesture->OnScroll::::");
-////
-//
-//                    }
-//                    return super.onScroll(e1, e2, distanceX, distanceY);
-//                }
 
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
@@ -742,6 +732,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             showCommentsShareLayout(true);
             mListener.showMenuIcon(false);
             storyBackImg.setVisibility(View.GONE);
+
         }
         else{
             mListener.showMenuIcon(true);
@@ -766,18 +757,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @OnTouch(R.id.pic_story_layout)
     public boolean onTouchContent(NestedScrollView view, MotionEvent me) {
 
-        //if comment section is visible , swipe up and down gesture for story and content is disabled
+//        if comment section is visible , swipe up and down gesture for story and content is disabled
         if(isCommentsVisible()){
             return false;
         }
 
-//        if (gesture.onTouchEvent(me)) {
-//            return true;
-//        }
         // Disallow the touch request for parent scroll on touch of child view
-        mImageDetailsLayout.requestDisallowInterceptTouchEvent(true);
         if (me.getAction() == MotionEvent.ACTION_UP) {
             setUpHalfScreen();
+            return true;
         }
 
         return false;
@@ -800,6 +788,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
             setUpHalfScreen();
+            mStoryParentLayout.fullScroll(View.FOCUS_UP);
+
         }
 
         return false;
@@ -807,8 +797,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
+
+        attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
+        mImageDetailsLayout.smoothScrollTo(0, 0);
+
         mImageDetailsLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.VISIBLE);
+
+        mCommentShareLayout.setVisibility(View.GONE);
     }
 
     private void setUpHalfScreen(){
@@ -826,7 +822,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public void run() {
                     if(isScrollingUp){
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
-
 //                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
 //                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
 //                                    .put("PIXTORY_ID",""+mContentData.id)
