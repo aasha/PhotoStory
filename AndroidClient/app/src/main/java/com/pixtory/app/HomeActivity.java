@@ -117,6 +117,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
+    public static final String OPT_FOR_DAILY_WALLPAPER = "Opt_for_daily_wallpaper";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
 
     private static final String User_App_Entry = "User_App_Entry";
@@ -246,6 +247,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mWallpaperYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                 mTopOverlay3.setVisibility(View.INVISIBLE);
                 mBlurLayer.setVisibility(View.GONE);
             }
@@ -257,6 +260,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mBlurLayer.setVisibility(View.GONE);
             }
         });
+/*
 
         mTopOverlay3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,6 +269,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mBlurLayer.setVisibility(View.GONE);
             }
         });
+*/
 
 
 
@@ -1077,6 +1082,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         break;
 
                     case 5:mDrawerLayout.closeDrawer(mDrawerList);
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_WallpaperSettings_Click")
+                                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                                .build());
+                        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                        boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
                         mTopOverlay3.setVisibility(View.VISIBLE);
                         mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
                         mBlurLayer.setVisibility(View.VISIBLE);
