@@ -1,9 +1,6 @@
 package com.pixtory.app.userprofile;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
@@ -30,21 +26,14 @@ import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.transformations.BlurTransformation;
 import com.pixtory.app.transformations.GrayscaleTransformation;
 import com.pixtory.app.utils.AmplitudeLog;
-import com.pixtory.app.utils.BlurBuilder;
-import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -144,7 +133,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        userProfleView = inflater.inflate(R.layout.user_profile_test,container,false);
+        userProfleView = inflater.inflate(R.layout.user_profile_coordinator,container,false);
 
         mPersonInfo = new PersonInfo();
         mContentDataList = new ArrayList<ContentData>();
