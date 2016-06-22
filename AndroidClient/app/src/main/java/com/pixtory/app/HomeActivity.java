@@ -1,8 +1,5 @@
 package com.pixtory.app;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -20,12 +17,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -33,11 +32,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.view.inputmethod.InputMethodManager;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -46,6 +47,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -146,13 +148,18 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ImageView menuIcon;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    //coachmark overlays
     private FrameLayout mTopOverlay;
-    private FrameLayout mTopOverlay3;
-    private LinearLayout mTopOverlay_wallpaper;
+    private FrameLayout mTopOverlayWallpaperSetting;
+    private LinearLayout mTopOverlayLongTap;
     private ImageView mBlurLayer;
     private TextView mWallpaperYes;
     private TextView mWallpaperNo;
-
+    private TextView mSwipeUpText1;
+    private TextView mSwipeUpText2;
+    private TextView mLongTapText;
+    private ToggleButton mToggleButton;
+    private TextView mWallpaperTopText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +181,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
 
+        //Measuring network condition
+        mConnectionClassManager = ConnectionClassManager.getInstance();
+        mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
+        mListener = new ConnectionChangedListener();
+        prepareFeed();
+        //while(App.getContentData()==null);
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
@@ -217,59 +230,106 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             }
         });
 
-        //Measuring network condition
-        mConnectionClassManager = ConnectionClassManager.getInstance();
-        mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
-        mListener = new ConnectionChangedListener();
-        prepareFeed();
 
+        //Binding coachmark overlays
         mBlurLayer = (ImageView)findViewById(R.id.blur_layer);
-        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_2);
-        mTopOverlay3 = (FrameLayout) findViewById(R.id.top_overlay_3);
+        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_swipe_up);
+        mTopOverlayWallpaperSetting = (FrameLayout) findViewById(R.id.top_overlay_wallpaper_setting);
+        mSwipeUpText1 = (TextView)findViewById(R.id.swipe_up_text_1);
+        mSwipeUpText2 = (TextView)findViewById(R.id.swipe_up_text_2);
+        mLongTapText = (TextView)findViewById(R.id.long_tap_text);
+        mToggleButton = (ToggleButton)findViewById(R.id.toggle_button);
+        mWallpaperTopText = (TextView)findViewById(R.id.wallpaper_top_text);
+
+        String swipeText1 = "<b>Swipe up</b> for the <b>Story</b> behind the picture.";
+        String swipeText2 = "A <b>Story</b> is the photographer\'s experience, emotion, inspiration or expression behind the picture.";
+        mSwipeUpText1.setText(Html.fromHtml(swipeText1));
+        mSwipeUpText2.setText(Html.fromHtml(swipeText2));
+
+        String longTapText = "<b>Long press</b> on an image to set it as your wallpaper";
+        mLongTapText.setText(Html.fromHtml(longTapText));
+
         if(!isFirstTimeOpen()){
             mTopOverlay.setVisibility(View.INVISIBLE);
-           // mBlurLayer.setVisibility(View.INVISIBLE);
         }
-        /*
-        mTopOverlay.setVisibility(View.VISIBLE);
+/*
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, 1f,
+                        Animation.RELATIVE_TO_PARENT, 0f);
+                animation.setDuration(1500);
+                animation.setFillEnabled(true);
+                //animation.setFillAfter(true);
+                mTopOverlay.setVisibility(View.VISIBLE);
+                mTopOverlay.setAnimation(animation);
+            }
+        },4000);
         mTopOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, -1f);
+                animation.setDuration(1500);
                 mTopOverlay.setVisibility(View.INVISIBLE);
-               // mBlurLayer.setVisibility(View.INVISIBLE);
+                mTopOverlay.setAnimation(animation);
             }
         });
-        */
-        mTopOverlay_wallpaper = (LinearLayout)findViewById(R.id.top_overlay);
+    */
+        mTopOverlayLongTap = (LinearLayout)findViewById(R.id.top_overlay_long_tap);
 
         mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
         mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
-        mWallpaperYes.setOnClickListener(new View.OnClickListener() {
+        /*mWallpaperYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                 sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                mTopOverlay3.setVisibility(View.INVISIBLE);
+                mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
                 mBlurLayer.setVisibility(View.GONE);
             }
         });
         mWallpaperNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTopOverlay3.setVisibility(View.INVISIBLE);
+                mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
                 mBlurLayer.setVisibility(View.GONE);
             }
         });
-/*
 
-        mTopOverlay3.setOnClickListener(new View.OnClickListener() {
+*/      mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
+                    Toast.makeText(HomeActivity.this,"Dailywallpaper set",Toast.LENGTH_SHORT).show();
+                    /*mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
+                    mBlurLayer.setVisibility(View.GONE);*/
+                }
+                else
+                {
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
+                    Toast.makeText(HomeActivity.this,"Dailywallpaper disabled",Toast.LENGTH_SHORT).show();
+                    /*mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
+                    mBlurLayer.setVisibility(View.GONE);*/
+                }
+            }
+        });
+        mTopOverlayWallpaperSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTopOverlay3.setVisibility(View.INVISIBLE);
+                mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
                 mBlurLayer.setVisibility(View.GONE);
             }
         });
-*/
+
 
 
 
@@ -1087,7 +1147,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                                 .build());
                         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                         boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
-                        mTopOverlay3.setVisibility(View.VISIBLE);
+                        boolean isShownBefore = sharedPreferences.getBoolean("Is_Shown_Before",false);
+                        if(!isShownBefore){
+                            mWallpaperTopText.setVisibility(View.VISIBLE);
+                            sharedPreferences.edit().putBoolean("Is_Shown_Before",true).apply();
+                        }
+                        else
+                            mWallpaperTopText.setVisibility(View.GONE);
+                        mTopOverlayWallpaperSetting.setVisibility(View.VISIBLE);
                         mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
                         mBlurLayer.setVisibility(View.VISIBLE);
                         break;
@@ -1228,17 +1295,32 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(Is_First_Run,false);
             editor.commit();
-            mTopOverlay.setVisibility(View.VISIBLE);
-           // mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
-           // mBlurLayer.setVisibility(View.VISIBLE);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 1f,
+                            Animation.RELATIVE_TO_PARENT, 0f);
+                    animation.setDuration(1500);
+                    animation.setFillEnabled(true);
+                    mTopOverlay.setVisibility(View.VISIBLE);
+                    mTopOverlay.setAnimation(animation);
+                }
+            },4000);
             mTopOverlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, -1f);
+                    animation.setDuration(1500);
                     mTopOverlay.setVisibility(View.INVISIBLE);
-                    mBlurLayer.setVisibility(View.INVISIBLE);
+                    mTopOverlay.setAnimation(animation);
                 }
             });
-
         }
         return firstRun;
     }
@@ -1247,23 +1329,60 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         int count = sharedPreferences.getInt(Swipe_Count,1);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        if(count<10)
+        if(count<13)
         {
          editor.putInt(Swipe_Count,count+1);
          editor.commit();
         }
         if(count==5){
-            mTopOverlay_wallpaper.setVisibility(View.VISIBLE);
-            //mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
-            //mBlurLayer.setVisibility(View.VISIBLE);
-            mTopOverlay_wallpaper.setOnClickListener(new View.OnClickListener() {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 1f,
+                            Animation.RELATIVE_TO_PARENT, 0f);
+                    animation.setDuration(1500);
+                    animation.setFillEnabled(true);
+                    mTopOverlayLongTap.setVisibility(View.VISIBLE);
+                    mTopOverlayLongTap.setAnimation(animation);
+                }
+            },500);
+            mTopOverlayLongTap.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mTopOverlay_wallpaper.setVisibility(View.INVISIBLE);
-            //        mBlurLayer.setVisibility(View.INVISIBLE);
+                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, -1f);
+                    animation.setDuration(1500);
+                    mTopOverlayLongTap.setVisibility(View.INVISIBLE);
+                    mTopOverlayLongTap.setAnimation(animation);
                 }
             });
 
+        }
+
+        if(count == 9){
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
+                    boolean isShownBefore = sharedPreferences.getBoolean("Is_Shown_Before",false);
+                    if(!isShownBefore){
+                        mWallpaperTopText.setVisibility(View.VISIBLE);
+                        sharedPreferences.edit().putBoolean("Is_Shown_Before",true).apply();
+                    }
+                    else
+                        mWallpaperTopText.setVisibility(View.GONE);
+                    mTopOverlayWallpaperSetting.setVisibility(View.VISIBLE);
+                    mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+                    mBlurLayer.setVisibility(View.VISIBLE);
+                }
+            },500);
         }
         return count;
     }

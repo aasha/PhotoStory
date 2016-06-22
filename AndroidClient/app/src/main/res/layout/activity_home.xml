@@ -57,10 +57,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/coach_mark_background_color"
+            android:background="#eeffffff"
             android:orientation="vertical"
             android:visibility="invisible"
-            android:id="@+id/top_overlay">
+            android:id="@+id/top_overlay_long_tap">
             <TextView
                 android:layout_width="274dp"
                 android:layout_height="wrap_content"
@@ -75,7 +75,8 @@
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:textSize="18sp"
-                android:fontFamily="sans-serif-light"/>
+                android:fontFamily="sans-serif-light"
+                android:id="@+id/long_tap_text"/>
             <ImageView
                 android:layout_width="132dp"
                 android:layout_height="211dp"
@@ -84,46 +85,11 @@
                 android:src="@drawable/long_tap_hand"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/translucent_white"
-            android:orientation="vertical"
-            android:id="@+id/top_overlay_1"
-            android:visibility="gone">
-            <TextView
-                android:layout_width="274dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="43dp"
-                android:background="@drawable/text_background"
-                android:text="@string/swipe_up_coach_mark_text"
-                android:textColor="@color/black"
-                android:textAlignment="center"
-                android:paddingTop="30dp"
-                android:paddingBottom="30dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif-light"/>
-            <ImageView
-                android:layout_width="112dp"
-                android:layout_height="300dp"
-                android:layout_gravity="center|bottom"
-                android:layout_marginTop="60dp"
-                android:src="@drawable/swipe_up_hand"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:background="#80ffffff"/>
-        </LinearLayout>
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/top_overlay_2"
-            android:background="#ccffffff"
+            android:id="@+id/top_overlay_swipe_up"
+            android:background="#eeffffff"
             android:visibility="gone">
             <TextView
                 android:layout_width="274dp"
@@ -138,8 +104,9 @@
                 android:paddingBottom="30dp"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textSize="18sp"
-                android:fontFamily="sans-serif-light"/>
+                android:textSize="22sp"
+                android:fontFamily="sans-serif-light"
+                android:id="@+id/swipe_up_text_1"/>
             <ImageView
                 android:layout_width="112dp"
                 android:layout_height="300dp"
@@ -150,7 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:background="#80ffffff"
+                android:background="#eeffffff"
                 android:textColor="@color/black"
                 android:paddingBottom="30dp"
                 android:textSize="16sp"
@@ -159,13 +126,14 @@
                 android:text="@string/swipe_up_coach_mark_text_2"
                 android:textAlignment="center"
                 android:paddingRight="20dp"
-                android:paddingLeft="20dp"/>
+                android:paddingLeft="20dp"
+                android:id="@+id/swipe_up_text_2"/>
         </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/top_overlay_3"
+            android:id="@+id/top_overlay_wallpaper_setting"
             android:background="@color/coach_mark_background_color"
             android:visibility="gone">
             <TextView
@@ -174,20 +142,22 @@
                 android:layout_gravity="top|center"
                 android:layout_marginTop="80dp"
                 android:text="We've got something new!"
-                android:textColor="@color/app_blue"
+                android:textColor="@color/black"
                 android:textAlignment="center"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:textSize="27sp"
                 android:fontFamily="sans-serif-regular"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:id="@+id/wallpaper_top_text"
+                android:visibility="gone"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center"
                 android:layout_marginTop="150dp"
                 android:text="@string/wallpaper_text"
-                android:textColor="@color/app_blue"
+                android:textColor="@color/black"
                 android:textAlignment="center"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
@@ -198,7 +168,8 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_blue"
                 android:layout_gravity="bottom|center"
-                android:layout_marginBottom="170dp">
+                android:layout_marginBottom="170dp"
+                android:visibility="gone">
                 <TextView
                     android:layout_width="wrap_content"
                     android:textSize="20sp"
@@ -227,7 +198,19 @@
                 android:layout_marginRight="4dp"
                 android:layout_marginBottom="125dp"
                 android:id="@+id/wallpaper_no"
-                android:paddingBottom="10dp"/>
+                android:paddingBottom="10dp"
+                android:visibility="gone"/>
+
+            <ToggleButton
+                android:layout_width="60dp"
+                android:layout_height="35dp"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="150dp"
+                android:textOff=""
+                android:textOn=""
+                android:background="@drawable/toggle_selector"
+                android:id="@+id/toggle_button"
+                android:checked="false"/>
 
             <TextView
                 android:layout_width="match_parent"
