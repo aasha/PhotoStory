@@ -725,9 +725,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
 
     private void navigateToUserProfile(ContentData cd){
-        if(isProfileContent)
-            getActivity().onBackPressed();
-        else{
+
         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Profile_Click")
                 .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                 .put("PIXTORY_ID",cd.id+"")
@@ -737,7 +735,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         intent.putExtra("USER_ID",Utils.getUserId(mContext));
         intent.putExtra("PERSON_ID",cd.personDetails.id+"");
         startActivity(intent);
-        }
+
     }
     
     private boolean modifyScreenHeight(int offset) {
@@ -839,10 +837,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public void run() {
                     if(isScrollingUp){
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
-//                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-//                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-//                                    .put("PIXTORY_ID",""+mContentData.id)
-//                                    .build());
+                        isFullScreenShown=false;
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                    .put("PIXTORY_ID",""+mContentData.id)
+                                    .build());
                     }
                     else {
                         mImageDetailsLayout.smoothScrollTo(0, 0);
