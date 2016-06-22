@@ -94,6 +94,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -161,10 +162,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ToggleButton mToggleButton;
     private TextView mWallpaperTopText;
 
+    @Bind(R.id.whole_frame)
+    FrameLayout mOuterContainer;
+
+    @Bind(R.id.loading_text)
+    TextView mLoadingText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         //TODO to be removed later
 //        checkForDeviceDensity();
         ButterKnife.bind(this);
@@ -173,13 +181,15 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
        /* if (Utils.isConnectedViaWifi(mCtx) == false) {
             showAlert();
         }*/
+        Log.i(TAG, "home activity oncreate");
+        callbackManager = CallbackManager.Factory.create();
 
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("pixtory coming up for you");
+        mProgress.setTitle("Loading....");
         mProgress.setCanceledOnTouchOutside(false);
 
-        mProgress.show();
-        callbackManager = CallbackManager.Factory.create();
+        mLoadingText.setVisibility(View.VISIBLE);
+        mOuterContainer.setVisibility(View.GONE);
 
         setPersonDetails();
         setUpNavigationDrawer();
@@ -383,10 +393,15 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void prepareFeed() {
 
+
         NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
                 mProgress.dismiss();
+
+                Log.i(TAG, "prepare feed successful!!");
+                mLoadingText.setVisibility(View.GONE);
+                mOuterContainer.setVisibility(View.VISIBLE);
                 if (o.contentList != null) {
                     App.setContentData(o.contentList);
                     Utils.deleteOldVideos(o.contentList);
@@ -395,6 +410,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             .build());
                     mCursorPagerAdapter.setData(App.getContentData());
                     mPager.setAdapter(mCursorPagerAdapter);
+
+
                 } else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
@@ -407,6 +424,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void failure(GetMainFeedResponse error) {
                 mProgress.dismiss();
+                mLoadingText.setVisibility(View.GONE);
+                mOuterContainer.setVisibility(View.VISIBLE);
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .put("MESSAGE", error.errorMessage)
@@ -417,6 +436,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void networkFailure(RetrofitError error) {
                 mProgress.dismiss();
+                mLoadingText.setVisibility(View.GONE);
+                mOuterContainer.setVisibility(View.VISIBLE);
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .put("MESSAGE", error.getMessage())
@@ -524,6 +545,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "home activity onstart");
+
 //        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
 //        //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
 //        if(mainFragment.isFullScreenShown())

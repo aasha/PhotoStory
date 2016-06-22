@@ -107,6 +107,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     RelativeLayout mStoryLayout = null;
     LinearLayout mCommentsLayout = null;
 
+    @Bind(R.id.picture_summary)
+    TextView mPicSummary;
+
     @Bind(R.id.image_main)
     ImageView mImageMain = null;
 
@@ -156,6 +159,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     @Bind(R.id.swipe_up_sign)
     TextView swipeUpSign = null;
+
+    @Bind(R.id.editor_pick_badge)
+    ImageView mEditorPickBage;
+
+    @Bind(R.id.loading_text)
+    TextView mLoadingText;
 
     ImageView swipeUpArrow;
 
@@ -418,22 +427,30 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
 
         final ContentData cd = mContentData;
+
+        mLoadingText.setVisibility(View.VISIBLE);
         Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain
-//                ,new com.squareup.picasso.Callback() {
-//                    @Override
-//                    public void onSuccess() {
-//                        mProgressDialog.dismiss();
-//                    }
-//
-//                    @Override
-//                    public void onError() {
-//                        mProgressDialog.dismiss();
-//
-//                    }
-//                }
+                ,new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        mLoadingText.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError() {
+                        mLoadingText.setVisibility(View.GONE);
+                    }
+                }
     );
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
+        mPicSummary.setText(cd.pictureSummary);
+
+        if(cd.editorsPick)
+            mEditorPickBage.setVisibility(View.VISIBLE);
+        else
+            mEditorPickBage.setVisibility(View.GONE);
+
         String name = (!(cd.personDetails.name.equals("")))? "By , "+cd.personDetails.name : " ";
         mTextExpert.setText(name);
 
@@ -457,7 +474,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 if (cd.personDetails.imageUrl == null || cd.personDetails.imageUrl.trim().equals("")){
                     cd.personDetails.imageUrl = "http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803";
                 }
-                Picasso.with(mContext).load(cd.personDetails.imageUrl).fit().into(mProfileImage);
+                Picasso.with(mContext).load(cd.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
                 mTextDesc.setText(cd.personDetails.description);
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
@@ -482,7 +499,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
-            mTextStoryDetails.setText(cd.pictureDescription+"\n \n \n\n \n \n");
+            mTextStoryDetails.setText(cd.pictureDescription+"\n \n \n\n");
         }
 
         mShareBtn.setOnClickListener(new View.OnClickListener() {
@@ -765,7 +782,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         // Disallow the touch request for parent scroll on touch of child view
         if (me.getAction() == MotionEvent.ACTION_UP) {
             setUpHalfScreen();
-            return true;
+            return false;
         }
 
         return false;

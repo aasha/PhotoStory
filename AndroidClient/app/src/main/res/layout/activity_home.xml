@@ -18,10 +18,23 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.pixtory.app.HomeActivity">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/app_blue"
+            android:visibility="visible"
+            android:textSize="20sp"
+            android:id="@+id/loading_text"
+            android:gravity="center"
+            android:background="@drawable/splash_background"
+            android:text="Fetching Amazing Pixtories \nFor You...."/>
+
         <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="@null"
+            android:visibility="gone"
             android:id="@+id/whole_frame">
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"

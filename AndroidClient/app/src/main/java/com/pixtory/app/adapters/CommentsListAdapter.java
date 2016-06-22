@@ -66,7 +66,7 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         holder.id = data.commentId;
         holder.mTVName.setText(data.personDetails.name);
         if( data.personDetails.imageUrl != null)
-            Picasso.with(mContext).load(data.personDetails.imageUrl).fit().into(holder.mImgAvatar);
+            Picasso.with(mContext).load(data.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(holder.mImgAvatar);
         else
             holder.mImgAvatar.setImageResource(R.drawable.hexagon_bg);
 
