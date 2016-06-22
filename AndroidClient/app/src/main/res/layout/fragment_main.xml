@@ -13,7 +13,7 @@
 
     <ImageView
         android:id="@+id/image_main"
-        android:src="@drawable/download"
+        android:src="@drawable/splash_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />

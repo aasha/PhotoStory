@@ -9,6 +9,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/avatarImg"
+        android:src="@drawable/profile_icon_3"
         android:layout_marginRight="10dp"/>
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"

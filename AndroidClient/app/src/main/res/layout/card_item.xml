@@ -12,7 +12,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/pixtory"
+            android:src="@drawable/pixtory_logo"
             android:scaleType="centerCrop"
             android:id="@+id/card_img"/>
         <com.pixtory.app.views.SlantView
