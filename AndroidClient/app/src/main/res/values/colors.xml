@@ -40,6 +40,7 @@
     <color name="transparent">#00000000</color>
     <color name="fb_blue">#3b5998</color>
     <color name="translucent_white">#ccffffff</color>
+    <color name="translucent_white_2">#ddffffff</color>
     <color name="menu_item_color">#414141</color>
     <color name="coach_mark_background_color">#60ffffff</color>
 

@@ -737,7 +737,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void onClick(View v) {
 
-                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), feedbackText.getText().toString(),spinnerFeedback.getSelectedItem().toString(),spinnerCategory.getSelectedItem().toString(),spinnerSubcategory.getSelectedItem().toString(),new NetworkApiCallback<BaseResponse>() {
+                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), "FEEDBACK : "+feedbackText.getText().toString(),spinnerFeedback.getSelectedItem().toString(),spinnerCategory.getSelectedItem().toString(),spinnerSubcategory.getSelectedItem().toString(),new NetworkApiCallback<BaseResponse>() {
                     @Override
                     public void success(BaseResponse o, Response response) {
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("FeedBack_Submit_Click")
@@ -875,7 +875,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                                     .build());
 
-                            Toast.makeText(HomeActivity.this, "Email Id Sent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(HomeActivity.this, "Thanks! The team at Pixtory will reach out to you", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -1120,7 +1120,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                         intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
                         startActivity(intent);
-                       // mDrawerLayout.closeDrawer(mDrawerList);
+                        mDrawerLayout.closeDrawer(mDrawerList);
                         break;
 
                     case 2: AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_BecomeContributor_Click")
@@ -1210,7 +1210,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                     intent.setAction(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, you may want to try this new App Pixtory. It gives you some great photographs and the story behind each. I liked it and think you will as well.\n");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, you may want to try this new App Pixtory. It gives you some great photographs and the story behind each. I liked it and think you will as well.\n\nwww.pixtory.in");
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);

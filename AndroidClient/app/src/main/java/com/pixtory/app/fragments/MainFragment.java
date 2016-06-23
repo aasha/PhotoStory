@@ -665,8 +665,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 @Override
                 public boolean onDown(MotionEvent e) {
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
-                    swipeUpArrow.clearAnimation();
-                    swipeUpArrow.setVisibility(View.GONE);
+                    //swipeUpArrow.clearAnimation();
+                    //swipeUpArrow.setVisibility(View.GONE);
                     return true;
                 }
 
@@ -846,6 +846,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     else {
                         mImageDetailsLayout.smoothScrollTo(0, 0);
                         mTextExpert.setVisibility(View.VISIBLE);
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
+                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                        .put("PIXTORY_ID",""+mContentData.id)
+                                        .build());
                     }
                 }
             });
@@ -1242,13 +1246,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 try {
                     myWallpaperManager.setBitmap(bitmap);
                 } catch (IOException e) {
-
+                    Toast.makeText(mContext,"exception",Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
+                Toast.makeText(mContext,"Bitmap Failed",Toast.LENGTH_SHORT).show();
 
             }
 
