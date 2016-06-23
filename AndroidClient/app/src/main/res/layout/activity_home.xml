@@ -28,7 +28,7 @@
             android:id="@+id/loading_text"
             android:gravity="center"
             android:background="@drawable/splash_background"
-            android:text="Fetching Amazing Pixtories \nFor You...."/>
+            android:text="  "/>
 
         <FrameLayout
             android:layout_width="fill_parent"
