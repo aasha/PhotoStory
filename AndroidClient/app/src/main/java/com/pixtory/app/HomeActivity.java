@@ -264,9 +264,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         String longTapText = "<b>Long press</b> on an image to set it as your wallpaper";
         mLongTapText.setText(Html.fromHtml(longTapText));
 
-        if(!isFirstTimeOpen()){
+       /* if(!isFirstTimeOpen()){
             mTopOverlay.setVisibility(View.INVISIBLE);
-        }
+        }*/
 /*
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -1337,7 +1337,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
          editor.putInt(Swipe_Count,count+1);
          editor.commit();
         }
-        if(count==5){
+        if(count==6){
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -1367,7 +1367,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         }
 
-        if(count == 9){
+        if(count == 10){
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -1386,6 +1386,35 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     mBlurLayer.setVisibility(View.VISIBLE);
                 }
             },500);
+        }
+
+        if(count==1){
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 1f,
+                            Animation.RELATIVE_TO_PARENT, 0f);
+                    animation.setDuration(1500);
+                    animation.setFillEnabled(true);
+                    mTopOverlay.setVisibility(View.VISIBLE);
+                    mTopOverlay.setAnimation(animation);
+                }
+            },500);
+            mTopOverlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, 0f,
+                            Animation.RELATIVE_TO_PARENT, -1f);
+                    animation.setDuration(1500);
+                    mTopOverlay.setVisibility(View.INVISIBLE);
+                    mTopOverlay.setAnimation(animation);
+                }
+            });
         }
         return count;
     }
