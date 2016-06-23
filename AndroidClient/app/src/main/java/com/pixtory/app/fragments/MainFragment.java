@@ -499,7 +499,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
-            mTextStoryDetails.setText(cd.pictureDescription);
+            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
         }
 
         mShareBtn.setOnClickListener(new View.OnClickListener() {
