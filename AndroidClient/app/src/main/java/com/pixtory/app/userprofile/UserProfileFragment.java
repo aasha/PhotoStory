@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -133,7 +134,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        userProfleView = inflater.inflate(R.layout.user_profile_coordinator,container,false);
+        userProfleView = inflater.inflate(R.layout.user_profile_test,container,false);
 
         mPersonInfo = new PersonInfo();
         mContentDataList = new ArrayList<ContentData>();
@@ -157,6 +158,8 @@ public class UserProfileFragment extends Fragment {
             for(ContentData cd:mContentDataList)
                 cd.personDetails=mPersonInfo;*/
             App.setProfileContentData(mContentDataList);
+            if(mContentDataList.size()==0)
+                Toast.makeText(getContext(),"You haven't liked any pixtory yet",Toast.LENGTH_SHORT).show();
             cardLayoutAdapter = new CardLayoutAdapter(getContext(), mContentDataList);
             personName.setText(mPersonInfo.name);
             personDesc.setText(mPersonInfo.description);
@@ -204,8 +207,8 @@ public class UserProfileFragment extends Fragment {
                     Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
                 }
                 mContentDataList = App.getProfileContentFromCache(mPersonId);
-                for(ContentData cd:mContentDataList)
-                    cd.personDetails=mPersonInfo;
+                /*for(ContentData cd:mContentDataList)
+                    cd.personDetails=mPersonInfo;*/
                 App.setProfileContentData(mContentDataList);
                 cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
                 Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
