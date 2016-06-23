@@ -11,4 +11,5 @@ public class PersonInfo {
     public String imageUrl = null;
     public String desc = null;
     public String description = null;
+    public boolean followedByUser = false;
 }

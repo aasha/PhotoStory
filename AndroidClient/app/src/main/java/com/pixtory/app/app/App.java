@@ -139,7 +139,7 @@ public class App extends Application implements AppConstants {
     public static ArrayList<ContentData> getProfileContentData(){return mProfileContentData;}
 
     public static void addToProfileCache(PersonInfo personInfo){
-        if(mProfileCache.isEmpty() || !mProfileCache.containsKey(personInfo.id+""))
+        //if(mProfileCache.isEmpty() || !mProfileCache.containsKey(personInfo.id+""))
             mProfileCache.put(personInfo.id+"", personInfo);
     }
 
@@ -159,4 +159,5 @@ public class App extends Application implements AppConstants {
             return mProfileContentCache.get(userID+"");
         return null;
     }
+
 }

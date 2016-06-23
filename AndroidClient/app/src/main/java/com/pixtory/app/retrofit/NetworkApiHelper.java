@@ -268,4 +268,26 @@ public class NetworkApiHelper {
             }
         });
     }
+
+    public void followPerson(int userId, int personId, boolean doFollow, final NetworkApiCallback cb) {
+        FollowPersonRequest req = new FollowPersonRequest();
+        req.userId = userId;
+        req.personId = personId;
+        req.doFollow = doFollow;
+
+        sAPI.followPerson(req, new Callback<BaseResponse>() {
+            @Override
+            public void success(BaseResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
 }
