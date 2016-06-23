@@ -1188,6 +1188,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             public void onClick(View v) {
                 dialog.dismiss();
                 LoginManager.getInstance().logInWithReadPermissions(HomeActivity.this, AppConstants.mFBPermissions);
+                setPersonDetails();
             }
         });
 

@@ -18,9 +18,17 @@ import android.widget.Toast;
 import com.facebook.login.LoginManager;
 import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
+import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.retrofit.GetPersonDetailsResponse;
+import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.utils.Utils;
+
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class UserProfileActivity2 extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, MainFragment.OnMainFragmentInteractionListener
 , CommentsDialogFragment.OnAddCommentButtonClickListener{
@@ -103,6 +111,7 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
             public void onClick(View v) {
                 dialog.dismiss();
                 LoginManager.getInstance().logInWithReadPermissions(UserProfileActivity2.this, AppConstants.mFBPermissions);
+                setPersonDetails();
             }
         });
 
@@ -113,5 +122,40 @@ public class UserProfileActivity2 extends FragmentActivity implements UserProfil
     public void onAddCommentButtonClicked(String str) {
         if(mainFragment!=null)
             mainFragment.postComment(str);
+    }
+
+    private void setPersonDetails(){
+
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(UserProfileActivity2.this)), Integer.parseInt(Utils.getUserId(UserProfileActivity2.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
+            @Override
+            public void success(GetPersonDetailsResponse o, Response response) {
+
+                if (o.contentList != null) {
+                    App.setPersonConentData(o.contentList);
+                } else {
+                    Toast.makeText(UserProfileActivity2.this, "No Person content data!", Toast.LENGTH_SHORT).show();
+
+                }
+
+                if (o.userDetails!=null){
+                    App.setPersonInfo(o.userDetails);
+                }else {
+                    System.out.println("Person data null");
+                    Toast.makeText(UserProfileActivity2.this, "No person data!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(GetPersonDetailsResponse error) {
+                // mProgress.dismiss();
+
+                Toast.makeText(UserProfileActivity2.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Toast.makeText(UserProfileActivity2.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
