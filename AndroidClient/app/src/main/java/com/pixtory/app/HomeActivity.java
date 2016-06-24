@@ -1020,6 +1020,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         menuIcon = (ImageView)findViewById(R.id.profileIcon);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,null,R.string.drawer_open,R.string.drawer_close){
             @Override
