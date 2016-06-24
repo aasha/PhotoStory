@@ -27,20 +27,11 @@ public class SlantView extends View {
         setWillNotDraw(false);
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
-//
-//    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//
-//
-//    }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
         int w = getWidth(), h = getHeight();
-
-
 
         paint.setStrokeWidth(2);
         paint.setColor(Color.WHITE);
@@ -55,6 +46,7 @@ public class SlantView extends View {
         path.lineTo(w,h);
         path.close();
         canvas.drawPath(path, paint);
+
 
     }
 }

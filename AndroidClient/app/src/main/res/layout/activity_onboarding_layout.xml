@@ -5,27 +5,21 @@
     android:id="@+id/container"
     android:background="@drawable/onboarding_bg">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/dummy_tv"
-        android:layout_centerInParent="true"/>
 
     <LinearLayout
         android:layout_width="200dp"
         android:id="@+id/fb_sign_btn"
         android:layout_height="@dimen/fb_signin_btn_height"
         android:background="@drawable/fb_btn_bg"
-        android:layout_below="@+id/dummy_tv"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="74dp">
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        >
 
     <ImageView
         android:layout_width="@dimen/fb_btn_icon_width"
         android:layout_height="@dimen/fb_btn_icon_height"
         android:layout_margin="8dp"
         android:layout_gravity="center"
-
         android:src="@drawable/fb_icon"/>
         <View
             android:layout_width="1px"

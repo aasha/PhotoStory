@@ -27,6 +27,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -461,6 +462,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         mLikeCountTV.setText(String.valueOf(cd.likeCount));
 
+        String data = "<b>While slowly sipping on strong ales in the oldest pub in Scotland, I reflected on our journey from Sallochy and Balmaha to Drymen.</b> Our last night out on the trail was spent under the bright countryside stars, only to be replaced by a foggy, moody morning. It followed us the entire morning, allowing narrow shafts of sunlight to pierce through. We hiked 136km in five and a half days.Before we finished our hike, we had to overcome one final hurdle: the Conic Hill. With a 360m ascent over 320m in distance" +
+                ", it wasn't the tallest peak but it was an incredibly steep summit. Conic Hill also serves as a natural barrier between the famous Scottish highlands and the lowlands."
+                +
+                "At the peak, we were faced with a difficult choice. On one side lay the tumultuous Highlands and on the other stood the rolling hills of the Lowlands. There could be no wrong decision - after all, it was Scotland.";
+
+
+
         //***Binding StoryContent****/
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
@@ -499,7 +507,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
-            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
+            mTextStoryDetails.setText(Html.fromHtml(data+"\n\n\n\n\n\n\n\n\n\n"));
+//            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
         }
 
         mShareBtn.setOnClickListener(new View.OnClickListener() {
@@ -835,7 +844,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mImageDetailsLayout.post(new Runnable() {
                 @Override
                 public void run() {
+
                     if(isScrollingUp){
+
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")

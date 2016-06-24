@@ -53,5 +53,5 @@ public interface AppConstants {
     static final int SHOW_PIC_COMMENTS = 89;
 
     final static List<String> mFBPermissions = Arrays.asList("public_profile",
-            "email", "user_about_me");
+            "email", "user_about_me","birthday");
 }

@@ -53,6 +53,7 @@
             <com.pixtory.app.views.RobotoLightTextView
                 android:layout_width="match_parent"
                 android:layout_gravity="start"
+                android:textAlignment="viewStart"
                 android:layout_below="@+id/separator"
                 android:layout_height="wrap_content"
                 android:textColor="@color/grey_1"
@@ -63,12 +64,11 @@
                 android:paddingBottom="60dp"
                 android:lineSpacingExtra="5sp"
                 android:minHeight="@dimen/story_min_height"
-                android:text="fknvlenfk"
                 android:id="@+id/txtDetailsPara"/>
                 <!--android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. when an unknown printer took a galley of type and scrambled it to make a type specimen book Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book-->
                 <!--when an unknown printer took a galley of type and scrambled it to make a type specimen when an unknown printer took a galley of type and scrambled it to make a type specimen book unknown printer took a galley of type and when an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type-->
                 <!--specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookscrambled it to make a type specimen book-->
-                <!--when an unknown printer took a galley of type and scrambled it to make a type specimen unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen book"-->
+                <!--when an unknown printer took a galley of type and scrambled it to make a type specimen unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen book"/>-->
 
     </RelativeLayout>
 
