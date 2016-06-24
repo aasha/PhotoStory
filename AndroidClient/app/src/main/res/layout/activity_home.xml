@@ -27,7 +27,7 @@
             android:textSize="20sp"
             android:id="@+id/loading_text"
             android:gravity="center"
-            android:background="@drawable/splash_background"
+            android:background="@drawable/splash_bg"
             android:text="  "/>
 
         <FrameLayout

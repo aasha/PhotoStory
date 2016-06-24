@@ -52,6 +52,7 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.pixtory.app.views.DroidSerifTextView;
 import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
 import com.squareup.picasso.Callback;
@@ -463,9 +464,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mLikeCountTV.setText(String.valueOf(cd.likeCount));
 
         String data = "<b>While slowly sipping on strong ales in the oldest pub in Scotland, I reflected on our journey from Sallochy and Balmaha to Drymen.</b> Our last night out on the trail was spent under the bright countryside stars, only to be replaced by a foggy, moody morning. It followed us the entire morning, allowing narrow shafts of sunlight to pierce through. We hiked 136km in five and a half days.Before we finished our hike, we had to overcome one final hurdle: the Conic Hill. With a 360m ascent over 320m in distance" +
-                ", it wasn't the tallest peak but it was an incredibly steep summit. Conic Hill also serves as a natural barrier between the famous Scottish highlands and the lowlands."
+                ", it wasn't the tallest peak <b>but it was an incredibly steep summit</b>. Conic Hill also serves as a natural barrier <i>between the famous Scottish highlands </i>and the lowlands."
                 +
-                "At the peak, we were faced with a difficult choice. On one side lay the tumultuous Highlands and on the other stood the rolling hills of the Lowlands. There could be no wrong decision - after all, it was Scotland.";
+                "At the peak, <u>we were faced with a difficult choice. On one side lay the tumultuous</u> Highlands and on the other stood the rolling hills of the Lowlands. There could be no wrong decision - after all, it was Scotland.";
 
 
 
@@ -473,7 +474,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
-        TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
+        DroidSerifTextView mTextStoryDetails = (DroidSerifTextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
         mShareBtn = (LinearLayout) mRootView.findViewById(R.id.btnShare);
         mCommentBtn = (LinearLayout) mRootView.findViewById(R.id.btnComment);
 
@@ -682,7 +683,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 @Override
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
-                    //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHimage_mainORT).show();
                     Log.i(TAG, "Long Tap");
                     if (isFullScreenShown) {
                         showWallpaperAlert();
@@ -805,15 +806,23 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             return false;
         }
 
-        if (gesture.onTouchEvent(me)) {
-            return true;
-        }
+
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
             setUpHalfScreen();
             mStoryParentLayout.fullScroll(View.FOCUS_UP);
 
+        }
+
+        return false;
+    }
+
+    @OnTouch(R.id.image_main)
+    public boolean onTouchImage(ImageView view , MotionEvent me){
+
+        if (gesture.onTouchEvent(me)) {
+            return true;
         }
 
         return false;

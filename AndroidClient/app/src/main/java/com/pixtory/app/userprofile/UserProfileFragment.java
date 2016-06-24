@@ -16,17 +16,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
+import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.transformations.BlurTransformation;
 import com.pixtory.app.transformations.GrayscaleTransformation;
 import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.CircularImageView;
 import com.squareup.picasso.Picasso;
 
@@ -54,7 +57,7 @@ public class UserProfileFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private String mParam1;
-
+    private Context mContext;
     private int mUserId;
     private int mPersonId;
     private PersonInfo mPersonInfo;
@@ -64,7 +67,7 @@ public class UserProfileFragment extends Fragment {
     private CardLayoutAdapter cardLayoutAdapter;
 
     private String mParam2;
-
+    private String imgUrl = "http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803";
     private OnFragmentInteractionListener mListener;
 
     public UserProfileFragment() {
@@ -94,6 +97,7 @@ public class UserProfileFragment extends Fragment {
         if (getArguments() != null) {
             mUserId = Integer.parseInt(getArguments().getString(ARG_PARAM1));
             mPersonId = Integer.parseInt(getArguments().getString(ARG_PARAM2));
+            mContext = getActivity();
             //setPersonDetails();
             //mPersonInfo = App.getPersonInfo(mUserId);
             // mContentDataList = App.getContentData();
@@ -159,19 +163,19 @@ public class UserProfileFragment extends Fragment {
                 cd.personDetails=mPersonInfo;*/
             App.setProfileContentData(mContentDataList);
             if(mContentDataList.size()==0)
-                Toast.makeText(getContext(),"You haven't liked any pixtory yet",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"You haven't liked any pixtory yet",Toast.LENGTH_SHORT).show();
             cardLayoutAdapter = new CardLayoutAdapter(getContext(), mContentDataList);
             personName.setText(mPersonInfo.name);
             personDesc.setText(mPersonInfo.description);
 
             if (mPersonInfo.imageUrl != null && mPersonInfo.imageUrl!="") {
-                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(mContext)).transform(new BlurTransformation(mContext, 10)).into(profileImageBorder);
+                Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(mContext, 10)).into(blurrPersonImage);
+                Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().into(profileImage);
             } else {
-                Picasso.with(getContext()).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                Picasso.with(getContext()).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                Picasso.with(getContext()).load("http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803").fit().into(profileImage);
+                Picasso.with(mContext).load(imgUrl).fit().centerCrop().transform(new GrayscaleTransformation(mContext)).transform(new BlurTransformation(mContext, 10)).into(profileImageBorder);
+                Picasso.with(mContext).load(imgUrl).fit().centerCrop().transform(new BlurTransformation(mContext, 10)).into(blurrPersonImage);
+                Picasso.with(mContext).load(imgUrl).fit().into(profileImage);
             }
 
             //initialise recyclerview and set its layout as grid layout
@@ -196,15 +200,21 @@ public class UserProfileFragment extends Fragment {
             {
                 personName.setText(mPersonInfo.name);
                 personDesc.setText(mPersonInfo.description);
+                if(mPersonInfo.followedByUser)
+                {
+                    personFollow.setText("FOLLOWING");
+                    if(Build.VERSION.SDK_INT>=21)
+                        personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                }
 
                 if (mPersonInfo.imageUrl != null) {
-                    Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                    Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                    Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                    Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(mContext)).transform(new BlurTransformation(mContext, 10)).into(profileImageBorder);
+                    Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(mContext, 10)).into(blurrPersonImage);
+                    Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().into(profileImage);
                 } else {
-                    Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                    Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                    Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
+                    Picasso.with(mContext).load(imgUrl).fit().centerCrop().transform(new GrayscaleTransformation(mContext)).transform(new BlurTransformation(mContext, 10)).into(profileImageBorder);
+                    Picasso.with(mContext).load(imgUrl).fit().centerCrop().transform(new BlurTransformation(mContext, 10)).into(blurrPersonImage);
+                    Picasso.with(mContext).load(imgUrl).fit().into(profileImage);
                 }
                 mContentDataList = App.getProfileContentFromCache(mPersonId);
                 /*for(ContentData cd:mContentDataList)
@@ -212,12 +222,12 @@ public class UserProfileFragment extends Fragment {
                 App.setProfileContentData(mContentDataList);
                 cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
                 Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
+
                 //initialise recyclerview and set its layout as grid layout
-                gridLayout = new GridLayoutManager(getContext(),2);
+                gridLayout = new GridLayoutManager(mContext,2);
                 recyclerView.setLayoutManager(gridLayout);
 
                 //intialise card layout adapter and set it to recycler view
-
                 recyclerView.setAdapter(cardLayoutAdapter);
 
                 //get the screen dimesions
@@ -237,18 +247,19 @@ public class UserProfileFragment extends Fragment {
                        // Toast.makeText(getContext(),"success",Toast.LENGTH_SHORT);
                         if (o.userDetails != null) {
                             mPersonInfo = o.userDetails;
-                            App.addToProfileCache(mPersonInfo);
+
                             personName.setText(mPersonInfo.name);
                             personDesc.setText(mPersonInfo.description);
 
+
                             if (mPersonInfo.imageUrl != null) {
-                                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                                Picasso.with(getContext()).load(mPersonInfo.imageUrl).fit().into(profileImage);
+                                Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new GrayscaleTransformation(mContext)).transform(new BlurTransformation(mContext, 10)).into(profileImageBorder);
+                                Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().centerCrop().transform(new BlurTransformation(mContext, 10)).into(blurrPersonImage);
+                                Picasso.with(mContext).load(mPersonInfo.imageUrl).fit().into(profileImage);
                             } else {
-                                Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new GrayscaleTransformation(getContext())).transform(new BlurTransformation(getContext(), 10)).into(profileImageBorder);
-                                Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().centerCrop().transform(new BlurTransformation(getContext(), 10)).into(blurrPersonImage);
-                                Picasso.with(getContext()).load(R.drawable.sample_pimg).fit().into(profileImage);
+                                Picasso.with(mContext).load(imgUrl).fit().centerCrop().transform(new GrayscaleTransformation(mContext)).transform(new BlurTransformation(mContext, 10)).into(profileImageBorder);
+                                Picasso.with(mContext).load(imgUrl).fit().centerCrop().transform(new BlurTransformation(mContext, 10)).into(blurrPersonImage);
+                                Picasso.with(mContext).load(imgUrl).fit().into(profileImage);
                             }
                         } else {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
@@ -261,11 +272,17 @@ public class UserProfileFragment extends Fragment {
 
                         if (o.contentList != null) {
                             mContentDataList = o.contentList;
-                            for(ContentData cd:mContentDataList)
-                                cd.personDetails=mPersonInfo;
                             App.addToProfileContentCache(mPersonId,mContentDataList);
+                            App.addToProfileCache(mContentDataList.get(0).personDetails);
                             App.setProfileContentData(mContentDataList);
-                            cardLayoutAdapter = new CardLayoutAdapter(getContext(),mContentDataList);
+                            if(mContentDataList.get(0).personDetails.followedByUser)
+                            {
+                                mPersonInfo.followedByUser=true;
+                                personFollow.setText("FOLLOWING");
+                                if(Build.VERSION.SDK_INT>=21)
+                                    personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                            }
+                            cardLayoutAdapter = new CardLayoutAdapter(mContext,mContentDataList);
                            // Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
                         } else {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Person_Details_Failed)
@@ -339,14 +356,17 @@ public class UserProfileFragment extends Fragment {
         personFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                personFollow.setText("FOLLOWING");
-                if(Build.VERSION.SDK_INT>=21)
-                    personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Follow_Click")
-                        .put(AppConstants.USER_ID,mUserId+"")
-                        .put("CONTRIBUTOR_ID",mPersonId+"")
-                        .build());
+                if(Utils.isNotEmpty(Utils.getFbID(getContext())))
+                {
+                    if(!mPersonInfo.followedByUser)
+                        sendFollowRequestToBackend(true);
+                    else
+                        sendFollowRequestToBackend(false);
+                }else
+                    mListener.showLoginAlert();
+
             }
+
         });
 
         return userProfleView;
@@ -369,6 +389,49 @@ public class UserProfileFragment extends Fragment {
         mListener = null;
     }
 
+    private void sendFollowRequestToBackend(final boolean doFollow){
+        NetworkApiHelper.getInstance().followPerson(mUserId,mPersonId,doFollow,new NetworkApiCallback<BaseResponse>() {
+            @Override
+            public void success(BaseResponse o, Response response) {
+                if(doFollow){
+                    Toast.makeText(mContext,"You are now following "+mPersonInfo.name,Toast.LENGTH_SHORT).show();
+                    mPersonInfo.followedByUser = true;
+                    personFollow.setText("FOLLOWING");
+                    App.addToProfileCache(mPersonInfo);
+                    if(Build.VERSION.SDK_INT>=21)
+                        personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Follow_Click")
+                            .put(AppConstants.USER_ID,mUserId+"")
+                            .put("CONTRIBUTOR_ID",mPersonId+"")
+                            .build());
+                }
+                else{
+                    Toast.makeText(mContext,"You've unfollwed "+mPersonInfo.name,Toast.LENGTH_SHORT).show();
+                    mPersonInfo.followedByUser = false;
+                    personFollow.setText("FOLLOW");
+                    if(Build.VERSION.SDK_INT>=21)
+                        personFollow.setBackground(getActivity().getDrawable(R.drawable.back_rectangle));
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_UnFollow_Click")
+                        .put(AppConstants.USER_ID,mUserId+"")
+                        .put("CONTRIBUTOR_ID",mPersonId+"")
+                        .build());
+                }
+            }
+
+            @Override
+            public void failure(BaseResponse error) {
+                // mProgress.dismiss();
+
+                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+                Toast.makeText(getContext(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -381,6 +444,8 @@ public class UserProfileFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
+        void showLoginAlert();
+
 
     }
 }
