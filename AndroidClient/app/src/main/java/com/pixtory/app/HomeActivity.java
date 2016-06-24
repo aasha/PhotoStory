@@ -971,7 +971,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setWallpaper();
+                Utils.setWallpaper(HomeActivity.this , getApplicationContext() ,App.getContentData().get(mPager.getCurrentItem()).pictureUrl);
                 dialog.dismiss();
             }
         });
@@ -987,33 +987,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.show();
     }
 
-    public void setWallpaper(){
-        String imgUrl = App.getContentData().get(mPager.getCurrentItem()).pictureUrl;
-        Picasso.with(HomeActivity.this).load(imgUrl).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Toast.makeText(HomeActivity.this,"Wallpaper set",Toast.LENGTH_SHORT).show();
-                WallpaperManager myWallpaperManager
-                        = WallpaperManager.getInstance(getApplicationContext());
-                try {
-                    myWallpaperManager.setBitmap(bitmap);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
-    }
 
 
     private void setUpNavigationDrawer() {

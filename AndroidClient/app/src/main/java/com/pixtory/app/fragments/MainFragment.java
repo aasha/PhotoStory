@@ -683,7 +683,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 @Override
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
-                    //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHimage_mainORT).show();
+                    //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
                     Log.i(TAG, "Long Tap");
                     if (isFullScreenShown) {
                         showWallpaperAlert();
@@ -806,23 +806,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             return false;
         }
 
-
+        if (gesture.onTouchEvent(me)) {
+            return true;
+        }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
             setUpHalfScreen();
             mStoryParentLayout.fullScroll(View.FOCUS_UP);
 
-        }
-
-        return false;
-    }
-
-    @OnTouch(R.id.image_main)
-    public boolean onTouchImage(ImageView view , MotionEvent me){
-
-        if (gesture.onTouchEvent(me)) {
-            return true;
         }
 
         return false;

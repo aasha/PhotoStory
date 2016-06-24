@@ -1,7 +1,10 @@
 package com.pixtory.app.utils;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
@@ -9,10 +12,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.model.ContentData;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -135,6 +142,40 @@ public class Utils {
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
         editor.putString(key, val);
         editor.commit(); // commit changes
+    }
+
+    public static void setWallpaper(final Context context , final Context appContext, String imgUrl){
+
+        if(isNotEmpty(imgUrl))
+            Picasso.with(context).load(imgUrl).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                    try {
+
+                        WallpaperManager myWallpaperManager
+                                = WallpaperManager.getInstance(appContext);
+
+                        myWallpaperManager.setBitmap(bitmap);
+
+                        Toast.makeText(appContext,"Wallpaper set",Toast.LENGTH_SHORT).show();
+
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+        });
     }
 
 //    public static boolean isNDAAccepted(Context context) {

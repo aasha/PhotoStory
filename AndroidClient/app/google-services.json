@@ -1,39 +1,29 @@
 {
   "project_info": {
-    "project_id": "photostory-9ff3c",
-    "project_number": "1032488455191",
-    "name": "PhotoStory"
+    "project_number": "46207295900",
+    "project_id": "pixtory-1352"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1032488455191:android:deb34e40d9adc7bd",
-        "client_id": "android:com.photostory.app",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:46207295900:android:9a126d00c4ca4f8b",
         "android_client_info": {
-          "package_name": "com.photostory.app",
-          "certificate_hash": []
+          "package_name": "com.pixtory.app"
         }
       },
       "oauth_client": [],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADbSsib9YXD3f1djucVJLOX6mlGBR9qI0"
+        }
+      ],
       "services": {
         "analytics_service": {
-          "status": 2,
-          "analytics_property": {
-            "tracking_id": "UA-76640678-1"
-          }
-        },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
+          "status": 1
         },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -41,6 +31,5 @@
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }
