@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="212dp"
+    android:layout_height="wrap_content"
     android:id="@+id/card_frame"
     android:background="#ffffff"
     android:elevation="3dp">
@@ -17,7 +17,7 @@
             android:id="@+id/card_img"/>
         <com.pixtory.app.views.SlantView
             android:layout_width="match_parent"
-            android:layout_height="26dp"
+            android:layout_height="23dp"
             android:layout_below="@+id/person_desc"
             android:id="@+id/slant_view_2"
             android:layout_gravity="bottom"/>
@@ -26,34 +26,35 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="67dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:orientation="vertical">
-
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="10sp"
-            android:id="@+id/card_title"
-            android:text="The Registan"
-            android:textColor="@color/app_blue"
-            android:fontFamily="sans-serif-light"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="2dp"
             android:textSize="10sp"
             android:text="Samarkand, Uzbekistan"
             android:textColor="@color/grey_3"
             android:id="@+id/card_place"
             android:fontFamily="sans-serif-light"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="10sp"
+            android:id="@+id/card_title"
+            android:text="The Registan"
+            android:textColor="@color/app_blue"
+            android:fontFamily="sans-serif-light"/>
+
+
     </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>

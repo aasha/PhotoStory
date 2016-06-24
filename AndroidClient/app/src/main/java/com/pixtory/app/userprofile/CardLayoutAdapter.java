@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.pixtory.app.R;
@@ -47,11 +48,11 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
         public TextView cardTitle;
         public TextView cardPlace;
         public ImageView cardImage;
-        public FrameLayout cardFrame;
+        public LinearLayout cardFrame;
 
         public ViewHolder(View v){
             super(v);
-            cardFrame = (FrameLayout)v.findViewById(R.id.card_frame);
+            cardFrame = (LinearLayout) v.findViewById(R.id.card_frame);
             cardImage = (ImageView)v.findViewById(R.id.card_img);
             cardTitle = (TextView)v.findViewById(R.id.card_title);
             cardPlace = (TextView)v.findViewById(R.id.card_place);

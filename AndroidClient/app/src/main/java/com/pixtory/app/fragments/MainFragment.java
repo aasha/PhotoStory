@@ -51,6 +51,7 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.userprofile.UserProfileActivity2;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
+import com.pixtory.app.views.DroidSerifTextView;
 import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
 import com.squareup.picasso.Callback;
@@ -465,7 +466,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
-        TextView mTextStoryDetails = (TextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
+        DroidSerifTextView mTextStoryDetails = (DroidSerifTextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
         mShareBtn = (LinearLayout) mRootView.findViewById(R.id.btnShare);
         mCommentBtn = (LinearLayout) mRootView.findViewById(R.id.btnComment);
 
