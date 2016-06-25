@@ -28,6 +28,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
+
 import com.google.android.gms.gcm.GcmListenerService;
 import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
@@ -106,15 +108,22 @@ public class MyGcmListenerService extends GcmListenerService {
             e.printStackTrace();
         }
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout);
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.pixtory_app_icon)
+                .setSmallIcon(R.drawable.pixtory_icon)
                 .setContentTitle("pixtory")
                 .setContentText(message)
-                .setAutoCancel(true);
-
+                .setAutoCancel(true)
+                .setContent(remoteViews);
+        if(b!=null)
+            remoteViews.setImageViewBitmap(R.id.notification_image,b);
+        remoteViews.setTextViewText(R.id.notification_message,message);
         //.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pixtory))
 //        if (b != null)
 //            notificationBuilder.setStyle(new NotificationCompat.().bigPicture(b));
+
 
         notificationBuilder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =

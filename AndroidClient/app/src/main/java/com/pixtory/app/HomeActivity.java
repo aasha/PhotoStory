@@ -53,6 +53,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
@@ -356,7 +357,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 .build());
 
         menuIcon.setImageResource(R.drawable.menu_icon);
-
+        FacebookSdk.sdkInitialize(getApplicationContext());
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -1375,22 +1376,53 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             Animation.RELATIVE_TO_PARENT, 0f);
                     animation.setDuration(1500);
                     animation.setFillEnabled(true);
+                    animation.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+                            mPager.setClickable(false);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+
+                            mTopOverlay.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                                            Animation.RELATIVE_TO_PARENT, 0f,
+                                            Animation.RELATIVE_TO_PARENT, 0f,
+                                            Animation.RELATIVE_TO_PARENT, -1f);
+                                    animation.setDuration(1500);
+                                    animation.setAnimationListener(new Animation.AnimationListener() {
+                                        @Override
+                                        public void onAnimationStart(Animation animation) {
+
+                                        }
+
+                                        @Override
+                                        public void onAnimationEnd(Animation animation) {
+                                            mPager.setClickable(true);
+                                        }
+
+                                        @Override
+                                        public void onAnimationRepeat(Animation animation) {
+                                        }
+                                    });
+                                    mTopOverlay.setVisibility(View.INVISIBLE);
+                                    mTopOverlay.setAnimation(animation);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
                     mTopOverlay.setVisibility(View.VISIBLE);
                     mTopOverlay.setAnimation(animation);
                 }
             },500);
-            mTopOverlay.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, -1f);
-                    animation.setDuration(1500);
-                    mTopOverlay.setVisibility(View.INVISIBLE);
-                    mTopOverlay.setAnimation(animation);
-                }
-            });
         }
         return count;
     }
