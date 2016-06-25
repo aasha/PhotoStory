@@ -333,6 +333,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     public void onSuccess(LoginResult loginResult) {
                         Toast.makeText(HomeActivity.this, "FB Login Success!", Toast.LENGTH_SHORT).show();
                         onFacebookLoginSuccess();
+
                     }
 
                     @Override
@@ -1240,6 +1241,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             Utils.putUserName(HomeActivity.this, name);
                             Utils.putUserImage(HomeActivity.this, imgUrl);
                             AmplitudeLog.sendUserInfo(regResp.userId);
+                            setPersonDetails();
                         }
 
                         @Override

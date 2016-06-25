@@ -109,17 +109,20 @@ public class MyGcmListenerService extends GcmListenerService {
         }
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout);
+        //RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.pixtory_icon)
                 .setContentTitle("pixtory")
                 .setContentText(message)
-                .setAutoCancel(true).setSound(defaultSoundUri)
-                .setContent(remoteViews);
+                .setAutoCancel(true);
         if(b!=null)
+            notificationBuilder.setLargeIcon(b);
+        else
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.splash_bg));
+       /* if(b!=null)
             remoteViews.setImageViewBitmap(R.id.notification_image,b);
-        remoteViews.setTextViewText(R.id.notification_message,message);
+        remoteViews.setTextViewText(R.id.notification_message,message);*/
         //.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pixtory))
 //        if (b != null)
 //            notificationBuilder.setStyle(new NotificationCompat.().bigPicture(b));

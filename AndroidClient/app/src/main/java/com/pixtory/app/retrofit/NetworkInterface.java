@@ -41,4 +41,7 @@ public interface NetworkInterface {
     @POST("/followPerson")
     void followPerson(@Body FollowPersonRequest req, Callback<BaseResponse> cd);
 
+    @POST("/getWallPaper")
+    void getWallPaper(@Body GetWallPaperRequest req, Callback<GetWallPaperResponse> cd);
+
 }
