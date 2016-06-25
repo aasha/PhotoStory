@@ -28,6 +28,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
+
 import com.google.android.gms.gcm.GcmListenerService;
 import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
@@ -66,7 +68,7 @@ public class MyGcmListenerService extends GcmListenerService {
         pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        changeWallPaper(image);
+        changeWallPaper();
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -105,17 +107,23 @@ public class MyGcmListenerService extends GcmListenerService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.pixtory_app_icon)
-                .setContentTitle("Pixtory")
-                .setContentText(message)
-                .setAutoCancel(false).setSound(defaultSoundUri);
 
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.pixtory_icon)
+                .setContentTitle("pixtory")
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setContent(remoteViews);
+        if(b!=null)
+            remoteViews.setImageViewBitmap(R.id.notification_image,b);
+        remoteViews.setTextViewText(R.id.notification_message,message);
         //.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pixtory))
 //        if (b != null)
 //            notificationBuilder.setStyle(new NotificationCompat.().bigPicture(b));
+
 
         notificationBuilder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =
@@ -126,7 +134,7 @@ public class MyGcmListenerService extends GcmListenerService {
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 
-    private void changeWallPaper(String imgUrl){
+    private void changeWallPaper(){
 
 //        if(Utils.isNotEmpty(imgUrl)) {
 //            Utils.setWallpaper(this , getApplicationContext(), imgUrl);
