@@ -7,7 +7,7 @@
 
 
     <LinearLayout
-        android:layout_width="200dp"
+        android:layout_width="@dimen/fb_signin_btn_width"
         android:id="@+id/fb_sign_btn"
         android:layout_height="@dimen/fb_signin_btn_height"
         android:background="@drawable/fb_btn_bg"
