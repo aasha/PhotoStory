@@ -290,4 +290,24 @@ public class NetworkApiHelper {
             }
         });
     }
+
+    public void getWallPaper(int userId,  final NetworkApiCallback cb) {
+        GetWallPaperRequest req = new GetWallPaperRequest();
+        req.userId = userId;
+
+        sAPI.getWallPaper(req, new Callback<GetWallPaperResponse>() {
+            @Override
+            public void success(GetWallPaperResponse resp, Response response) {
+                if (resp.success == true)
+                    cb.success(resp, response);
+                else
+                    cb.failure(resp);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
 }
