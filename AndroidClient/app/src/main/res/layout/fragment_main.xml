@@ -9,7 +9,6 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:id="@+id/layout_complete"
-             android:background="@drawable/gradient"
         android:visibility="visible"
              tools:context="com.pixtory.app.fragments.MainFragment">
 
@@ -23,12 +22,12 @@
             android:gravity="center"
             android:text="Loading...."/>
 
-    <ImageView
-        android:id="@+id/image_main"
-        android:visibility="visible"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/image_main"
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:layout_width="70dp"

@@ -66,7 +66,7 @@ public class MyGcmListenerService extends GcmListenerService {
         pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        changeWallPaper();
+        changeWallPaper(image);
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -105,12 +105,13 @@ public class MyGcmListenerService extends GcmListenerService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.pixtory_app_icon)
-                .setContentTitle("pixtory")
+                .setContentTitle("Pixtory")
                 .setContentText(message)
-                .setAutoCancel(true);
+                .setAutoCancel(false).setSound(defaultSoundUri);
 
         //.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pixtory))
 //        if (b != null)
@@ -125,11 +126,11 @@ public class MyGcmListenerService extends GcmListenerService {
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 
-    private void changeWallPaper(){
+    private void changeWallPaper(String imgUrl){
 
-        if(Utils.isNotEmpty("")) {
-            Utils.setWallpaper(this , getApplicationContext(), "");
-        }
+//        if(Utils.isNotEmpty(imgUrl)) {
+//            Utils.setWallpaper(this , getApplicationContext(), imgUrl);
+//        }
 
     }
 }
