@@ -139,9 +139,9 @@ public class MyGcmListenerService extends GcmListenerService {
 
     private void changeWallPaper(){
 
-        if(Utils.isNotEmpty("")) {
-            Utils.setWallpaper(this , getApplicationContext(), "");
-        }
+//        if(Utils.isNotEmpty(imgUrl)) {
+//            Utils.setWallpaper(this , getApplicationContext(), imgUrl);
+//        }
 
     }
 }

@@ -13,6 +13,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -84,6 +86,14 @@ public class App extends Application implements AppConstants {
         Log.d("Amplitude", "Amplitude init");
         Amplitude.getInstance().initialize(this, "7c657990d3385956001836ca63567102").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
+
+        /**Enabling disk caching for Picasso**/
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.downloader(new OkHttpDownloader(this,Integer.MAX_VALUE));
+        Picasso built = builder.build();
+        built.setIndicatorsEnabled(true);
+        built.setLoggingEnabled(true);
+        Picasso.setSingletonInstance(built);
     }
 
     synchronized public Tracker getDefaultTracker() {

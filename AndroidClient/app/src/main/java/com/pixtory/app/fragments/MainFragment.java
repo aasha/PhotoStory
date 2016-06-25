@@ -38,6 +38,12 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import butterknife.*;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -56,6 +62,7 @@ import com.pixtory.app.views.DroidSerifTextView;
 import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -113,7 +120,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     TextView mPicSummary;
 
     @Bind(R.id.image_main)
-    ImageView mImageMain = null;
+    SimpleDraweeView mImageMain = null;
 
     @Bind(R.id.bottom_container)
     RelativeLayout mImageDetailBottomContainer = null;
@@ -431,7 +438,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         final ContentData cd = mContentData;
 
         mLoadingText.setVisibility(View.VISIBLE);
-        Picasso.with(mContext).load(mContentData.pictureUrl).fit().into(mImageMain
+        Picasso.with(mContext).load(mContentData.pictureUrl).noFade().resize(mDeviceWidthInPx,mDeviceHeightInPx).into(mImageMain
                 ,new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
@@ -440,10 +447,24 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                     @Override
                     public void onError() {
-                        mLoadingText.setVisibility(View.GONE);
+
                     }
                 }
     );
+//        Uri uri = Uri.parse("http://pooyak.com/p/progjpeg/jpegload.cgi?o=1");
+////        mImageMain = (SimpleDraweeView) findViewById(R.id.my_image_view);
+////        mImageMain.setImageURI(uri);
+//
+////        Uri uri;
+//        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+//                .setProgressiveRenderingEnabled(true)
+//                .build();
+//        DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                .setImageRequest(request)
+//                .setOldController(mImageMain.getController())
+//                .build();
+//        mImageMain.setController(controller);
+
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
         mPicSummary.setText(cd.pictureSummary);
@@ -463,10 +484,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         mLikeCountTV.setText(String.valueOf(cd.likeCount));
 
-        String data = "<b>While slowly sipping on strong ales in the oldest pub in Scotland, I reflected on our journey from Sallochy and Balmaha to Drymen.</b> Our last night out on the trail was spent under the bright countryside stars, only to be replaced by a foggy, moody morning. It followed us the entire morning, allowing narrow shafts of sunlight to pierce through. We hiked 136km in five and a half days.Before we finished our hike, we had to overcome one final hurdle: the Conic Hill. With a 360m ascent over 320m in distance" +
-                ", it wasn't the tallest peak <b>but it was an incredibly steep summit</b>. Conic Hill also serves as a natural barrier <i>between the famous Scottish highlands </i>and the lowlands."
-                +
-                "At the peak, <u>we were faced with a difficult choice. On one side lay the tumultuous</u> Highlands and on the other stood the rolling hills of the Lowlands. There could be no wrong decision - after all, it was Scotland.";
+//        String data = "<b>While slowly sipping on strong ales in the oldest pub in Scotland, I reflected on our journey from Sallochy and Balmaha to Drymen.</b> Our last night out on the trail was spent under the bright countryside stars, only to be replaced by a foggy, moody morning. It followed us the entire morning, allowing narrow shafts of sunlight to pierce through. We hiked 136km in five and a half days.Before we finished our hike, we had to overcome one final hurdle: the Conic Hill. With a 360m ascent over 320m in distance" +
+//                ", it wasn't the tallest peak <b>but it was an incredibly steep summit</b>. Conic Hill also serves as a natural barrier <i>between the famous Scottish highlands </i>and the lowlands."
+//                +
+//                "At the peak, <u>we were faced with a difficult choice. On one side lay the tumultuous</u> Highlands and on the other stood the rolling hills of the Lowlands. There could be no wrong decision - after all, it was Scotland.";
 
 
 
@@ -508,7 +529,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
-            mTextStoryDetails.setText(Html.fromHtml(data+"\n\n\n\n\n\n\n\n\n\n"));
+            mTextStoryDetails.setText(Html.fromHtml(cd.pictureDescription) +"\n\n\n\n\n\n\n\n\n\n\n\n")
+            ;
 //            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
         }
 
@@ -1252,7 +1274,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         Picasso.with(mContext).load(imgUrl).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Toast.makeText(mContext,"Wallpaper set",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"Wallopaper set",Toast.LENGTH_SHORT).show();
                 WallpaperManager myWallpaperManager
                         = WallpaperManager.getInstance(mContext.getApplicationContext());
                 try {
