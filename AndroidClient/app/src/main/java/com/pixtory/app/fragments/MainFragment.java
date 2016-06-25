@@ -28,6 +28,8 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -811,8 +813,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         // Disallow the touch request for parent scroll on touch of child view
         if (me.getAction() == MotionEvent.ACTION_UP) {
-            setUpHalfScreen();
-            return false;
+
+            int min_dist = (scrollY-oldScrollY);
+            if( min_dist != 0){
+                setUpHalfScreen();
+            mStoryParentLayout.fullScroll(View.FOCUS_UP);
+        }
+
+        return false;
         }
 
         return false;
@@ -834,9 +842,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
-            setUpHalfScreen();
-            mStoryParentLayout.fullScroll(View.FOCUS_UP);
+            float min_dist = (scrollY-oldScrollY);
+            Log.i(TAG,"min dist-"+min_dist);
 
+            if( min_dist != 0){
+                setUpHalfScreen();
+                mStoryParentLayout.fullScroll(View.FOCUS_UP);}
         }
 
         return false;
@@ -860,7 +871,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(isCommentsVisible())
             attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
-        isScrollingUp= (scrollY < oldScrollY)?false:true;
+        isScrollingUp= (scrollY < oldScrollY) ?false:true;
 //        Log.i(TAG,"scrollY::"+scrollY+"::mHalfSCreenSize::"+mHalfScreenSize);
         if(scrollY < mHalfScreenSize){
 
@@ -878,6 +889,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                     .build());
                     }
                     else {
+                        isFullScreenShown = true;
                         mImageDetailsLayout.smoothScrollTo(0, 0);
                         mTextExpert.setVisibility(View.VISIBLE);
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
@@ -1270,24 +1282,24 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public void setWallpaper(){
-        String imgUrl = mContentData.pictureUrl;
-        Picasso.with(mContext).load(imgUrl).into(new Target() {
+//        String imgUrl = mContentData.pictureUrl;
+        Picasso.with(mContext).load(mContentData.pictureUrl).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Toast.makeText(mContext,"Wallopaper set",Toast.LENGTH_SHORT).show();
                 WallpaperManager myWallpaperManager
                         = WallpaperManager.getInstance(mContext.getApplicationContext());
                 try {
                     myWallpaperManager.setBitmap(bitmap);
+                    Toast.makeText(mContext.getApplicationContext(),"Wallpaper set",Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
-                    Toast.makeText(mContext,"exception",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(mContext,"Bitmap Failed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
 
             }
 
@@ -1355,7 +1367,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
                                 intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
                                 intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                                intent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+contentData.pictureDescription);
+                                intent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
+                                SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
+                                intent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
+                                        +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
                                 intent.setPackage(packageName);
                                 targetInviteIntents.add(intent);
                             }
@@ -1388,25 +1403,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         });
         }
 
-    /**
-     * Callback to show loading progress bar when image is loaded
-     */
-    private class ImageLoadedCallback implements Callback {
-        ProgressDialog progressBar;
+    private boolean isTouchEnabled = true;
+    public  void setActioUpEnabled(boolean isEnable){
+        isTouchEnabled = isEnable;
+    }
 
-        public  ImageLoadedCallback(ProgressDialog progDialog){
-            progressBar = progDialog;
-        }
-
-        @Override
-        public void onSuccess() {
-
-        }
-
-        @Override
-        public void onError() {
-
-        }
+    public boolean getActionUpEnabled(){
+        return isTouchEnabled;
     }
 
 }

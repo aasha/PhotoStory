@@ -9,6 +9,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:paddingTop="5dp"
         android:layout_height="match_parent">
 
     <com.pixtory.app.views.CircularImageView
@@ -60,7 +61,7 @@
                 android:textSize="17sp"
                 android:paddingLeft="35dp"
                 android:paddingRight="35dp"
-                android:paddingTop="20dp"
+                android:paddingTop="25dp"
                 android:paddingBottom="60dp"
                 android:lineSpacingExtra="7sp"
                 android:minHeight="@dimen/story_min_height"

@@ -34,7 +34,8 @@
 
     <uses-feature android:name="android.hardware.camera" />
 
-    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <application
         android:name=".app.App"
         android:hardwareAccelerated="true"
@@ -43,40 +44,32 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Launcher">
-
         <activity
             android:name=".onboarding.OnBoardingActivity"
             android:icon="@drawable/pixtory_app_icon"
             android:label="Pixtory">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".userprofile.UserProfileActivity"
             android:icon="@drawable/pixtory_app_icon"
             android:label="USerProfileActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        </activity>
-
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
         <activity
             android:name=".HomeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        </activity>
-
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
         <activity
             android:name=".userprofile.UserProfileActivity2"
             android:icon="@drawable/pixtory_app_icon"
             android:label="UserProfileActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-
-        </activity>
-
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
         <activity
             android:name=".WebviewActivity"
             android:label="@string/title_activity_webview"
@@ -93,6 +86,8 @@
                 <category android:name="gcm.play.android.samples.com.gcmquickstart" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".WallpaperChangeAlarmReceiver"/>
 
         <service
             android:name=".pushnotification.MyGcmListenerService"
@@ -126,14 +121,13 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.pixtory.app.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+
     </application>
-
-
 
 </manifest>

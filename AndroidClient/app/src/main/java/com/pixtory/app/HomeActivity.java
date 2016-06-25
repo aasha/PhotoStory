@@ -1,7 +1,9 @@
 package com.pixtory.app;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
@@ -28,10 +30,13 @@ import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -61,6 +66,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
+import com.google.android.exoplayer.util.SystemClock;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
@@ -93,6 +99,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -151,10 +159,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ActionBarDrawerToggle mDrawerToggle;
 
     //coachmark overlays
-    private FrameLayout mTopOverlay;
-    private FrameLayout mTopOverlayWallpaperSetting;
-    private LinearLayout mTopOverlayLongTap;
-    private ImageView mBlurLayer;
+    private FrameLayout mSwipeUpCoachMark;
+    private FrameLayout mWallpaperCoachMark;
+    private LinearLayout mSwipeUpCoachMarkLongTap;
+    private ImageView mWallpaperCoachMarkBlurBg;
     private TextView mWallpaperYes;
     private TextView mWallpaperNo;
     private TextView mSwipeUpText1;
@@ -168,6 +176,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     @Bind(R.id.loading_text)
     TextView mLoadingText;
+
+    private AlarmManager mAlarmManager = null;
+    private PendingIntent mPendingIntent = null;
+    private Intent mWallpaperReceiverIntent = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,13 +260,18 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
 
         //Binding coachmark overlays
-        mBlurLayer = (ImageView)findViewById(R.id.blur_layer);
-        mTopOverlay = (FrameLayout) findViewById(R.id.top_overlay_swipe_up);
-        mTopOverlayWallpaperSetting = (FrameLayout) findViewById(R.id.top_overlay_wallpaper_setting);
+        mWallpaperCoachMarkBlurBg = (ImageView)findViewById(R.id.blur_layer);
+        mSwipeUpCoachMark = (FrameLayout) findViewById(R.id.top_overlay_swipe_up);
+        mWallpaperCoachMark = (FrameLayout) findViewById(R.id.top_overlay_wallpaper_setting);
+        mSwipeUpCoachMarkLongTap = (LinearLayout)findViewById(R.id.top_overlay_long_tap);
+
+        
         mSwipeUpText1 = (TextView)findViewById(R.id.swipe_up_text_1);
         mSwipeUpText2 = (TextView)findViewById(R.id.swipe_up_text_2);
+
         mLongTapText = (TextView)findViewById(R.id.long_tap_text);
         mToggleButton = (ToggleButton)findViewById(R.id.toggle_button);
+
         mWallpaperTopText = (TextView)findViewById(R.id.wallpaper_top_text);
 
         String swipeText1 = "<b>Swipe up</b> for the <b>Story</b> behind the picture.";
@@ -265,84 +282,36 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         String longTapText = "<b>Long press</b> on an image to set it as your wallpaper";
         mLongTapText.setText(Html.fromHtml(longTapText));
 
-       /* if(!isFirstTimeOpen()){
-            mTopOverlay.setVisibility(View.INVISIBLE);
-        }*/
-/*
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                        Animation.RELATIVE_TO_PARENT, 0f,
-                        Animation.RELATIVE_TO_PARENT, 1f,
-                        Animation.RELATIVE_TO_PARENT, 0f);
-                animation.setDuration(1500);
-                animation.setFillEnabled(true);
-                //animation.setFillAfter(true);
-                mTopOverlay.setVisibility(View.VISIBLE);
-                mTopOverlay.setAnimation(animation);
-            }
-        },4000);
-        mTopOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                        Animation.RELATIVE_TO_PARENT, 0f,
-                        Animation.RELATIVE_TO_PARENT, 0f,
-                        Animation.RELATIVE_TO_PARENT, -1f);
-                animation.setDuration(1500);
-                mTopOverlay.setVisibility(View.INVISIBLE);
-                mTopOverlay.setAnimation(animation);
-            }
-        });
-    */
-        mTopOverlayLongTap = (LinearLayout)findViewById(R.id.top_overlay_long_tap);
+
 
         mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
         mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
-        /*mWallpaperYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
-                mBlurLayer.setVisibility(View.GONE);
-            }
-        });
-        mWallpaperNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
-                mBlurLayer.setVisibility(View.GONE);
-            }
-        });
 
-*/      mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                    Toast.makeText(HomeActivity.this,"Dailywallpaper set",Toast.LENGTH_SHORT).show();
-                    /*mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
-                    mBlurLayer.setVisibility(View.GONE);*/
+                    setAlarmManagerToSetWallPaper();
+                    Toast.makeText(HomeActivity.this,"Pixtory will get personalized wallpaper for your device",Toast.LENGTH_SHORT).show();
+
                 }
                 else
                 {
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
-                    Toast.makeText(HomeActivity.this,"Dailywallpaper disabled",Toast.LENGTH_SHORT).show();
-                    /*mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
-                    mBlurLayer.setVisibility(View.GONE);*/
+                    cancelAlarm();
+                    Toast.makeText(HomeActivity.this,"You can check this option again from menu options",Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
-        mTopOverlayWallpaperSetting.setOnClickListener(new View.OnClickListener() {
+        mWallpaperCoachMark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTopOverlayWallpaperSetting.setVisibility(View.INVISIBLE);
-                mBlurLayer.setVisibility(View.GONE);
+                mWallpaperCoachMark.setVisibility(View.INVISIBLE);
+                mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
             }
         });
 
@@ -385,8 +354,40 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
                     }
                 });
+
     }
 
+    public void setAlarmManagerToSetWallPaper(){
+        mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+
+        mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTime(new Date());
+//        calendar.set(Calendar.HOUR_OF_DAY, 19);
+//        calendar.set(Calendar.MINUTE, 30);
+
+
+//        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                AlarmManager.INTERVAL_HALF_HOUR,
+//                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
+
+        //repeat alarm in 40 sec
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000 * 20 , mPendingIntent);
+        Log.i("Alarm","setAlarmManagerToSetWallPaper called");
+
+    }
+
+    public void cancelAlarm(){
+        if(mAlarmManager != null && mPendingIntent != null){
+            mAlarmManager.cancel(mPendingIntent);
+            Log.i("Alarm", "Alarm Manager Canceled");
+        }
+    }
 
 //    @OnClick(R.id.profileIcon)
 //    public void onUserImageClick() {
@@ -458,15 +459,15 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 boolean sentToken = sharedPreferences
                         .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    Log.e("AASHA", "Registered for push notifs");
+                    Log.e(TAG, "Registered for push notifs");
                 } else {
-                    Log.e("AASHA", "Failed");
+                    Log.e(TAG, "Registration for push notification failed");
                 }
             }
         };
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
-            Log.i("SRIRAM","PushNotifications");
+            Log.i(TAG,"PushNotifications");
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
@@ -1133,9 +1134,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         }
                         else
                             mWallpaperTopText.setVisibility(View.GONE);
-                        mTopOverlayWallpaperSetting.setVisibility(View.VISIBLE);
-                        mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
-                        mBlurLayer.setVisibility(View.VISIBLE);
+                        mWallpaperCoachMark.setVisibility(View.VISIBLE);
+                        mWallpaperCoachMarkBlurBg.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+                        mWallpaperCoachMarkBlurBg.setVisibility(View.VISIBLE);
                         break;
                 }
             }
@@ -1268,42 +1269,42 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mProgress.dismiss();
     }
 
-    private boolean isFirstTimeOpen(){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
-        if(firstRun){
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(Is_First_Run,false);
-            editor.commit();
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 1f,
-                            Animation.RELATIVE_TO_PARENT, 0f);
-                    animation.setDuration(1500);
-                    animation.setFillEnabled(true);
-                    mTopOverlay.setVisibility(View.VISIBLE);
-                    mTopOverlay.setAnimation(animation);
-                }
-            },4000);
-            mTopOverlay.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, -1f);
-                    animation.setDuration(1500);
-                    mTopOverlay.setVisibility(View.INVISIBLE);
-                    mTopOverlay.setAnimation(animation);
-                }
-            });
-        }
-        return firstRun;
-    }
+//    private boolean isFirstTimeOpen(){
+//        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+//        boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
+//        if(firstRun){
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putBoolean(Is_First_Run,false);
+//            editor.commit();
+//            final Handler handler = new Handler();
+//            handler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+//                            Animation.RELATIVE_TO_PARENT, 0f,
+//                            Animation.RELATIVE_TO_PARENT, 1f,
+//                            Animation.RELATIVE_TO_PARENT, 0f);
+//                    animation.setDuration(1500);
+//                    animation.setFillEnabled(true);
+//                    mSwipeUpCoachMark.setVisibility(View.VISIBLE);
+//                    mSwipeUpCoachMark.setAnimation(animation);
+//                }
+//            },4000);
+//            mSwipeUpCoachMark.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+//                            Animation.RELATIVE_TO_PARENT, 0f,
+//                            Animation.RELATIVE_TO_PARENT, 0f,
+//                            Animation.RELATIVE_TO_PARENT, -1f);
+//                    animation.setDuration(1500);
+//                    mSwipeUpCoachMark.setVisibility(View.INVISIBLE);
+//                    mSwipeUpCoachMark.setAnimation(animation);
+//                }
+//            });
+//        }
+//        return firstRun;
+//    }
 
     private int swipeCount(){
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
@@ -1314,37 +1315,119 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
          editor.putInt(Swipe_Count,count+1);
          editor.commit();
         }
-        if(count==6){
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 1f,
-                            Animation.RELATIVE_TO_PARENT, 0f);
-                    animation.setDuration(1500);
-                    animation.setFillEnabled(true);
-                    mTopOverlayLongTap.setVisibility(View.VISIBLE);
-                    mTopOverlayLongTap.setAnimation(animation);
-                }
-            },500);
-            mTopOverlayLongTap.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, -1f);
-                    animation.setDuration(1500);
-                    mTopOverlayLongTap.setVisibility(View.INVISIBLE);
-                    mTopOverlayLongTap.setAnimation(animation);
-                }
-            });
+
+
+        switch (count){
+            case 1: showCoachMarks(mSwipeUpCoachMark);
+                break;
+
+            case 6: showCoachMarks(mSwipeUpCoachMarkLongTap);
+                break;
+
+            case 10: showWallPaperCoachMark();
+                break;
 
         }
 
-        if(count == 10){
+        return count;
+    }
+
+    public void showCoachMarks(final View coachMarkView){
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, 0f,
+                        Animation.RELATIVE_TO_PARENT, 1f,
+                        Animation.RELATIVE_TO_PARENT, 0f);
+                animation.setDuration(1500);
+                animation.setFillEnabled(true);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+
+                        coachMarkView.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                              coachMarkView.setVisibility(View.GONE);
+                                Animation fadeOut = new AlphaAnimation(1, 0);
+                                fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+                                fadeOut.setStartOffset(300);
+                                fadeOut.setDuration(200);
+
+                                fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                                    @Override
+                                    public void onAnimationStart(Animation animation) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animation animation) {
+                                        coachMarkView.setVisibility(View.GONE);
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animation animation) {
+
+                                    }
+                                });
+
+                                coachMarkView.startAnimation(fadeOut);
+                                mainFragment.setActioUpEnabled(false);
+
+                                return false;
+                            }
+                        });
+
+//                                @Override
+//                                public void onClick(View v) {
+//                                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
+//                                            Animation.RELATIVE_TO_PARENT, 0f,
+//                                            Animation.RELATIVE_TO_PARENT, 0f,
+//                                            Animation.RELATIVE_TO_PARENT, -1f);
+//                                    animation.setDuration(1500);
+//                                    animation.setAnimationListener(new Animation.AnimationListener() {
+//                                        @Override
+//                                        public void onAnimationStart(Animation animation) {
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onAnimationEnd(Animation animation) {
+//                                            mPager.setClickable(true);
+//                                        }
+//
+//                                        @Override
+//                                        public void onAnimationRepeat(Animation animation) {
+//                                        }
+//                                    });
+//                                    mSwipeUpCoachMark.setVisibility(View.INVISIBLE);
+//                                    mSwipeUpCoachMark.setAnimation(animation);
+//                                }
+
+//                            mainFragment.setActioUpEnabled(true);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                coachMarkView.setVisibility(View.VISIBLE);
+                coachMarkView.setAnimation(animation);
+            }
+        },500);
+
+    }
+
+    private void showWallPaperCoachMark(){
+
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -1358,73 +1441,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     }
                     else
                         mWallpaperTopText.setVisibility(View.GONE);
-                    mTopOverlayWallpaperSetting.setVisibility(View.VISIBLE);
-                    mBlurLayer.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
-                    mBlurLayer.setVisibility(View.VISIBLE);
+                    mWallpaperCoachMark.setVisibility(View.VISIBLE);
+                    mWallpaperCoachMarkBlurBg.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+                    mWallpaperCoachMarkBlurBg.setVisibility(View.VISIBLE);
                 }
             },500);
-        }
 
-        if(count==1){
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 0f,
-                            Animation.RELATIVE_TO_PARENT, 1f,
-                            Animation.RELATIVE_TO_PARENT, 0f);
-                    animation.setDuration(1500);
-                    animation.setFillEnabled(true);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                            mPager.setClickable(false);
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-
-                            mTopOverlay.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-                                            Animation.RELATIVE_TO_PARENT, 0f,
-                                            Animation.RELATIVE_TO_PARENT, 0f,
-                                            Animation.RELATIVE_TO_PARENT, -1f);
-                                    animation.setDuration(1500);
-                                    animation.setAnimationListener(new Animation.AnimationListener() {
-                                        @Override
-                                        public void onAnimationStart(Animation animation) {
-
-                                        }
-
-                                        @Override
-                                        public void onAnimationEnd(Animation animation) {
-                                            mPager.setClickable(true);
-                                        }
-
-                                        @Override
-                                        public void onAnimationRepeat(Animation animation) {
-                                        }
-                                    });
-                                    mTopOverlay.setVisibility(View.INVISIBLE);
-                                    mTopOverlay.setAnimation(animation);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    mTopOverlay.setVisibility(View.VISIBLE);
-                    mTopOverlay.setAnimation(animation);
-                }
-            },500);
-        }
-        return count;
     }
 
 }

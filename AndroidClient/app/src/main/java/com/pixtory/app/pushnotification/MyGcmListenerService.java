@@ -115,7 +115,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 .setSmallIcon(R.drawable.pixtory_icon)
                 .setContentTitle("pixtory")
                 .setContentText(message)
-                .setAutoCancel(true)
+                .setAutoCancel(true).setSound(defaultSoundUri)
                 .setContent(remoteViews);
         if(b!=null)
             remoteViews.setImageViewBitmap(R.id.notification_image,b);
