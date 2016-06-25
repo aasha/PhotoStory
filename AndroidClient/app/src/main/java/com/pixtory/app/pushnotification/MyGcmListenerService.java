@@ -113,7 +113,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.pixtory_icon)
-                .setContentTitle("pixtory")
+                .setContentTitle("Pixtory")
                 .setContentText(message)
                 .setAutoCancel(true);
         if(b!=null)
