@@ -378,7 +378,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         //repeat alarm in 40 sec
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 20 , mPendingIntent);
+                1000*60*60*24, mPendingIntent);
         Log.i("Alarm","setAlarmManagerToSetWallPaper called");
 
     }
@@ -826,9 +826,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             Toast.makeText(HomeActivity.this,"Screen density::" + density,Toast.LENGTH_SHORT).show();
         }
 
-
     }
-
 
     /*
     method for 'become a contributor' item
@@ -948,47 +946,47 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.show();
     }
 
-    private void showWallpaperAlert(){
-        final Dialog dialog = new Dialog(HomeActivity.this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.wallpaper_alert);
-
-        DisplayMetrics dm =  new DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = (int)(0.9*dm.widthPixels);
-        lp.gravity = Gravity.CENTER;
-
-        dialog.getWindow().setLayout(lp.width,lp.height);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
-        LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
-        LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
-        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
-        layoutParams.width = (int)(0.5*dm.widthPixels);
-        wallpaperYes.setLayoutParams(layoutParams);*/
-        wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Utils.setWallpaper(HomeActivity.this , getApplicationContext() ,App.getContentData().get(mPager.getCurrentItem()).pictureUrl);
-                dialog.dismiss();
-            }
-        });
-
-        wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-    }
+//    private void showWallpaperAlert(){
+//        final Dialog dialog = new Dialog(HomeActivity.this);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.wallpaper_alert);
+//
+//        DisplayMetrics dm =  new DisplayMetrics();
+//        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
+//
+//
+//        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+//        lp.copyFrom(dialog.getWindow().getAttributes());
+//        lp.width = (int)(0.9*dm.widthPixels);
+//        lp.gravity = Gravity.CENTER;
+//
+//        dialog.getWindow().setLayout(lp.width,lp.height);
+//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//
+//        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
+//        LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
+//        LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
+//        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
+//        layoutParams.width = (int)(0.5*dm.widthPixels);
+//        wallpaperYes.setLayoutParams(layoutParams);*/
+//        wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Utils.setWallpaper(HomeActivity.this , getApplicationContext() ,App.getContentData().get(mPager.getCurrentItem()).pictureUrl);
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        dialog.show();
+//    }
 
 
 

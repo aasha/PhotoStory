@@ -531,7 +531,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
-            mTextStoryDetails.setText(Html.fromHtml(cd.pictureDescription) +"\n\n\n\n\n\n\n\n\n\n\n\n")
+            mTextStoryDetails.setText(Html.fromHtml(cd.pictureDescription+"<br></br><br></br><br></br><br></br><br>" +
+                    "</br><br></br><br></br><br></br><br></br><br></br><br></br>"))
             ;
 //            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
         }
@@ -779,14 +780,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         if(offset > mBottomScreenHt ){
             showCommentsShareLayout(true);
-            mListener.showMenuIcon(false);
-            storyBackImg.setVisibility(View.GONE);
-
         }
         else{
-            mListener.showMenuIcon(true);
             showCommentsShareLayout(false);
-            storyBackImg.setVisibility(View.VISIBLE);
         }
 
         return true;
@@ -817,10 +813,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             int min_dist = (scrollY-oldScrollY);
             if( min_dist != 0){
                 setUpHalfScreen();
+            }
             mStoryParentLayout.fullScroll(View.FOCUS_UP);
-        }
-
-        return false;
+            return false;
         }
 
         return false;
@@ -847,7 +842,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
             if( min_dist != 0){
                 setUpHalfScreen();
-                mStoryParentLayout.fullScroll(View.FOCUS_UP);}
+                mStoryParentLayout.fullScroll(View.FOCUS_UP);
+            }
         }
 
         return false;
@@ -881,16 +877,22 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                     if(isScrollingUp){
 
+                        mListener.showMenuIcon(false);
+                        storyBackImg.setVisibility(View.GONE);
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
+
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
                                     .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                     .put("PIXTORY_ID",""+mContentData.id)
                                     .build());
                     }
                     else {
-                        isFullScreenShown = true;
+
+                        mListener.showMenuIcon(true);
+                        storyBackImg.setVisibility(View.VISIBLE);
                         mImageDetailsLayout.smoothScrollTo(0, 0);
+                        isFullScreenShown = true;
                         mTextExpert.setVisibility(View.VISIBLE);
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
                                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
