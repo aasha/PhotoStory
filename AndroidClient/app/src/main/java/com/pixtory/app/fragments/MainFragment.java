@@ -477,7 +477,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         else
             mEditorPickBage.setVisibility(View.GONE);
 
-        String name = (!(cd.personDetails.name.equals("")))? "By , "+cd.personDetails.name : " ";
+        String name = (!(cd.personDetails.name.equals("")))? "By, "+cd.personDetails.name : " ";
         mTextExpert.setText(name);
 
         if (mContentData.likedByUser == true)
@@ -1239,7 +1239,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private void showWallpaperAlert(){
         final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.wallpaper_alert);
+        dialog.setContentView(R.layout.set_wallpaper_alert);
 
         DisplayMetrics dm =  new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -1252,8 +1252,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         dialog.getWindow().setLayout(lp.width,lp.height);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
-        LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
+        FrameLayout wallpaperNo = (FrameLayout) dialog.findViewById(R.id.wallpaper_no_2);
+        FrameLayout wallpaperYes =(FrameLayout) dialog.findViewById(R.id.wallpaper_yes_2);
 
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override

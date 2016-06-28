@@ -642,8 +642,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
-        LinearLayout feedbackCancel = (LinearLayout)dialog.findViewById(R.id.feedback_cancel);
-        LinearLayout feedbackSend =(LinearLayout) dialog.findViewById(R.id.feedback_send);
+        FrameLayout feedbackCancel = (FrameLayout)dialog.findViewById(R.id.feedback_cancel);
+        FrameLayout feedbackSend =(FrameLayout) dialog.findViewById(R.id.feedback_send);
 
         final Spinner spinnerFeedback = (Spinner)dialog.findViewById(R.id.spinner_feedback);
         final Spinner spinnerCategory = (Spinner)dialog.findViewById(R.id.spinner_category);
@@ -807,7 +807,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private void showContributeDialog(){
         final Dialog dialog = new Dialog(HomeActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.contribute_dialog);
+        dialog.setContentView(R.layout.contributor_dialog);
 
         DisplayMetrics dm =  new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -824,8 +824,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         final EditText cEmail = (EditText)dialog.findViewById(R.id.c_email);
         final EditText cName = (EditText)dialog.findViewById(R.id.c_name);
         final EditText cNumber = (EditText)dialog.findViewById(R.id.c_phone);
-        LinearLayout contributeCancel = (LinearLayout)dialog.findViewById(R.id.contribute_cancel);
-        LinearLayout contriuteSubmit =(LinearLayout) dialog.findViewById(R.id.contribute_submit);
+        FrameLayout contributeCancel = (FrameLayout)dialog.findViewById(R.id.contributor_cancel);
+        FrameLayout contriuteSubmit =(FrameLayout) dialog.findViewById(R.id.contributor_submit);
 
 
             contributeCancel.setOnClickListener(new TextView.OnClickListener() {

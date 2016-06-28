@@ -3,7 +3,7 @@
     <solid
         android:color="@color/fb_blue"/>
     <corners
-        android:radius="10dp" />
+        android:radius="0dp" />
     <stroke
         android:width="0dp"
         android:color="@color/app_blue" >

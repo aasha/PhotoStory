@@ -1,65 +1,72 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="fill_parent"
     android:background="@color/white">
     <TextView
-        android:text="Feedback on Pixtory"
-        android:textSize="20sp"
+        android:text="@string/contribute_text"
+        android:textSize="15sp"
         android:textAlignment="center"
         android:paddingTop="15dp"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:scaleType="center"
-        android:textColor="@color/black"
         android:contentDescription="@string/app_name"
+        android:padding="20dp"
+        android:textColor="@color/black"
         android:fontFamily="sans-serif"/>
-    <!--<View android:layout_width="match_parent"-->
-        <!--android:layout_height="2dp"-->
-        <!--android:background="@color/app_blue"-->
-        <!--android:layout_marginRight="3dp"/>-->
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="41dp"
-        android:background="@drawable/drop_down_background"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp"
-        android:id="@+id/spinner_feedback"></Spinner>
 
-    <Spinner
-    android:layout_width="match_parent"
-    android:layout_height="41dp"
-    android:background="@drawable/drop_down_background"
-    android:layout_marginTop="20dp"
-    android:layout_marginLeft="17dp"
-    android:layout_marginRight="17dp"
-    android:id="@+id/spinner_category"></Spinner>
-
-    <Spinner
-    android:layout_width="match_parent"
-    android:layout_height="41dp"
-    android:background="@drawable/drop_down_background"
-    android:layout_marginTop="20dp"
-    android:layout_marginLeft="17dp"
-    android:layout_marginRight="17dp"
-    android:id="@+id/spinner_subcateogry"></Spinner>
-
+    <View android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/opaque_black"/>
     <EditText
-        android:id="@+id/feedback_text"
-        android:inputType="textMultiLine"
+        android:id="@+id/c_name"
         android:layout_width="match_parent"
         android:textSize="20sp"
-        android:layout_height="124dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_marginBottom="4dp"
+        android:padding="10dp"
+        android:lines="1"
+        android:hint="Your name"
+        android:textColor="@color/black"
+        android:paddingBottom="5dp"
+        android:background="@drawable/edit_text_theme"/>
+    <EditText
+        android:id="@+id/c_email"
+        android:layout_width="match_parent"
+        android:textSize="20sp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_marginBottom="4dp"
+        android:lines="1"
+        android:padding="10dp"
+        android:hint="Your email id"
+        android:textColor="@color/black"
+        android:inputType="textEmailAddress"
+        android:paddingBottom="5dp"
+        android:background="@drawable/edit_text_theme"/>
+
+    <EditText
+        android:id="@+id/c_phone"
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:layout_height="40dp"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
         android:layout_marginBottom="16dp"
-        android:lines="6"
-        android:hint="Please share your thoughts with us!"
-        android:fontFamily="sans-serif"
+        android:lines="1"
+        android:hint="Your phone number"
         android:textColor="@color/black"
-        style="@style/EditTextCustom" />
+        android:inputType="phone"
+        android:paddingBottom="5dp"
+        android:background="@drawable/edit_text_theme"/>
 
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -79,7 +86,7 @@
             android:layout_weight="1"
             android:layout_margin="0dp"
             android:background="@drawable/yes_no_selector"
-            android:id="@+id/feedback_cancel"
+            android:id="@+id/contributor_cancel"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="wrap_content"
@@ -101,7 +108,7 @@
             android:layout_weight="1"
             android:layout_margin="0dp"
             android:background="@drawable/yes_no_selector"
-            android:id="@+id/feedback_send">
+            android:id="@+id/contributor_submit">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -115,6 +122,8 @@
 
 
     </LinearLayout>
-
-
+    <!--<View android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#3399ff"
+        android:layout_marginRight="3dp"/>-->
 </LinearLayout>

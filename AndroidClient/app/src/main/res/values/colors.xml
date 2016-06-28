@@ -43,6 +43,7 @@
     <color name="translucent_white_2">#ddffffff</color>
     <color name="menu_item_color">#414141</color>
     <color name="coach_mark_background_color">#60ffffff</color>
+    <color name="opaque_black">#88000000</color>
 
 
 

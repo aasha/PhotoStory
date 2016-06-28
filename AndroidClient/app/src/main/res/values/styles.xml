@@ -30,4 +30,11 @@
 
         <item name="android:windowBackground">@drawable/splash_layout</item>
     </style>
+
+    <style name="EditTextTheme">
+        <!-- Used for the bottom line when not selected / focused -->
+        <item name="colorControlNormal">#9e9e9e</item>
+        <item name="colorControlActivated">@color/opaque_black</item>
+        <item name="colorControlHighlight">@color/opaque_black</item>
+    </style>
 </resources>
