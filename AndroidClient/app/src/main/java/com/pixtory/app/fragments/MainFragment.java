@@ -1274,31 +1274,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public void setWallpaper(){
-//        String imgUrl = mContentData.pictureUrl;
-        Picasso.with(mContext).load(mContentData.pictureUrl).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                WallpaperManager myWallpaperManager
-                        = WallpaperManager.getInstance(mContext.getApplicationContext());
-                try {
-                    myWallpaperManager.setBitmap(bitmap);
-                    Toast.makeText(mContext,"Wallpaper set",Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    Toast.makeText(mContext,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
+        if(App.getWallpaperTarget()!=null)
+            Picasso.with(mContext).load(mContentData.pictureUrl).into(App.getWallpaperTarget());
+        else
+            Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
     }
 
     public void sharePixtory(final ContentData contentData)
@@ -1341,21 +1321,21 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             String packageName=resInfo.activityInfo.packageName;
                             Log.i("Package Name", packageName);
                             if(packageName.contains("com.facebook.katana") || packageName.contains("android.gm") || packageName.contains("com.instagram.android")){
-                                String data = contentData.pictureDescription;
-                                data = data.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","");
+                                String content = Html.fromHtml(contentData.pictureDescription).toString();
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
                                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
                                 intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
                                 intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+data);
+                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
                                 intent.setPackage(packageName);
                                 targetInviteIntents.add(intent);
                             }
                             else if(packageName.contains("com.whatsapp")){
                                 String data = contentData.pictureDescription;
-                                data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_");
+                                data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","");
+                                data = Html.fromHtml(data).toString();
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
