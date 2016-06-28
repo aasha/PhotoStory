@@ -15,36 +15,49 @@
         android:contentDescription="@string/app_name"
         android:fontFamily="sans-serif"/>
     <!--<View android:layout_width="match_parent"-->
-        <!--android:layout_height="2dp"-->
-        <!--android:background="@color/app_blue"-->
-        <!--android:layout_marginRight="3dp"/>-->
+    <!--android:layout_height="2dp"-->
+    <!--android:background="@color/app_blue"-->
+    <!--android:layout_marginRight="3dp"/>-->
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="41dp"
-        android:background="@drawable/drop_down_background"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
-        android:id="@+id/spinner_feedback"></Spinner>
+        android:id="@+id/spinner_feedback">
+
+    </Spinner>
+    <View android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/opaque_black"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
 
     <Spinner
-    android:layout_width="match_parent"
-    android:layout_height="41dp"
-    android:background="@drawable/drop_down_background"
-    android:layout_marginTop="20dp"
-    android:layout_marginLeft="17dp"
-    android:layout_marginRight="17dp"
-    android:id="@+id/spinner_category"></Spinner>
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:id="@+id/spinner_category"></Spinner>
+    <View android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/opaque_black"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
 
     <Spinner
-    android:layout_width="match_parent"
-    android:layout_height="41dp"
-    android:background="@drawable/drop_down_background"
-    android:layout_marginTop="20dp"
-    android:layout_marginLeft="17dp"
-    android:layout_marginRight="17dp"
-    android:id="@+id/spinner_subcateogry"></Spinner>
-
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:id="@+id/spinner_subcateogry"></Spinner>
+    <View android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/opaque_black"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
     <EditText
         android:id="@+id/feedback_text"
         android:inputType="textMultiLine"
