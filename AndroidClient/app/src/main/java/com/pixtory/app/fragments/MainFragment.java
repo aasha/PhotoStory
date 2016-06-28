@@ -1366,6 +1366,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             else if(packageName.contains("com.whatsapp")){
                                 String data = contentData.pictureDescription;
                                 data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","");
+                                data = Html.fromHtml(data).toString();
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
