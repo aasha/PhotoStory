@@ -1,10 +1,15 @@
 package com.pixtory.app.app;
 
 import android.app.Application;
+import android.app.WallpaperManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.Toast;
+
 import com.amplitude.api.Amplitude;
 import com.crittercism.app.Crittercism;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -15,7 +20,9 @@ import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -61,6 +68,8 @@ public class App extends Application implements AppConstants {
         }
     };
 
+    private static Target mWallpaperTarget;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -94,6 +103,38 @@ public class App extends Application implements AppConstants {
         built.setIndicatorsEnabled(false);
         built.setLoggingEnabled(false);
         Picasso.setSingletonInstance(built);
+
+        mWallpaperTarget = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Log.i("WallPaper","Set wallpaper onBitmapLoaded called");
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                    Log.i("WallPaper","Set wallpaper done");
+                    Toast.makeText(getApplicationContext(),"Wallpaper set",Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    Log.i("WallPaper","Set wallpaper IO exception");
+                    Toast.makeText(getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Log.i("WallPaper","Set wallpaper onBitmapFailed called");
+                Toast.makeText(getApplicationContext(),"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                Log.i("WallPaper","Set wallpaper onPrepareLoad called");
+            }
+        };
+
+
     }
 
     synchronized public Tracker getDefaultTracker() {
@@ -170,4 +211,9 @@ public class App extends Application implements AppConstants {
         return null;
     }
 
+    public static Target getWallpaperTarget(){
+        if(mWallpaperTarget!=null)
+            return mWallpaperTarget;
+        return null;
+    }
 }

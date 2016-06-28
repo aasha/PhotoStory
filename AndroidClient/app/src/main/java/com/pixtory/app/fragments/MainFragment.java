@@ -1284,32 +1284,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public void setWallpaper(){
-//        String imgUrl = mContentData.pictureUrl;
-        Picasso.with(mContext).load(mContentData.pictureUrl).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                WallpaperManager myWallpaperManager
-                        = WallpaperManager.getInstance(mContext.getApplicationContext());
-                try {
-                    myWallpaperManager.setBitmap(bitmap);
-                    Toast.makeText(mContext.getApplicationContext(),"Wallpaper set",Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
+        if(App.getWallpaperTarget()!=null)
+            Picasso.with(mContext).load(mContentData.pictureUrl).into(App.getWallpaperTarget());
+        else
+            Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
     }
 
     public void sharePixtory(final ContentData contentData)
