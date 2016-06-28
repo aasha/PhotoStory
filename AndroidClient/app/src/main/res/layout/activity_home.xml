@@ -175,6 +175,7 @@
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:textSize="27sp"
+                android:id="@+id/wallpaper_coachmark_text"
                 android:fontFamily="sans-serif-regular"/>
             <FrameLayout
                 android:layout_width="wrap_content"

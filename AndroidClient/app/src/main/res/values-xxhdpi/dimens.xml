@@ -10,4 +10,7 @@
     <dimen name="skip_login_font">12sp</dimen>
     <dimen name="card_name_font">10sp</dimen>
 
+    <dimen name="image_detail_width">250dp</dimen>
+
+
 </resources>

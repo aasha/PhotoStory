@@ -46,6 +46,7 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -532,7 +533,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextStoryDetails.setText(Html.fromHtml(cd.pictureDescription+"<br></br><br></br><br></br><br></br><br>" +
-                    "</br><br></br><br></br><br></br><br></br><br></br><br></br>"))
+                    "</br><br></br><br></br>"))
             ;
 //            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
         }
@@ -784,7 +785,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         else{
             showCommentsShareLayout(false);
         }
-
         return true;
 
     }
@@ -809,15 +809,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         // Disallow the touch request for parent scroll on touch of child view
         if (me.getAction() == MotionEvent.ACTION_UP) {
+            Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
 
-            int min_dist = (scrollY-oldScrollY);
-            if( min_dist != 0){
+            if((scrollY-oldScrollY) != 0){
                 setUpHalfScreen();
             }
-            mStoryParentLayout.fullScroll(View.FOCUS_UP);
             return false;
         }
-
         return false;
 
     }
@@ -837,12 +835,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
 //            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
-            float min_dist = (scrollY-oldScrollY);
-            Log.i(TAG,"min dist-"+min_dist);
+            Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
 
-            if( min_dist != 0){
+            if( (scrollY-oldScrollY) != 0){
                 setUpHalfScreen();
-                mStoryParentLayout.fullScroll(View.FOCUS_UP);
             }
         }
 
@@ -851,14 +847,18 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private void setUpFullScreen(){
         isFullScreenShown = true;
+        mStoryParentLayout.fullScroll(View.FOCUS_UP);
+
 
         attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
-        mImageDetailsLayout.smoothScrollTo(0, 0);
 
         mImageDetailsLayout.setVisibility(View.VISIBLE);
         mTextExpert.setVisibility(View.VISIBLE);
 
         mCommentShareLayout.setVisibility(View.GONE);
+        mImageDetailsLayout.smoothScrollTo(0, 0);
+
+
     }
 
     private void setUpHalfScreen(){
@@ -874,9 +874,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mImageDetailsLayout.post(new Runnable() {
                 @Override
                 public void run() {
-
                     if(isScrollingUp){
-
                         mListener.showMenuIcon(false);
                         storyBackImg.setVisibility(View.GONE);
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
@@ -893,6 +891,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         storyBackImg.setVisibility(View.VISIBLE);
                         mImageDetailsLayout.smoothScrollTo(0, 0);
                         isFullScreenShown = true;
+                        mStoryParentLayout.fullScroll(View.FOCUS_UP);
+
                         mTextExpert.setVisibility(View.VISIBLE);
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
                                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
@@ -916,20 +916,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             public void onAnimationStart(Animator animator) {
 
             }
-
             @Override
             public void onAnimationEnd(Animator animator) {
                 if(showContent){
-//                    mSlantView.setVisibility(View.GONE);
                     mTextExpert.setVisibility(View.VISIBLE);
                 }
             }
-
             @Override
             public void onAnimationCancel(Animator animator) {
 
             }
-
             @Override
             public void onAnimationRepeat(Animator animator) {
 
@@ -987,7 +983,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 else{
                     mListener.showLoginAlert();
                 }
-
             }
         });
 
@@ -1249,7 +1244,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         DisplayMetrics dm =  new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = (int)(0.9*dm.widthPixels);
@@ -1258,12 +1252,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         dialog.getWindow().setLayout(lp.width,lp.height);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
         LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
         LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
-        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
-        layoutParams.width = (int)(0.5*dm.widthPixels);
-        wallpaperYes.setLayoutParams(layoutParams);*/
+
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1275,7 +1266,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
-
                 dialog.dismiss();
             }
         });
@@ -1292,9 +1282,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         = WallpaperManager.getInstance(mContext.getApplicationContext());
                 try {
                     myWallpaperManager.setBitmap(bitmap);
-                    Toast.makeText(mContext.getApplicationContext(),"Wallpaper set",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,"Wallpaper set",Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
-                    Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
@@ -1302,7 +1292,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
                 Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
-
             }
 
             @Override

@@ -190,6 +190,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             Utils.putUserName(OnBoardingActivity.this, name);
                             Utils.putUserImage(OnBoardingActivity.this, imgUrl);
                             AmplitudeLog.sendUserInfo(regResp.userId);
+
                             gotoNextScreen();
                         }
 
@@ -218,6 +219,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
     private void gotoNextScreen() {
         Intent i = new Intent(OnBoardingActivity.this, HomeActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(i);
         this.finish();
     }

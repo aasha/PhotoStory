@@ -161,6 +161,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     //coachmark overlays
     private FrameLayout mSwipeUpCoachMark;
     private FrameLayout mWallpaperCoachMark;
+    private TextView mWallpaperCoachMarkText;
     private LinearLayout mSwipeUpCoachMarkLongTap;
     private ImageView mWallpaperCoachMarkBlurBg;
     private TextView mWallpaperYes;
@@ -191,9 +192,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         ButterKnife.bind(this);
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
-       /* if (Utils.isConnectedViaWifi(mCtx) == false) {
-            showAlert();
-        }*/
+
+
         Log.i(TAG, "home activity oncreate");
         callbackManager = CallbackManager.Factory.create();
 
@@ -203,9 +203,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         mLoadingText.setVisibility(View.VISIBLE);
         mOuterContainer.setVisibility(View.GONE);
+        prepareFeed();
 
         setPersonDetails();
-        setUpNavigationDrawer();
+
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
 
@@ -213,7 +214,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mConnectionClassManager = ConnectionClassManager.getInstance();
         mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
         mListener = new ConnectionChangedListener();
-        prepareFeed();
         //while(App.getContentData()==null);
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
@@ -258,11 +258,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             }
         });
 
-
+        setUpNavigationDrawer();
         //Binding coachmark overlays
         mWallpaperCoachMarkBlurBg = (ImageView)findViewById(R.id.blur_layer);
         mSwipeUpCoachMark = (FrameLayout) findViewById(R.id.top_overlay_swipe_up);
         mWallpaperCoachMark = (FrameLayout) findViewById(R.id.top_overlay_wallpaper_setting);
+        mWallpaperCoachMarkText = (TextView)findViewById(R.id.wallpaper_coachmark_text);
         mSwipeUpCoachMarkLongTap = (LinearLayout)findViewById(R.id.top_overlay_long_tap);
 
         
@@ -282,8 +283,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         String longTapText = "<b>Long press</b> on an image to set it as your wallpaper";
         mLongTapText.setText(Html.fromHtml(longTapText));
 
-
-
         mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
         mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
 
@@ -294,11 +293,13 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                     setAlarmManagerToSetWallPaper();
+                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
                     Toast.makeText(HomeActivity.this,"Pixtory will get personalized wallpaper for your device",Toast.LENGTH_SHORT).show();
 
                 }
                 else
                 {
+                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
@@ -314,9 +315,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
             }
         });
-
-
-
 
         //Register for push notifs
         registerForPushNotification();
@@ -359,6 +357,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     }
 
     public void setAlarmManagerToSetWallPaper(){
+
         mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
 
         mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
@@ -427,25 +426,25 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void failure(GetMainFeedResponse error) {
                 mProgress.dismiss();
-                mLoadingText.setVisibility(View.GONE);
-                mOuterContainer.setVisibility(View.VISIBLE);
+                mLoadingText.setVisibility(View.VISIBLE);
+                mOuterContainer.setVisibility(View.GONE);
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .put("MESSAGE", error.errorMessage)
                         .build());
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Please check your network connection, cannot proceed further", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void networkFailure(RetrofitError error) {
                 mProgress.dismiss();
-                mLoadingText.setVisibility(View.GONE);
-                mOuterContainer.setVisibility(View.VISIBLE);
+                mLoadingText.setVisibility(View.VISIBLE);
+                mOuterContainer.setVisibility(View.GONE);
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .put("MESSAGE", error.getMessage())
                         .build());
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Please check your network connection, cannot proceed further", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -566,20 +565,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     }
 
-    private void showAlert() {
-        new AlertDialog.Builder(mCtx)
-                .setTitle("Warning")
-                .setMessage("You are not on a Wi-fi connection. pixtory recommends a wi-fi environment for a better experience")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -600,15 +585,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         @Override
         public void onBandwidthStateChange(ConnectionQuality bandwidthState) {
             mConnectionClass = bandwidthState;
-           /* runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
-                            .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                            .put(AppConstants.CONNECTION_QUALITY, mConnectionClass.toString())
-                            .build());
-                }
-            });*/
         }
     }
 
@@ -770,9 +746,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         dialog.show();
     }
 
-
-//    TODO: test method to be removed later
-
     @Override
     public void showMenuIcon(boolean show){
         if(show)
@@ -884,7 +857,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             // mProgress.dismiss();
 
                             Toast.makeText(HomeActivity.this, "Error sending Email id", Toast.LENGTH_SHORT).show();
-                        }
+                        }   
 
                         @Override
                         public void networkFailure(RetrofitError error) {
@@ -945,51 +918,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         dialog.show();
     }
-
-//    private void showWallpaperAlert(){
-//        final Dialog dialog = new Dialog(HomeActivity.this);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.wallpaper_alert);
-//
-//        DisplayMetrics dm =  new DisplayMetrics();
-//        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-//
-//
-//        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-//        lp.copyFrom(dialog.getWindow().getAttributes());
-//        lp.width = (int)(0.9*dm.widthPixels);
-//        lp.gravity = Gravity.CENTER;
-//
-//        dialog.getWindow().setLayout(lp.width,lp.height);
-//        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//
-//        //final EditText feedbackText = (EditText)dialog.findViewById(R.id.feedback_text);
-//        LinearLayout wallpaperNo = (LinearLayout) dialog.findViewById(R.id.wallpaper_no_2);
-//        LinearLayout wallpaperYes =(LinearLayout) dialog.findViewById(R.id.wallpaper_yes_2);
-//        /*ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(wallpaperYes.getWidth(),wallpaperYes.getHeight());
-//        layoutParams.width = (int)(0.5*dm.widthPixels);
-//        wallpaperYes.setLayoutParams(layoutParams);*/
-//        wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Utils.setWallpaper(HomeActivity.this , getApplicationContext() ,App.getContentData().get(mPager.getCurrentItem()).pictureUrl);
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        dialog.show();
-//    }
-
-
-
 
     private void setUpNavigationDrawer() {
 
@@ -1089,13 +1017,21 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             mDrawerLayout.closeDrawer(mDrawerList);
                         break;
 
-                    case 1:AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Profile_Click")
-                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                    .build());
-                        Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
-                        intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
-                        intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
-                        startActivity(intent);
+                    case 1:
+
+                        if(Utils.isNotEmpty(Utils.getFbID(HomeActivity.this))) {
+
+                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Profile_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+                            Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
+                            intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
+                            intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                            startActivity(intent);
+
+                        }else{
+                            showLoginAlert();
+                        }
                         mDrawerLayout.closeDrawer(mDrawerList);
                         break;
 
@@ -1124,18 +1060,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_WallpaperSettings_Click")
                                 .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                                 .build());
-                        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                        boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
-                        boolean isShownBefore = sharedPreferences.getBoolean("Is_Shown_Before",false);
-                        if(!isShownBefore){
-                            mWallpaperTopText.setVisibility(View.VISIBLE);
-                            sharedPreferences.edit().putBoolean("Is_Shown_Before",true).apply();
-                        }
-                        else
-                            mWallpaperTopText.setVisibility(View.GONE);
-                        mWallpaperCoachMark.setVisibility(View.VISIBLE);
-                        mWallpaperCoachMarkBlurBg.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
-                        mWallpaperCoachMarkBlurBg.setVisibility(View.VISIBLE);
+                        prepareWallpaperCoachmark(true);
                         break;
                 }
             }
@@ -1269,42 +1194,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mProgress.dismiss();
     }
 
-//    private boolean isFirstTimeOpen(){
-//        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-//        boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
-//        if(firstRun){
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-//            editor.putBoolean(Is_First_Run,false);
-//            editor.commit();
-//            final Handler handler = new Handler();
-//            handler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-//                            Animation.RELATIVE_TO_PARENT, 0f,
-//                            Animation.RELATIVE_TO_PARENT, 1f,
-//                            Animation.RELATIVE_TO_PARENT, 0f);
-//                    animation.setDuration(1500);
-//                    animation.setFillEnabled(true);
-//                    mSwipeUpCoachMark.setVisibility(View.VISIBLE);
-//                    mSwipeUpCoachMark.setAnimation(animation);
-//                }
-//            },4000);
-//            mSwipeUpCoachMark.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-//                            Animation.RELATIVE_TO_PARENT, 0f,
-//                            Animation.RELATIVE_TO_PARENT, 0f,
-//                            Animation.RELATIVE_TO_PARENT, -1f);
-//                    animation.setDuration(1500);
-//                    mSwipeUpCoachMark.setVisibility(View.INVISIBLE);
-//                    mSwipeUpCoachMark.setAnimation(animation);
-//                }
-//            });
-//        }
-//        return firstRun;
-//    }
 
     private int swipeCount(){
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
@@ -1315,7 +1204,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
          editor.putInt(Swipe_Count,count+1);
          editor.commit();
         }
-
 
         switch (count){
             case 1: showCoachMarks(mSwipeUpCoachMark);
@@ -1328,7 +1216,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 break;
 
         }
-
         return count;
     }
 
@@ -1384,34 +1271,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                                 return false;
                             }
                         });
-
-//                                @Override
-//                                public void onClick(View v) {
-//                                    TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0f,
-//                                            Animation.RELATIVE_TO_PARENT, 0f,
-//                                            Animation.RELATIVE_TO_PARENT, 0f,
-//                                            Animation.RELATIVE_TO_PARENT, -1f);
-//                                    animation.setDuration(1500);
-//                                    animation.setAnimationListener(new Animation.AnimationListener() {
-//                                        @Override
-//                                        public void onAnimationStart(Animation animation) {
-//
-//                                        }
-//
-//                                        @Override
-//                                        public void onAnimationEnd(Animation animation) {
-//                                            mPager.setClickable(true);
-//                                        }
-//
-//                                        @Override
-//                                        public void onAnimationRepeat(Animation animation) {
-//                                        }
-//                                    });
-//                                    mSwipeUpCoachMark.setVisibility(View.INVISIBLE);
-//                                    mSwipeUpCoachMark.setAnimation(animation);
-//                                }
-
-//                            mainFragment.setActioUpEnabled(true);
                     }
 
                     @Override
@@ -1432,21 +1291,35 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                    boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
-                    boolean isShownBefore = sharedPreferences.getBoolean("Is_Shown_Before",false);
-                    if(!isShownBefore){
-                        mWallpaperTopText.setVisibility(View.VISIBLE);
-                        sharedPreferences.edit().putBoolean("Is_Shown_Before",true).apply();
-                    }
-                    else
-                        mWallpaperTopText.setVisibility(View.GONE);
-                    mWallpaperCoachMark.setVisibility(View.VISIBLE);
-                    mWallpaperCoachMarkBlurBg.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
-                    mWallpaperCoachMarkBlurBg.setVisibility(View.VISIBLE);
+                    prepareWallpaperCoachmark(false);
                 }
             },500);
 
+    }
+
+
+    private  void prepareWallpaperCoachmark(boolean isCalledFromMenuOptions){
+
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
+        boolean isShownBefore = sharedPreferences.getBoolean("Is_Shown_Before",false);
+        if(!isShownBefore && !isCalledFromMenuOptions){
+            mWallpaperTopText.setVisibility(View.VISIBLE);
+            sharedPreferences.edit().putBoolean("Is_Shown_Before",true).apply();
+        }
+        else
+            mWallpaperTopText.setVisibility(View.GONE);
+        mWallpaperCoachMark.setVisibility(View.VISIBLE);
+        mWallpaperCoachMarkBlurBg.setImageBitmap(BlurBuilder.blur(findViewById(R.id.whole_frame)));
+        mWallpaperCoachMarkBlurBg.setVisibility(View.VISIBLE);
+
+        if(isOpted){
+            mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
+            mToggleButton.setChecked(true);
+        }else{
+            mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
+            mToggleButton.setChecked(false);
+        }
     }
 
 }

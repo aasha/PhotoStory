@@ -9,6 +9,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:id="@+id/layout_complete"
+        android:background="@drawable/gradient"
         android:visibility="visible"
              tools:context="com.pixtory.app.fragments.MainFragment">
 
@@ -75,7 +76,7 @@
                             android:textSize="11sp"
                             android:textAllCaps="true"
                             android:textColor="@color/grey_5"/>
-                        <TextView android:layout_width="240dp"
+                        <TextView android:layout_width="@dimen/image_detail_width"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/text_place"
                             android:layout_marginLeft="30dp"
@@ -88,7 +89,7 @@
                             android:maxLines="1"/>
                     
                     <TextView
-                        android:layout_width="240dp"
+                        android:layout_width="@dimen/image_detail_width"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:layout_marginLeft="30dp"

@@ -24,6 +24,7 @@
     <dimen name="story_min_height">380dp</dimen>
 
     <dimen name="post_comment_btn_height">60dp</dimen>
+    <dimen name="image_detail_width">240dp</dimen>
 
 
 </resources>
