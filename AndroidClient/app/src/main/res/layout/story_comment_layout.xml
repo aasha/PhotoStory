@@ -52,7 +52,7 @@
     <RelativeLayout
         android:visibility="visible"
         android:layout_width="match_parent"
-        android:layout_height="387dp"
+        android:layout_height="@dimen/comment_min_height"
         android:layout_above="@+id/postBtn_ll"
         android:layout_below="@+id/separator">
 

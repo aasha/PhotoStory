@@ -18,7 +18,7 @@
     <ImageView
         android:layout_width="@dimen/fb_btn_icon_width"
         android:layout_height="@dimen/fb_btn_icon_height"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/fb_icon_margin"
         android:layout_gravity="center"
         android:src="@drawable/fb_icon"/>
         <View

@@ -400,12 +400,63 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
 
-        mStoryParentLayout.getLayoutParams().height =  (int)(0.75f *mDeviceHeightInPx);
+        if(mDeviceHeightInPx > 900){
+            mStoryParentLayout.getLayoutParams().height =  (int)(0.75f *mDeviceHeightInPx);
+        }else {
+            mStoryParentLayout.getLayoutParams().height =  (int)(0.70f *mDeviceHeightInPx);
+        }
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
         mTopLikeLayout.setLayoutParams(relativeParams);
         mTopLikeLayout.requestLayout();
+
+        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT)
+
+        mStoryParentLayout.setOnTouchListener(new NestedScrollView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+
+                if(isCommentsVisible()){
+                    return false;
+                }
+
+//                // Disallow the touch request for parent scroll on touch of child view
+//                if (me.getAction() == MotionEvent.ACTION_UP) {
+//                    Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
+//
+//                    if((scrollY-oldScrollY) != 0){
+//                        setUpHalfScreen();
+//                    }
+//                    return false;
+//                }
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
+
+                        if((scrollY-oldScrollY) != 0){
+                            setUpHalfScreen();
+                        }
+                    break;
+
+
+                }
+                v.onTouchEvent(event);
+                return false;
+
+                // Handle ListView touch events.
+//                return false;
+            }
+        });
 
         setUpFullScreen();
 
@@ -487,13 +538,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         mLikeCountTV.setText(String.valueOf(cd.likeCount));
 
-//        String data = "<b>While slowly sipping on strong ales in the oldest pub in Scotland, I reflected on our journey from Sallochy and Balmaha to Drymen.</b> Our last night out on the trail was spent under the bright countryside stars, only to be replaced by a foggy, moody morning. It followed us the entire morning, allowing narrow shafts of sunlight to pierce through. We hiked 136km in five and a half days.Before we finished our hike, we had to overcome one final hurdle: the Conic Hill. With a 360m ascent over 320m in distance" +
-//                ", it wasn't the tallest peak <b>but it was an incredibly steep summit</b>. Conic Hill also serves as a natural barrier <i>between the famous Scottish highlands </i>and the lowlands."
-//                +
-//                "At the peak, <u>we were faced with a difficult choice. On one side lay the tumultuous</u> Highlands and on the other stood the rolling hills of the Lowlands. There could be no wrong decision - after all, it was Scotland.";
-
-
-
         //***Binding StoryContent****/
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
@@ -535,7 +579,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mTextStoryDetails.setText(Html.fromHtml(cd.pictureDescription+"<br></br><br></br><br></br><br></br><br>" +
                     "</br><br></br><br></br>"))
             ;
-//            mTextStoryDetails.setText(cd.pictureDescription +"\n\n\n\n\n\n\n\n\n\n");
         }
 
         mShareBtn.setOnClickListener(new View.OnClickListener() {
@@ -588,7 +631,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             setCommentsVisible(true);
             mStoryParentLayout.setNestedScrollingEnabled(false);
             mImageDetailsLayout.setScrollingEnabled(false);
-
         }
     }
 
@@ -601,7 +643,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             throw new ClassCastException(activity.toString()
                     + " must implement OnMainFragmentInteractionListener");
         }
-
     }
 
     @Override
@@ -667,12 +708,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         modifyScreenHeight(y);
     }
 
-    boolean isNestedViewScrolling = false;
-//    @Override
-//    public void onScrollChanged(ObservableObservableNestedScrollView scrollView, int x, int y, int oldx, int oldy) {
-//        Log.i(TAG,"Nested view Scrolling::: x:y:oldx:oldy::--"+x+":"+y+":"+oldx+":"+oldy);
-//    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -687,7 +722,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         void showMenuIcon(boolean showMenuIcon);
         void showLoginAlert();
     }
-
 
     public void resetFragmentState() {
         setUpFullScreen();
@@ -848,8 +882,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private void setUpFullScreen(){
         isFullScreenShown = true;
         mStoryParentLayout.fullScroll(View.FOCUS_UP);
-
-
         attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
         mImageDetailsLayout.setVisibility(View.VISIBLE);
@@ -936,7 +968,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     /**
      * Comments Section Implementation
      */
-
     private ArrayList<CommentData> commentDataList;
     private RecyclerView mCommentsRecyclerView;
     private CommentsListAdapter mCommentsRecyclerViewAdapter;
@@ -1229,7 +1260,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public void onBackButtonClicked(){
         if(isCommentsVisible()){
             setCommentsVisible(false);
-//            mListener.onAnimateMenuIcon(false);
             attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
         }
     }

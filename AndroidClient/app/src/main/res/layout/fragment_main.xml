@@ -167,7 +167,7 @@
                 <android.support.v4.widget.NestedScrollView
                     android:id="@+id/pic_story_layout" android:padding="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="200dp"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:visibility="visible"

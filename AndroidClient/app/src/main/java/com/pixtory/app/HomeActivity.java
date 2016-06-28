@@ -395,7 +395,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void prepareFeed() {
 
-
         NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
@@ -599,7 +598,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     App.setPersonConentData(o.contentList);
                 } else {
                     Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
-
                 }
 
                 if (o.userDetails!=null){
@@ -612,8 +610,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
             @Override
             public void failure(GetPersonDetailsResponse error) {
-                // mProgress.dismiss();
-
                 Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
             }
 
@@ -831,7 +827,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             contributeCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 dialog.dismiss();
             }
         });
@@ -848,14 +843,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("BecomeContributor_Submit_Click")
                                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                                     .build());
-
                             Toast.makeText(HomeActivity.this, "Thanks! The team at Pixtory will reach out to you", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void failure(BaseResponse error) {
-                            // mProgress.dismiss();
-
                             Toast.makeText(HomeActivity.this, "Error sending Email id", Toast.LENGTH_SHORT).show();
                         }   
 
