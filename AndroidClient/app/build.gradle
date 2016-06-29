@@ -25,7 +25,6 @@ android {
         versionName "1.1" //increment with every release
     }
 
-
     dexOptions {
         incremental true
         javaMaxHeapSize "4g"

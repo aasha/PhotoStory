@@ -11,14 +11,14 @@ import android.view.View;
 /**
  * Created by sonali kakrayne on 26/05/2016 AD.
  */
-public class SlantViewP extends View {
+public class SlantViewGrey extends View {
 
     private Context mContext;
     Paint paint ;
     Path path;
     private static final int UPC = 0xD6DBE5FF;
 
-    public SlantViewP(Context ctx, AttributeSet attrs) {
+    public SlantViewGrey(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         mContext = ctx;
         setWillNotDraw(false);

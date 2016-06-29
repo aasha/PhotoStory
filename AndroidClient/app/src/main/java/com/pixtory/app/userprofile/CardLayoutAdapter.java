@@ -9,15 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.View.OnClickListener;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,8 +24,6 @@ import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-
-import retrofit.http.HEAD;
 
 
 public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.ViewHolder>{
@@ -102,8 +93,8 @@ public class CardLayoutAdapter extends RecyclerView.Adapter<CardLayoutAdapter.Vi
                 args.putInt(MainFragment.ARG_PARAM1,position);
                 args.putBoolean(MainFragment.ARG_PARAM4,true);
                 storyFragment.setArguments(args);
-                if(context!=null && context instanceof UserProfileActivity2){
-                    UserProfileActivity2 userProfileActivity2 = (UserProfileActivity2)context;
+                if(context!=null && context instanceof UserProfileActivity){
+                    UserProfileActivity userProfileActivity2 = (UserProfileActivity)context;
                     userProfileActivity2.switchFragment(storyFragment);
                 }
             }

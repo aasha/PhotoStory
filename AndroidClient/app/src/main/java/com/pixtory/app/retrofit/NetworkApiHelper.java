@@ -2,6 +2,8 @@ package com.pixtory.app.retrofit;
 
 
 import android.content.Context;
+import android.util.Log;
+
 import com.pixtory.app.utils.Utils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -59,24 +61,29 @@ public class NetworkApiHelper {
         });
     }
 
-    public void getMainFeed(Context ctxt, final NetworkApiCallback cb) {
+    public void getMainFeed(Context ctxt, String userId ,final NetworkApiCallback cb) {
         GetMainFeedRequest req = new GetMainFeedRequest();
-        req.userId = Integer.parseInt(Utils.getUserId(ctxt));
+//        req.userId = Integer.parseInt(Utils.getUserId(ctxt));
+        if(Utils.isNotEmpty(userId)){
+            req.userId = Integer.parseInt(userId);
 
-        sAPI.getMainFeed(req, new Callback<GetMainFeedResponse>() {
-            @Override
-            public void success(GetMainFeedResponse contentResponse, Response response) {
-                if (contentResponse.success == true)
-                    cb.success(contentResponse, response);
-                else
-                    cb.failure(contentResponse);
-            }
+            sAPI.getMainFeed(req, new Callback<GetMainFeedResponse>() {
+                @Override
+                public void success(GetMainFeedResponse contentResponse, Response response) {
+                    if (contentResponse.success == true)
+                        cb.success(contentResponse, response);
+                    else
+                        cb.failure(contentResponse);
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
-                cb.networkFailure(error);
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    cb.networkFailure(error);
+                }
+            });
+        }else{
+            Log.i(TAG , "getMainFeed error--user Id is null");
+        }
     }
 
     /**

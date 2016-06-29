@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -28,7 +26,6 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -41,12 +38,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import butterknife.*;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -58,14 +50,12 @@ import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
-import com.pixtory.app.userprofile.UserProfileActivity2;
+import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.pixtory.app.views.DroidSerifTextView;
 import com.pixtory.app.views.ObservableScrollView;
 import com.pixtory.app.views.ScrollViewListener;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -102,11 +92,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private OnMainFragmentInteractionListener mListener;
 
-    private static final String Vid_Tap_Like = "Vid_Tap_Like";
     private static final String Vid_Tap_Unlike = "Vid_Tap_Unlike";
-    private static final String Vid_Reco_Tap = "Vid_Reco_Tap";
-
-    public static final String Vid_Reco_VideoExpand = "Vid_Reco_VideoExpand";
 
     private Context mContext;
 
@@ -177,6 +163,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     @Bind(R.id.loading_text)
     TextView mLoadingText;
+
+
+    @Bind(R.id.postBtn_ll)
+    LinearLayout mCommentPostBtnLayout;
 
     ImageView swipeUpArrow;
 
@@ -400,10 +390,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mHalfScreenSize = (int)(mHalfScreenPer *mDeviceHeightInPx);
         Log.i(TAG,"mHalfScreenSize::"+mHalfScreenSize);
 
-        if(mDeviceHeightInPx > 900){
+        if(mDeviceHeightInPx > 1280){
             mStoryParentLayout.getLayoutParams().height =  (int)(0.75f *mDeviceHeightInPx);
         }else {
-            mStoryParentLayout.getLayoutParams().height =  (int)(0.70f *mDeviceHeightInPx);
+            mStoryParentLayout.getLayoutParams().height =  (int)(0.72f *mDeviceHeightInPx);
         }
 
         RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT);
@@ -624,6 +614,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             setCommentsVisible(false);
             mStoryParentLayout.setNestedScrollingEnabled(true);
             mImageDetailsLayout.setScrollingEnabled(true);
+            mCommentPostBtnLayout.setVisibility(View.GONE);
 
         }else{
             mImageDetailsLayout.setScrollingEnabled(false);
@@ -631,6 +622,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             setCommentsVisible(true);
             mStoryParentLayout.setNestedScrollingEnabled(false);
             mImageDetailsLayout.setScrollingEnabled(false);
+            mCommentPostBtnLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -683,10 +675,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public void setCommentsVisible(boolean commentsVisible) {
         isCommentsVisible = commentsVisible;
 
-        if(isCommentsVisible)
+        if(isCommentsVisible) {
             mCommentShareLayout.setVisibility(View.GONE);
-        else
+        }
+        else {
             mCommentShareLayout.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -801,7 +795,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 .put("PIXTORY_ID",cd.id+"")
                 .put("POSITION_ID",mContentIndex+"")
                 .build());
-        Intent intent = new Intent(mContext, UserProfileActivity2.class);
+        Intent intent = new Intent(mContext, UserProfileActivity.class);
         intent.putExtra("USER_ID",Utils.getUserId(mContext));
         intent.putExtra("PERSON_ID",cd.personDetails.id+"");
         startActivity(intent);
@@ -978,7 +972,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private void buildCommentsLayout(ContentData data){
 
-        Button mPostComment = (Button)mCommentsLayout.findViewById(R.id.postComment);
+        Button mPostComment = (Button)mRootView.findViewById(R.id.postComment);
         ImageView mCommentCloseBtn = (ImageView)mCommentsLayout.findViewById(R.id.closeBtn);
 
         TextView mPlace = (TextView)mCommentsLayout.findViewById(R.id.txtPlace);
@@ -1184,7 +1178,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 anim.addListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-
                     }
 
                     @Override

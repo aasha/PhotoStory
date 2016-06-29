@@ -1,22 +1,17 @@
 package com.pixtory.app;
 
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,7 +61,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
-import com.google.android.exoplayer.util.SystemClock;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
@@ -87,16 +81,13 @@ import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.RegisterResponse;
 import com.pixtory.app.transformations.ParallaxPagerTransformer;
-import com.pixtory.app.userprofile.UserProfileActivity2;
+import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.utils.Utils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -182,11 +173,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private PendingIntent mPendingIntent = null;
     private Intent mWallpaperReceiverIntent = null;
 
+    public String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        userId = getIntent().getStringExtra("USER_ID");
         //TODO to be removed later
 //        checkForDeviceDensity();
         ButterKnife.bind(this);
@@ -203,8 +197,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         mLoadingText.setVisibility(View.VISIBLE);
         mOuterContainer.setVisibility(View.GONE);
-        prepareFeed();
 
+        prepareFeed();
         setPersonDetails();
 
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -213,6 +207,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         //Measuring network condition
         mConnectionClassManager = ConnectionClassManager.getInstance();
         mDeviceBandwidthSampler = DeviceBandwidthSampler.getInstance();
+
         mListener = new ConnectionChangedListener();
         //while(App.getContentData()==null);
 
@@ -389,13 +384,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
     }
 
-//    @OnClick(R.id.profileIcon)
-//    public void onUserImageClick() {
-//    }
 
     private void prepareFeed() {
 
-        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, new NetworkApiCallback<GetMainFeedResponse>() {
+        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, userId ,new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
                 mProgress.dismiss();
@@ -431,7 +423,8 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                         .put("MESSAGE", error.errorMessage)
                         .build());
-                Toast.makeText(HomeActivity.this, "Please check your network connection, cannot proceed further", Toast.LENGTH_SHORT).show();
+                Log.i(TAG,"GetMainFeedResponse error"+error.errorMessage);
+                Toast.makeText(HomeActivity.this, "GetMainFeedResponse error--"+error.errorMessage, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -447,7 +440,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             }
         });
     }
-
 
     private void registerForPushNotification() {
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -546,22 +538,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "home activity onstart");
-
-//        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-//        //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
-//        if(mainFragment.isFullScreenShown())
-//            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
-//                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-//                    .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
-//                    .put("POSITION_ID",""+previousPage)
-//                    .build());
-//        else
-//            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
-//                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-//                    .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
-//                    .build());
-
+        Log.i(TAG, "home activity on Start");
     }
 
     @Override
@@ -587,10 +564,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
     }
 
-
     private void setPersonDetails(){
 
-        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(userId), Integer.parseInt(userId),new NetworkApiCallback<GetPersonDetailsResponse>() {
             @Override
             public void success(GetPersonDetailsResponse o, Response response) {
 
@@ -610,12 +586,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
             @Override
             public void failure(GetPersonDetailsResponse error) {
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "GetPersonDetailsResponse error--"+error.errorMessage, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void networkFailure(RetrofitError error) {
-                Toast.makeText(HomeActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Please check your network connection--"+error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -627,7 +603,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         DisplayMetrics dm =  new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
@@ -821,17 +796,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         final EditText cName = (EditText)dialog.findViewById(R.id.c_name);
         final EditText cNumber = (EditText)dialog.findViewById(R.id.c_phone);
         FrameLayout contributeCancel = (FrameLayout)dialog.findViewById(R.id.contributor_cancel);
-        FrameLayout contriuteSubmit =(FrameLayout) dialog.findViewById(R.id.contributor_submit);
+        FrameLayout contributeSubmit =(FrameLayout) dialog.findViewById(R.id.contributor_submit);
 
 
-            contributeCancel.setOnClickListener(new TextView.OnClickListener() {
+        contributeCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
 
-        contriuteSubmit.setOnClickListener(new TextView.OnClickListener(){
+        contributeSubmit.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
                 if (!isEmailValid(cEmail.getText().toString()))
@@ -1016,7 +991,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Profile_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
-                            Intent intent = new Intent(HomeActivity.this, UserProfileActivity2.class);
+                            Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
                             intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                             intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
                             startActivity(intent);

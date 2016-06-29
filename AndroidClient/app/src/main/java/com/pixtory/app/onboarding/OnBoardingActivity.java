@@ -191,7 +191,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             Utils.putUserImage(OnBoardingActivity.this, imgUrl);
                             AmplitudeLog.sendUserInfo(regResp.userId);
 
-                            gotoNextScreen();
+                            gotoNextScreen(regResp.userId);
                         }
 
                         @Override
@@ -217,9 +217,11 @@ public class OnBoardingActivity  extends FragmentActivity {
         request.executeAsync();
     }
 
-    private void gotoNextScreen() {
+    private void gotoNextScreen(String userId) {
         Intent i = new Intent(OnBoardingActivity.this, HomeActivity.class);
+        i.putExtra("USER_ID",userId);
         i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
         startActivity(i);
         this.finish();
     }
@@ -229,10 +231,10 @@ public class OnBoardingActivity  extends FragmentActivity {
         String userId = Utils.getUserId(OnBoardingActivity.this);
 
         if (null != userId && !userId.isEmpty()) {
-            gotoNextScreen();
+            gotoNextScreen(userId);
             return true;
         }
-        LoginManager.getInstance().logOut();
+//        LoginManager.getInstance().logOut();
         return false;
     }
 
@@ -262,7 +264,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 Utils.putUserName(OnBoardingActivity.this, name);
 
                 AmplitudeLog.sendUserInfo(regResp.userId);
-                gotoNextScreen();
+                gotoNextScreen(regResp.userId);
             }
 
             @Override
