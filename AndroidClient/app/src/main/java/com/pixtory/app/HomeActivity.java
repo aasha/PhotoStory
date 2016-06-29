@@ -206,7 +206,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         prepareFeed();
 
         setPersonDetails();
-
+        isFirstTimeOpen();
         mPager = (ViewPager) findViewById(R.id.pager);
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
 
@@ -237,17 +237,20 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mCurrentFragmentPosition = position;
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
                //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
-               if(mainFragment!=null && mainFragment.isFullScreenShown())
+               if(mainFragment!=null && mainFragment.isFullScreenShown()){
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
                             .put("POSITION_ID",""+previousPage)
                             .build());
-                else
+                   Log.i(TAG,"MF_Picture_PixtorySwipe_Amplitude");}
+                else{
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
                             .build());
+                   Log.i(TAG,"ST_Story_PixtorySwipe_Amplitude");
+               }
                 swipeCount();
                 Log.i(TAG,"Page swipe");
             }
@@ -1015,6 +1018,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                         }
                         else
                             mDrawerLayout.closeDrawer(mDrawerList);
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Close_Click")
+                                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                                .build());
                         break;
 
                     case 1:
@@ -1220,7 +1226,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     }
 
     public void showCoachMarks(final View coachMarkView){
-
+        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -1322,7 +1328,23 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         }
     }
 
+    private boolean isFirstTimeOpen(){
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
+        if(firstRun){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(Is_First_Run,false);
+            editor.commit();
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("App_FirstOpen")
+                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                    .build());
+        }
+        return firstRun;
+    }
+
 }
+
+
 
 
 
