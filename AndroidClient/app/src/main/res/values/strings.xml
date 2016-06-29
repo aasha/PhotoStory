@@ -44,7 +44,7 @@
 
     <string name="post_your_comment">POST YOUR COMMENT</string>
     <string name="character_limit">CHARACTERS</string>
-    <string name="comment_textbox_hint">What do you have to say about this pixstory</string>
+    <string name="comment_textbox_hint">What do you have to say about this pixtory</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
 
