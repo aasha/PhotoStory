@@ -21,8 +21,8 @@ android {
         applicationId "com.pixtory.app"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 2 //increment with every release
+        versionName "1.1" //increment with every release
     }
 
 
