@@ -108,6 +108,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     public static final String Vid_Reco_VideoExpand = "Vid_Reco_VideoExpand";
 
+    private static Animation mAnimation;
+
     private Context mContext;
 
     @Bind(R.id.pic_story_layout)
@@ -179,6 +181,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     TextView mLoadingText;
 
     ImageView swipeUpArrow;
+
+    private boolean isSwipeUpArrowShown = false;
 
     ProgressDialog mProgressDialog;
 
@@ -331,7 +335,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 TranslateAnimation.RELATIVE_TO_PARENT, 0.03f);
         upAnimation.setStartOffset(500);
         upAnimation.setInterpolator(new LinearInterpolator());
-        Animation   mAnimation = new TranslateAnimation(
+           mAnimation = new TranslateAnimation(
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.RELATIVE_TO_PARENT, 0f,
@@ -351,9 +355,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mAnimation.setInterpolator(new LinearInterpolator());
 
         swipeUpArrow = (ImageView)mRootView.findViewById(R.id.swipe_up_arrow);
-        swipeUpArrow.setAnimation(mAnimation);
-        //swipeUpSign.setAnimation(animation);
-        //swipeUpSign.startAnimation(animation);
+        isSwipeUpArrowShown = false;
+        if(!isSwipeUpArrowShown){
+            swipeUpArrow.setVisibility(View.VISIBLE);
+            swipeUpArrow.setAnimation(mAnimation);
+            Log.i(TAG,"Swipe up Animation set");
+            isSwipeUpArrowShown=true;
+        }
+
+
         if(!isProfileContent)
         {
             storyBackClick.setVisibility(View.GONE);
@@ -701,6 +711,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 @Override
                 public boolean onDown(MotionEvent e) {
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                            .put("PIXTORY_ID",""+mContentData.id)
+                            .build());
+                    Log.i(TAG,"MF_Picture_StoryView_Amplitude");
                     //swipeUpArrow.clearAnimation();
                     //swipeUpArrow.setVisibility(View.GONE);
                     return true;
@@ -858,12 +873,20 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mCommentShareLayout.setVisibility(View.GONE);
         mImageDetailsLayout.smoothScrollTo(0, 0);
 
+        if(!isSwipeUpArrowShown){
+            swipeUpArrow.setVisibility(View.VISIBLE);
+            swipeUpArrow.setAnimation(mAnimation);
+            Log.i(TAG,"Swipe up Animation set");
+            isSwipeUpArrowShown=true;
+        }
 
     }
 
     private void setUpHalfScreen(){
         mTextExpert.setVisibility(View.GONE);
-
+        swipeUpArrow.setVisibility(View.GONE);
+        swipeUpArrow.clearAnimation();
+        isSwipeUpArrowShown=false;
         if(isCommentsVisible())
             attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
@@ -880,10 +903,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
 
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                                    .put("PIXTORY_ID",""+mContentData.id)
-                                    .build());
+
                     }
                     else {
 
@@ -898,6 +918,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                         .put("PIXTORY_ID",""+mContentData.id)
                                         .build());
+                        Log.i(TAG,"ST_Story_PictureView_Amplitude");
+                        if(!isSwipeUpArrowShown){
+                            swipeUpArrow.setVisibility(View.VISIBLE);
+                            swipeUpArrow.setAnimation(mAnimation);
+                            Log.i(TAG,"Swipe up Animation set");
+                            isSwipeUpArrowShown=true;
+                        }
+
                     }
                 }
             });
