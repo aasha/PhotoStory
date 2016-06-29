@@ -79,7 +79,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="100dp"
-                android:background="@drawable/text_background"
                 android:text="@string/wallpaper_coach_mark_text"
                 android:textColor="@color/black"
                 android:textAlignment="center"
@@ -87,15 +86,16 @@
                 android:paddingBottom="30dp"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 android:fontFamily="sans-serif-light"
-                android:id="@+id/long_tap_text"/>
+                android:id="@+id/long_tap_text"
+                android:lineSpacingExtra="5dp"/>
             <ImageView
-                android:layout_width="132dp"
-                android:layout_height="211dp"
+                android:layout_width="122dp"
+                android:layout_height="174dp"
                 android:layout_gravity="center|bottom"
-                android:layout_marginTop="60dp"
-                android:src="@drawable/long_tap_hand"/>
+                android:layout_marginTop="40dp"
+                android:src="@drawable/long_tap_hand_icon"/>
         </LinearLayout>
 
         <FrameLayout
@@ -109,7 +109,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center"
                 android:layout_marginTop="43dp"
-                android:background="@drawable/text_background"
                 android:text="@string/swipe_up_coach_mark_text"
                 android:textColor="@color/black"
                 android:textAlignment="center"
@@ -119,21 +118,21 @@
                 android:paddingRight="15dp"
                 android:textSize="22sp"
                 android:fontFamily="sans-serif-light"
-                android:id="@+id/swipe_up_text_1"/>
+                android:id="@+id/swipe_up_text_1"
+                android:lineSpacingExtra="5dp"/>
             <ImageView
-                android:layout_width="112dp"
-                android:layout_height="300dp"
+                android:layout_width="80dp"
+                android:layout_height="274dp"
                 android:layout_gravity="top|center"
                 android:layout_marginTop="180dp"
-                android:src="@drawable/swipe_up_hand"/>
+                android:src="@drawable/swipe_up_hand_icon"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:background="#eeffffff"
                 android:textColor="@color/black"
                 android:paddingBottom="30dp"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:fontFamily="sans-serif-regular"
                 android:paddingTop="20dp"
                 android:text="@string/swipe_up_coach_mark_text_2"

@@ -94,6 +94,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private static final String Vid_Tap_Unlike = "Vid_Tap_Unlike";
 
+    private static Animation mAnimation;
+
     private Context mContext;
 
     @Bind(R.id.pic_story_layout)
@@ -169,6 +171,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     LinearLayout mCommentPostBtnLayout;
 
     ImageView swipeUpArrow;
+
+    private boolean isSwipeUpArrowShown = false;
 
     ProgressDialog mProgressDialog;
 
@@ -321,7 +325,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 TranslateAnimation.RELATIVE_TO_PARENT, 0.03f);
         upAnimation.setStartOffset(500);
         upAnimation.setInterpolator(new LinearInterpolator());
-        Animation   mAnimation = new TranslateAnimation(
+           mAnimation = new TranslateAnimation(
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.ABSOLUTE, 0f,
                 TranslateAnimation.RELATIVE_TO_PARENT, 0f,
@@ -341,9 +345,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mAnimation.setInterpolator(new LinearInterpolator());
 
         swipeUpArrow = (ImageView)mRootView.findViewById(R.id.swipe_up_arrow);
-        swipeUpArrow.setAnimation(mAnimation);
-        //swipeUpSign.setAnimation(animation);
-        //swipeUpSign.startAnimation(animation);
+        isSwipeUpArrowShown = false;
+        if(!isSwipeUpArrowShown){
+            swipeUpArrow.setVisibility(View.VISIBLE);
+            swipeUpArrow.setAnimation(mAnimation);
+            Log.i(TAG,"Swipe up Animation set");
+            isSwipeUpArrowShown=true;
+        }
+
+
         if(!isProfileContent)
         {
             storyBackClick.setVisibility(View.GONE);
@@ -729,6 +739,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 @Override
                 public boolean onDown(MotionEvent e) {
                     Log.i(TAG, "MotionEvent.ACTION_DOWN");
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                            .put("PIXTORY_ID",""+mContentData.id)
+                            .build());
+                    Log.i(TAG,"MF_Picture_StoryView_Amplitude");
                     //swipeUpArrow.clearAnimation();
                     //swipeUpArrow.setVisibility(View.GONE);
                     return true;
@@ -884,12 +899,20 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mCommentShareLayout.setVisibility(View.GONE);
         mImageDetailsLayout.smoothScrollTo(0, 0);
 
+        if(!isSwipeUpArrowShown){
+            swipeUpArrow.setVisibility(View.VISIBLE);
+            swipeUpArrow.setAnimation(mAnimation);
+            Log.i(TAG,"Swipe up Animation set");
+            isSwipeUpArrowShown=true;
+        }
 
     }
 
     private void setUpHalfScreen(){
         mTextExpert.setVisibility(View.GONE);
-
+        swipeUpArrow.setVisibility(View.GONE);
+        swipeUpArrow.clearAnimation();
+        isSwipeUpArrowShown=false;
         if(isCommentsVisible())
             attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
@@ -906,10 +929,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
 
-                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-                                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                                    .put("PIXTORY_ID",""+mContentData.id)
-                                    .build());
+
                     }
                     else {
 
@@ -924,6 +944,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                         .put("PIXTORY_ID",""+mContentData.id)
                                         .build());
+                        Log.i(TAG,"ST_Story_PictureView_Amplitude");
+                        if(!isSwipeUpArrowShown){
+                            swipeUpArrow.setVisibility(View.VISIBLE);
+                            swipeUpArrow.setAnimation(mAnimation);
+                            Log.i(TAG,"Swipe up Animation set");
+                            isSwipeUpArrowShown=true;
+                        }
+
                     }
                 }
             });
@@ -1343,8 +1371,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         for(ResolveInfo resInfo : resInfos){
                             String packageName=resInfo.activityInfo.packageName;
                             Log.i("Package Name", packageName);
-                            if(packageName.contains("com.facebook.katana") || packageName.contains("android.gm") || packageName.contains("com.instagram.android")){
-                                String content = Html.fromHtml(contentData.pictureDescription).toString();
+                            if(packageName.contains("com.facebook.katana")  || packageName.contains("com.instagram.android")){
+                                String content = contentData.pictureDescription;
+                                content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
@@ -1355,10 +1384,24 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                 intent.setPackage(packageName);
                                 targetInviteIntents.add(intent);
                             }
+                            else if(packageName.contains("android.gm")){
+                                String content = contentData.pictureDescription;
+                                content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                                Intent intent=new Intent();
+                                intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                intent.setType("text/email");
+                                intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
                             else if(packageName.contains("com.whatsapp")){
                                 String data = contentData.pictureDescription;
-                                data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","");
-                                data = Html.fromHtml(data).toString();
+                                data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                                //data = Html.fromHtml(data).toString();
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
