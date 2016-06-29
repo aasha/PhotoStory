@@ -1348,8 +1348,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         for(ResolveInfo resInfo : resInfos){
                             String packageName=resInfo.activityInfo.packageName;
                             Log.i("Package Name", packageName);
-                            if(packageName.contains("com.facebook.katana") || packageName.contains("android.gm") || packageName.contains("com.instagram.android")){
-                                String content = Html.fromHtml(contentData.pictureDescription).toString();
+                            if(packageName.contains("com.facebook.katana")  || packageName.contains("com.instagram.android")){
+                                String content = contentData.pictureDescription;
+                                content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
@@ -1360,10 +1361,24 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                 intent.setPackage(packageName);
                                 targetInviteIntents.add(intent);
                             }
+                            else if(packageName.contains("android.gm")){
+                                String content = contentData.pictureDescription;
+                                content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                                Intent intent=new Intent();
+                                intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                                intent.setAction(Intent.ACTION_SEND);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                                intent.setType("text/email");
+                                intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
+                                intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                                intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+                                intent.setPackage(packageName);
+                                targetInviteIntents.add(intent);
+                            }
                             else if(packageName.contains("com.whatsapp")){
                                 String data = contentData.pictureDescription;
-                                data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","");
-                                data = Html.fromHtml(data).toString();
+                                data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                                //data = Html.fromHtml(data).toString();
                                 Intent intent=new Intent();
                                 intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                                 intent.setAction(Intent.ACTION_SEND);
