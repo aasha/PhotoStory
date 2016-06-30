@@ -1183,6 +1183,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                 });
                 mContentData.likedByUser = true;
+                App.addToPersonContentData(mContentData);
                 anim.start();
                 if(isFullScreenShown)
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_Like")

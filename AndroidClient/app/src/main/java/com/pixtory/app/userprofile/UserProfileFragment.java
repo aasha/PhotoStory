@@ -11,13 +11,11 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
@@ -160,7 +158,7 @@ public class UserProfileFragment extends Fragment {
         if(mUserId==mPersonId){
             personFollow.setVisibility(View.GONE);
             mPersonInfo = App.getPersonInfo();
-            mContentDataList = App.getPersonConentData();
+            mContentDataList = App.getPersonContentData();
             /*if(mContentDataList!=null)
             for(ContentData cd:mContentDataList)
                 cd.personDetails=mPersonInfo;*/

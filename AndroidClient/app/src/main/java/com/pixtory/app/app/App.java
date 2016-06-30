@@ -184,7 +184,11 @@ public class App extends Application implements AppConstants {
         mPersonConentData = conentData;
     }
 
-    public static ArrayList<ContentData> getPersonConentData(){ return mPersonConentData; }
+    public static void addToPersonContentData(ContentData contentData){
+        mPersonConentData.add(contentData);
+    }
+
+    public static ArrayList<ContentData> getPersonContentData(){ return mPersonConentData; }
 
     public static void setProfileContentData(ArrayList<ContentData> contentData){
         mProfileContentData = contentData;
