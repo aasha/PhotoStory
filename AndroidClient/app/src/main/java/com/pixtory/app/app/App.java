@@ -221,13 +221,10 @@ public class App extends Application implements AppConstants {
     }
 
     public static void shuffleContentData(int startPos){
-        if(mCData!=null&&startPos<mCData.size()){
-            ContentData cd;
-            for(int i=0;i<startPos;i++){
-                cd = mCData.get(0);
-                mCData.remove(0);
-                mCData.add(cd);
-            }
+        if(mCData!=null&&startPos<mCData.size()&&startPos>0){
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos));
+            mCData.subList(0,startPos).clear();
+            mCData.addAll(sublist);
         }
     }
 
