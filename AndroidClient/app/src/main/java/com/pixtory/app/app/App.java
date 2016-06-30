@@ -25,8 +25,10 @@ import com.squareup.picasso.Target;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by aasha.medhi on 12/05/15.
@@ -186,6 +188,10 @@ public class App extends Application implements AppConstants {
 
     public static void addToPersonContentData(ContentData contentData){
         mPersonConentData.add(contentData);
+        Set<ContentData> hs = new HashSet<>();
+        hs.addAll(mPersonConentData);
+        mPersonConentData.clear();
+        mPersonConentData.addAll(hs);
     }
 
     public static ArrayList<ContentData> getPersonContentData(){ return mPersonConentData; }
