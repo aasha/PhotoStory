@@ -1,5 +1,6 @@
 package com.pixtory.app.userprofile;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -58,6 +59,7 @@ public class UserProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private Context mContext;
+    private Activity mActivity;
     private int mUserId;
     private int mPersonId;
     private PersonInfo mPersonInfo;
@@ -98,6 +100,7 @@ public class UserProfileFragment extends Fragment {
             mUserId = Integer.parseInt(getArguments().getString(ARG_PARAM1));
             mPersonId = Integer.parseInt(getArguments().getString(ARG_PARAM2));
             mContext = getActivity();
+            mActivity = getActivity();
             //setPersonDetails();
             //mPersonInfo = App.getPersonInfo(mUserId);
             // mContentDataList = App.getContentData();
@@ -187,7 +190,7 @@ public class UserProfileFragment extends Fragment {
 
             //get the screen dimesions
             DisplayMetrics dm =  new DisplayMetrics();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+            mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
             //set spacing proportional to width of the the screen (0.063 times the screen width
             double spacing = 0.063*dm.widthPixels;
@@ -204,7 +207,7 @@ public class UserProfileFragment extends Fragment {
                 {
                     personFollow.setText("FOLLOWING");
                     if(Build.VERSION.SDK_INT>=21)
-                        personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                        personFollow.setBackground(mContext.getDrawable(R.drawable.blue_rectangle));
                 }
 
                 if (mPersonInfo.imageUrl != null) {
@@ -232,7 +235,7 @@ public class UserProfileFragment extends Fragment {
 
                 //get the screen dimesions
                 DisplayMetrics dm =  new DisplayMetrics();
-                getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+                mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
                 //set spacing proportional to width of the the screen (0.063 times the screen width
                 double spacing = 0.063*dm.widthPixels;
@@ -280,7 +283,7 @@ public class UserProfileFragment extends Fragment {
                                 mPersonInfo.followedByUser=true;
                                 personFollow.setText("FOLLOWING");
                                 if(Build.VERSION.SDK_INT>=21)
-                                    personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                                    personFollow.setBackground(mContext.getDrawable(R.drawable.blue_rectangle));
                             }
                             cardLayoutAdapter = new CardLayoutAdapter(mContext,mContentDataList);
                            // Toast.makeText(getContext(),mContentDataList.size()+"",Toast.LENGTH_SHORT);
@@ -303,7 +306,8 @@ public class UserProfileFragment extends Fragment {
 
                         //get the screen dimesions
                         DisplayMetrics dm =  new DisplayMetrics();
-                        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                        mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
                         //set spacing proportional to width of the the screen (0.063 times the screen width
                         double spacing = 0.063*dm.widthPixels;
@@ -318,7 +322,7 @@ public class UserProfileFragment extends Fragment {
                                 .put(AppConstants.USER_ID, Integer.toString(mPersonId))
                                 .put("MESSAGE", error.errorMessage)
                                 .build());
-                        Toast.makeText(getActivity(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Please check your network connection", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -328,7 +332,7 @@ public class UserProfileFragment extends Fragment {
                                 .put(AppConstants.USER_ID, Integer.toString(mPersonId))
                                 .put("MESSAGE", error.getMessage())
                                 .build());
-                        Toast.makeText(getActivity(), "Please check your network connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Please check your network connection", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -341,7 +345,7 @@ public class UserProfileFragment extends Fragment {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
                  .put("USER_ID",mUserId+"")
                 .build());
-                getActivity().onBackPressed();
+                mActivity.onBackPressed();
             }});
 
         mBackClick.setOnClickListener(new View.OnClickListener() {
@@ -350,7 +354,7 @@ public class UserProfileFragment extends Fragment {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
                         .put("USER_ID",mUserId+"")
                         .build());
-                getActivity().onBackPressed();
+                mActivity.onBackPressed();
             }});
 
         personFollow.setOnClickListener(new View.OnClickListener() {
@@ -399,7 +403,7 @@ public class UserProfileFragment extends Fragment {
                     personFollow.setText("FOLLOWING");
                     App.addToProfileCache(mPersonInfo);
                     if(Build.VERSION.SDK_INT>=21)
-                        personFollow.setBackground(getActivity().getDrawable(R.drawable.blue_rectangle));
+                        personFollow.setBackground(mContext.getDrawable(R.drawable.blue_rectangle));
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Follow_Click")
                             .put(AppConstants.USER_ID,mUserId+"")
                             .put("CONTRIBUTOR_ID",mPersonId+"")
@@ -410,7 +414,7 @@ public class UserProfileFragment extends Fragment {
                     mPersonInfo.followedByUser = false;
                     personFollow.setText("FOLLOW");
                     if(Build.VERSION.SDK_INT>=21)
-                        personFollow.setBackground(getActivity().getDrawable(R.drawable.back_rectangle));
+                        personFollow.setBackground(mContext.getDrawable(R.drawable.back_rectangle));
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_UnFollow_Click")
                         .put(AppConstants.USER_ID,mUserId+"")
                         .put("CONTRIBUTOR_ID",mPersonId+"")
