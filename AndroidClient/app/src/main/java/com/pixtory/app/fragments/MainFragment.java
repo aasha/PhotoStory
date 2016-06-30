@@ -738,12 +738,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                 @Override
                 public boolean onDown(MotionEvent e) {
-                    Log.i(TAG, "MotionEvent.ACTION_DOWN");
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
-                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                            .put("PIXTORY_ID",""+mContentData.id)
-                            .build());
-                    Log.i(TAG,"MF_Picture_StoryView_Amplitude");
+
                     //swipeUpArrow.clearAnimation();
                     //swipeUpArrow.setVisibility(View.GONE);
                     return true;
@@ -928,7 +923,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         storyBackImg.setVisibility(View.GONE);
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
-
+                        Log.i(TAG, "MotionEvent.ACTION_DOWN");
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",""+mContentData.id)
+                                .build());
+                        Log.i(TAG,"MF_Picture_StoryView_Amplitude");
 
                     }
                     else {
@@ -1185,7 +1185,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 mContentData.likedByUser = true;
                 anim.start();
                 if(isFullScreenShown)
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Like_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_Like")
                         .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
                         .put("PIXTORY_ID", "" + mContentData.id)
                         .put("POSITION_ID",""+mContentIndex)
@@ -1225,10 +1225,20 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 });
                 anim.start();
                 mContentData.likedByUser = false;
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Vid_Tap_Unlike)
-                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put(AppConstants.OPINION_ID, "" + mContentData.id)
-                        .build());
+                if(isFullScreenShown)
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_UnLike")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                            .put("PIXTORY_ID", "" + mContentData.id)
+                            .put("POSITION_ID",""+mContentIndex)
+                            .put("BOOLEAN","True")
+                            .build());
+                else
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_UnLike")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                            .put("PIXTORY_ID", "" + mContentData.id)
+                            .put("POSITION_ID",""+mContentIndex)
+                            .put("BOOLEAN","False")
+                            .build());
             }
             sendLikeToBackend(mContentData.id, mContentData.likedByUser);
         }
@@ -1309,6 +1319,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress_Yes_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                        .put("PIXTORY_ID", mContentData.id + "")
+                        .put("POSITION_ID", mContentIndex + "")
+                        .build());
                 setWallpaper();
                 dialog.dismiss();
             }
@@ -1317,6 +1332,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress_Cancel_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                        .put("PIXTORY_ID", mContentData.id + "")
+                        .put("POSITION_ID", mContentIndex + "")
+                        .build());
                 dialog.dismiss();
             }
         });
