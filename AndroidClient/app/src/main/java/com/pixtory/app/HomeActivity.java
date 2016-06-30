@@ -108,6 +108,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
     private static String Is_First_Run = "FirstRun";
     private static String Swipe_Count = "SwipeCount";
+    private static String Page_Index = "View_Pager_Index";
     private final static String TAG = HomeActivity.class.getName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private ProgressDialog mProgress = null;
@@ -230,8 +231,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 else
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
+                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                sharedPreferences.edit().putInt(Page_Index,App.getOriginalIndex(App.getContentData().get(mCurrentFragmentPosition).id)).apply();
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
-               //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
                if(mainFragment!=null && mainFragment.isFullScreenShown()){
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
@@ -400,6 +402,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mOuterContainer.setVisibility(View.VISIBLE);
                 if (o.contentList != null) {
                     App.setContentData(o.contentList);
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    int startPos = sharedPreferences.getInt(Page_Index,0);
+                    App.shuffleContentData(startPos);
                     Utils.deleteOldVideos(o.contentList);
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Done)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
@@ -1309,6 +1314,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         return firstRun;
     }
 
+    @Override
+    public void onCloseCommentClicked() {
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_CommentView_close")
+                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                .put("PIXTORY_ID",App.getContentData().get(mCurrentFragmentPosition).id+"")
+                .build());
+        Log.i(TAG,"Comment view for "+App.getContentData().get(mCurrentFragmentPosition).name+" closed.");
+    }
 }
 
 

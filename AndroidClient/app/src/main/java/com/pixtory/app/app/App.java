@@ -24,6 +24,7 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -39,7 +40,6 @@ public class App extends Application implements AppConstants {
     }
 
     private static ArrayList<ContentData> mCData = null;
-
     private static ArrayList<ContentData> mLikedContentData = null;
 
     private LayoutInflater mInfater = null;
@@ -69,6 +69,8 @@ public class App extends Application implements AppConstants {
     };
 
     private static Target mWallpaperTarget;
+
+    private static Map<String,String> mOriginalIndices = new HashMap<String, String>();
 
     @Override
     public void onCreate() {
@@ -157,7 +159,8 @@ public class App extends Application implements AppConstants {
 
     public static void setContentData(ArrayList<ContentData> mC) {
         mCData = mC;
-
+        for(int i=0;i< mC.size();i++)
+            mOriginalIndices.put(mC.get(i).id+"",i+"");
     }
 
     public static ArrayList<ContentData> getContentData() {
@@ -215,5 +218,22 @@ public class App extends Application implements AppConstants {
         if(mWallpaperTarget!=null)
             return mWallpaperTarget;
         return null;
+    }
+
+    public static void shuffleContentData(int startPos){
+        if(mCData!=null&&startPos<mCData.size()){
+            ContentData cd;
+            for(int i=0;i<startPos;i++){
+                cd = mCData.get(0);
+                mCData.remove(0);
+                mCData.add(cd);
+            }
+        }
+    }
+
+    public static int getOriginalIndex(int contentId){
+        if(mOriginalIndices!=null)
+            return Integer.parseInt(mOriginalIndices.get(contentId+""));
+        return 0;
     }
 }
