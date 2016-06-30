@@ -188,10 +188,11 @@ public class App extends Application implements AppConstants {
 
     public static void addToPersonContentData(ContentData contentData){
         mPersonConentData.add(contentData);
-        Set<ContentData> hs = new HashSet<>();
-        hs.addAll(mPersonConentData);
-        mPersonConentData.clear();
-        mPersonConentData.addAll(hs);
+    }
+
+    public static void removeFromPersonContentData(ContentData contentData){
+        mPersonConentData.remove(contentData);
+
     }
 
     public static ArrayList<ContentData> getPersonContentData(){ return mPersonConentData; }

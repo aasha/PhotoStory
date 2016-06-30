@@ -1183,7 +1183,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                 });
                 mContentData.likedByUser = true;
-                App.addToPersonContentData(mContentData);
                 anim.start();
                 if(isFullScreenShown)
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_Like")
@@ -1254,8 +1253,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void success(BaseResponse baseResponse, Response response) {
                 if(isLiked) {
+                    App.addToPersonContentData(mContentData);
                     mContentData.likeCount += 1;
                 }else{
+                    App.removeFromPersonContentData(mContentData);
                     if(mContentData.likeCount>0)
                         mContentData.likeCount -= 1;
                 }
