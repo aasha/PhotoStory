@@ -114,6 +114,10 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private ProgressDialog mProgress = null;
     private Context mCtx = null;
 
+    private static final int LONG_TAP = 0;
+    private static final int SWIPE_UP = 1;
+    private static String longTapText,swipeUpTextTop,swipeUpTextBottom;
+
     private CallbackManager callbackManager;
 
     private ViewPager mPager = null;
@@ -276,11 +280,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         mWallpaperTopText = (TextView)findViewById(R.id.wallpaper_top_text);
 
         String swipeText1 = "<b>Swipe up</b> for the <b>Story</b> behind the picture.";
+        swipeUpTextTop = "<b>Swipe up</b> for the <b>Story</b> behind the picture.";
         String swipeText2 = "A <b>Story</b> is the photographer\'s experience, emotion, inspiration or expression behind the picture.";
+        swipeUpTextBottom = "A <b>Story</b> is the photographer\'s experience, emotion, inspiration or expression behind the picture.";
+
         mSwipeUpText1.setText(Html.fromHtml(swipeText1));
         mSwipeUpText2.setText(Html.fromHtml(swipeText2));
 
-        String longTapText = "<b>Long press</b> on an image to set it as your wallpaper";
+        longTapText = "<b>Long press</b> on an image to set it as your wallpaper";
         mLongTapText.setText(Html.fromHtml(longTapText));
 
         mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
@@ -392,7 +399,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void prepareFeed() {
 
-        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, userId ,new NetworkApiCallback<GetMainFeedResponse>() {
+        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, Utils.getUserId(HomeActivity.this) ,new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
             public void success(GetMainFeedResponse o, Response response) {
                 mProgress.dismiss();
@@ -574,7 +581,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
     private void setPersonDetails(){
 
-        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(userId), Integer.parseInt(userId),new NetworkApiCallback<GetPersonDetailsResponse>() {
+        NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
             @Override
             public void success(GetPersonDetailsResponse o, Response response) {
 
@@ -1067,7 +1074,6 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             public void onClick(View v) {
                 dialog.dismiss();
                 LoginManager.getInstance().logInWithReadPermissions(HomeActivity.this, AppConstants.mFBPermissions);
-                setPersonDetails();
             }
         });
 
@@ -1143,6 +1149,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             Utils.putUserImage(HomeActivity.this, imgUrl);
                             AmplitudeLog.sendUserInfo(regResp.userId);
                             setPersonDetails();
+                            prepareFeed();
                         }
 
                         @Override
@@ -1183,11 +1190,23 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
          editor.commit();
         }
 
+        final Handler handler = new Handler();
+
         switch (count){
-            case 1: showCoachMarks(mSwipeUpCoachMark);
+            case 1:handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showCoachmarksDialog(SWIPE_UP);
+                    }
+                },500);
                 break;
 
-            case 6: showCoachMarks(mSwipeUpCoachMarkLongTap);
+            case 6:  handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showCoachmarksDialog(LONG_TAP);
+                    }
+                },500);
                 break;
 
             case 10: showWallPaperCoachMark();
@@ -1322,6 +1341,45 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 .build());
         Log.i(TAG,"Comment view for "+App.getContentData().get(mCurrentFragmentPosition).name+" closed.");
     }
+
+    public void showCoachmarksDialog(int CoachmarkType){
+        final Dialog dialog = new Dialog(HomeActivity.this,R.style.PauseDialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        final View testView;
+
+        switch (CoachmarkType){
+            case LONG_TAP:dialog.setContentView(R.layout.long_tap_caochmark_dialog);
+                ((TextView)dialog.findViewById(R.id.long_tap_text)).setText(Html.fromHtml(longTapText));
+                break;
+
+            case SWIPE_UP:LONG_TAP:dialog.setContentView(R.layout.swipe_up_caochmark_dialog);
+                ((TextView)dialog.findViewById(R.id.swipe_up_text_top)).setText(Html.fromHtml(swipeUpTextTop));
+                ((TextView)dialog.findViewById(R.id.swipe_up_text_bottom)).setText(Html.fromHtml(swipeUpTextBottom));
+                break;
+        }
+
+        testView = dialog.findViewById(R.id.dialog_layout);
+        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+
+        testView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
 }
 
 

@@ -37,4 +37,19 @@
         <item name="colorControlActivated">@color/opaque_black</item>
         <item name="colorControlHighlight">@color/opaque_black</item>
     </style>
+
+
+    <style name="PauseDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:windowAnimationStyle">@style/PauseDialogAnimation</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="PauseDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_out</item>
+    </style>
 </resources>

@@ -24,6 +24,7 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -234,6 +235,7 @@ public class App extends Application implements AppConstants {
     public static void shuffleContentData(int startPos){
         if(mCData!=null&&startPos<mCData.size()&&startPos>0){
             ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos));
+            Collections.reverse(sublist);
             mCData.subList(0,startPos).clear();
             mCData.addAll(sublist);
         }
