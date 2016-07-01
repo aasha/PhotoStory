@@ -44,7 +44,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
     private static final String SCREEN_NAME = "Notification";
-    private static final String App_Notification_Shown = "App_Notification_Shown";
+    private static final String App_Notification_Shown = "NF_Notification_Shown";
 
     PendingIntent pendingIntent ;
 
