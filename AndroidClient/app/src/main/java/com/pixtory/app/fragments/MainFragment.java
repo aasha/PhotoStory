@@ -190,6 +190,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private int  scrollY,oldScrollY;
     private boolean isScrollingUp = true;
+    private boolean isPixtorySwipeUp = true;
     
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
@@ -349,7 +350,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(!isSwipeUpArrowShown){
             swipeUpArrow.setVisibility(View.VISIBLE);
             swipeUpArrow.setAnimation(mAnimation);
-            Log.i(TAG,"Swipe up Animation set");
             isSwipeUpArrowShown=true;
         }
 
@@ -897,7 +897,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(!isSwipeUpArrowShown){
             swipeUpArrow.setVisibility(View.VISIBLE);
             swipeUpArrow.setAnimation(mAnimation);
-            Log.i(TAG,"Swipe up Animation set");
             isSwipeUpArrowShown=true;
         }
 
@@ -924,11 +923,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
                         Log.i(TAG, "MotionEvent.ACTION_DOWN");
+                        if(isPixtorySwipeUp){
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
                                 .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                 .put("PIXTORY_ID",""+mContentData.id)
                                 .build());
                         Log.i(TAG,"MF_Picture_StoryView_Amplitude");
+                        }
+                        isPixtorySwipeUp=false;
 
                     }
                     else {
@@ -948,10 +950,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         if(!isSwipeUpArrowShown){
                             swipeUpArrow.setVisibility(View.VISIBLE);
                             swipeUpArrow.setAnimation(mAnimation);
-                            Log.i(TAG,"Swipe up Animation set");
                             isSwipeUpArrowShown=true;
                         }
-
+                        isPixtorySwipeUp = true;
                     }
                 }
             });
