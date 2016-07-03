@@ -186,6 +186,11 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
         setContentView(R.layout.activity_home);
 
         userId = getIntent().getStringExtra("USER_ID");
+
+        if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
+            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+            .build());
         //TODO to be removed later
 //        checkForDeviceDensity();
         ButterKnife.bind(this);
@@ -297,6 +302,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperConfirm_Click")
+                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                    .build());
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                     setAlarmManagerToSetWallPaper();
@@ -306,6 +314,9 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 }
                 else
                 {
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperCancel_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();

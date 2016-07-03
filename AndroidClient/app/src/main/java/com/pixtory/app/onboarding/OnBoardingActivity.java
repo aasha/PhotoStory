@@ -220,6 +220,7 @@ public class OnBoardingActivity  extends FragmentActivity {
     private void gotoNextScreen(String userId) {
         Intent i = new Intent(OnBoardingActivity.this, HomeActivity.class);
         i.putExtra("USER_ID",userId);
+        i.putExtra("NOTIFICATION_CLICK",false);
         i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 
         startActivity(i);
