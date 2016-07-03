@@ -884,6 +884,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     private void setUpFullScreen(){
+        isPixtorySwipeUp=true;
         isFullScreenShown = true;
         mStoryParentLayout.fullScroll(View.FOCUS_UP);
         attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
