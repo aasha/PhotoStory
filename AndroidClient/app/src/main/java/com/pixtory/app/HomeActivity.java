@@ -1455,14 +1455,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onCloseCommentClicked() {
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_CommentView_close")
-                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                .put("PIXTORY_ID",App.getContentData().get(mCurrentFragmentPosition).id+"")
-                .build());
-        Log.i(TAG,"Comment view for "+App.getContentData().get(mCurrentFragmentPosition).name+" closed.");
-    }
+
 
     public void showCoachmarksDialog(int CoachmarkType){
         final Dialog dialog = new Dialog(HomeActivity.this,R.style.PauseDialog);

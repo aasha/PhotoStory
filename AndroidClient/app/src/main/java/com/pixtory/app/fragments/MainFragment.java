@@ -910,7 +910,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         return false;
     }
 
-    private void setUpFullScreen(){
+    public void setUpFullScreen(){
         isPixtorySwipeUp=true;
         isFullScreenShown = true;
         mStoryParentLayout.fullScroll(View.FOCUS_UP);
@@ -1077,6 +1077,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void onClick(View view) {
                 attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CM_CommentView_close")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",(mContentData.id)+"")
+                        .build());
             }
         });
 

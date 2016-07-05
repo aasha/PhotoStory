@@ -72,18 +72,20 @@ public class ImageDownloadManager extends AsyncTask {
                 break;
             }else {
 
-                mImageUrl =  new StringBuilder(urlList.get(initialIndex + i).pictureUrl);
+                if((urlList.get(initialIndex + i).pictureUrl) != null ) {
+                    mImageUrl = new StringBuilder(urlList.get(initialIndex + i).pictureUrl);
 
-                if(mImageUrl != null && !(mImageUrl.equals(""))) {
-                    Log.i(TAG, "Image url-" + mImageUrl.toString());
-                    ImageRequest request = ImageRequestBuilder
-                            .newBuilderWithSource(Uri.parse(urlList.get(initialIndex + i).pictureUrl))
-                            .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-                            .setProgressiveRenderingEnabled(true)
-                            .build();
+                    if (mImageUrl != null && !(mImageUrl.equals(""))) {
+                        Log.i(TAG, "Image url-" + mImageUrl.toString());
+                        ImageRequest request = ImageRequestBuilder
+                                .newBuilderWithSource(Uri.parse(urlList.get(initialIndex + i).pictureUrl))
+                                .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+                                .setProgressiveRenderingEnabled(true)
+                                .build();
 
-                    ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                    final DataSource<Void> dataSource = imagePipeline.prefetchToDiskCache(request, null);
+                        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                        final DataSource<Void> dataSource = imagePipeline.prefetchToDiskCache(request, null);
+                    }
                 }
 
 //                dataSource.subscribe(new DataSubscriber<Void>() {
