@@ -44,4 +44,7 @@ public interface NetworkInterface {
     @POST("/getWallPaper")
     void getWallPaper(@Body GetWallPaperRequest req, Callback<GetWallPaperResponse> cd);
 
+    @POST("/getContentByCategory")
+    void getContentByCategory(@Body GetContentByCategoryRequest req, Callback<GetMainFeedResponse> cb);
+
 }

@@ -644,15 +644,12 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         final Spinner spinnerFeedback = (Spinner)dialog.findViewById(R.id.spinner_feedback);
         final Spinner spinnerCategory = (Spinner)dialog.findViewById(R.id.spinner_category);
-        final Spinner spinnerSubcategory = (Spinner)dialog.findViewById(R.id.spinner_subcateogry);
 
-        final String feedbacks[] = new String[]{"FEEDBACK","I liked this","I disliked this","I'm reporting a problem"};
-        String categories[] = new String[]{"CATEGORY","App On-boarding","Image Screen","Story Screen","Profile screen","Comments","Sharing"};
-        String subcategories[] = new String[]{"SUB CATEGORY","Images are slow to load","App crashing","App sluggish","Layout looks messed up","Others"};
+        final String feedbacks[] = new String[]{"Feedback","I liked this","I disliked this","I'm reporting a problem"};
+        String categories[] = new String[]{"Category","App On-boarding","Image Screen","Story Screen","Profile screen","Comments","Sharing"};
 
         final List<String> feedbackList = new ArrayList<>(Arrays.asList(feedbacks));
         final List<String> categoryList = new ArrayList<>(Arrays.asList(categories));
-        final List<String> subcategoryList = new ArrayList<>(Arrays.asList(subcategories));
 
         ArrayAdapter<String> spinnerFeedbackAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item,feedbackList){
             @Override
@@ -678,28 +675,14 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 return view;
             }
         };
-        ArrayAdapter<String> spinnerSubcategoryAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item,subcategoryList){
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                if(position==0){
-                    tv.setBackgroundColor(getResources().getColor(R.color.grey_3));
-                    tv.setTextColor(getResources().getColor(R.color.white));
-                }
-                return view;
-            }
-        };
 
         spinnerFeedbackAdapter.setDropDownViewResource(R.layout.spinner_item);
         spinnerCategoryAdapter.setDropDownViewResource(R.layout.spinner_item);
-        spinnerSubcategoryAdapter.setDropDownViewResource(R.layout.spinner_item);
 
         spinnerFeedback.setPrompt("Feedback");
 
         spinnerFeedback.setAdapter(spinnerFeedbackAdapter);
         spinnerCategory.setAdapter(spinnerCategoryAdapter);
-        spinnerSubcategory.setAdapter(spinnerSubcategoryAdapter);
 
         feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
@@ -713,7 +696,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
             @Override
             public void onClick(View v) {
 
-                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), "FEEDBACK : "+feedbackText.getText().toString(),spinnerFeedback.getSelectedItem().toString(),spinnerCategory.getSelectedItem().toString(),spinnerSubcategory.getSelectedItem().toString(),new NetworkApiCallback<BaseResponse>() {
+                NetworkApiHelper.getInstance().userFeedBack(Integer.parseInt(Utils.getUserId(HomeActivity.this)), "FEEDBACK : "+feedbackText.getText().toString(),spinnerFeedback.getSelectedItem().toString(),spinnerCategory.getSelectedItem().toString(),"",new NetworkApiCallback<BaseResponse>() {
                     @Override
                     public void success(BaseResponse o, Response response) {
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("FeedBack_Submit_Click")
