@@ -22,7 +22,7 @@
             android:textSize="20sp"
             android:id="@+id/loading_text"
             android:gravity="center"
-            android:text="Loading...."/>
+            android:text=""/>
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/image_main"
@@ -251,6 +251,7 @@ S
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_gravity="center"
+            android:id="@+id/share_img"
             android:src="@drawable/share" />
         <TextView
             android:layout_width="wrap_content"

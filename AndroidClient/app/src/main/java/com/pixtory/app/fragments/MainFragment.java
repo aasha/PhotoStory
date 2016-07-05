@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +13,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -34,11 +37,27 @@ import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import butterknife.*;
 
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.datasource.DataSubscriber;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.Priority;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableBitmap;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -130,9 +149,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.image_like)
     ImageView mImageLike = null;
 
-//    @Bind(R.id.slant_view)
-//    SlantView mSlantView = null;
-
     @Bind(R.id.like_count)
     TextView mLikeCountTV = null;
 
@@ -170,6 +186,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.postBtn_ll)
     LinearLayout mCommentPostBtnLayout;
 
+    @Bind(R.id.share_img)
+    ImageView mShareImg;
+
     ImageView swipeUpArrow;
 
     private boolean isSwipeUpArrowShown = false;
@@ -190,7 +209,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private int  scrollY,oldScrollY;
     private boolean isScrollingUp = true;
-    
+
+    private Bitmap mImageBitmap = null;
+
+    private ImagePipeline frescoImagePipeline;
+
     @SuppressLint("NewApi")
     private int getSoftbuttonsbarHeight() {
         // getRealMetrics is only available with API 17 and +
@@ -288,7 +311,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mDeviceHeightInPx = displayMetrics.heightPixels;
 
         mSlantViewHtInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
-        mImageExtendedHeight = mDeviceHeightInPx +mSlantViewHtInPx;
+        mImageExtendedHeight = mDeviceHeightInPx + ((int)(2.5f*mSlantViewHtInPx));
         mBottomScreenHt = (int)(0.60f*mDeviceHeightInPx);
         mDeviceHeightInPx += mSoftBarHeight;
 
@@ -411,7 +434,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mTopLikeLayout.setLayoutParams(relativeParams);
         mTopLikeLayout.requestLayout();
 
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT)
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
 
         mStoryParentLayout.setOnTouchListener(new NestedScrollView.OnTouchListener() {
             @Override
@@ -488,36 +511,30 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (mContentData == null) {
             return;
         }
-
         final ContentData cd = mContentData;
 
         mLoadingText.setVisibility(View.VISIBLE);
-        Picasso.with(mContext).load(mContentData.pictureUrl).noFade().resize(mDeviceWidthInPx,mDeviceHeightInPx).into(mImageMain
-                ,new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        mLoadingText.setVisibility(View.GONE);
-                    }
+        frescoImagePipeline = Fresco.getImagePipeline();
 
-                    @Override
-                    public void onError() {
+        if(Utils.isNotEmpty(mContentData.pictureUrl)) {
+            ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
+                    .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+                    .build();
+            GenericDraweeHierarchyBuilder builder =
+                    new GenericDraweeHierarchyBuilder(getResources())
+                            .setPlaceholderImage(getResources().getDrawable(R.drawable.progress_image))
+                            .setFailureImage(getResources().getDrawable(R.drawable.splash_bg));
 
-                    }
-                }
-    );
-//        Uri uri = Uri.parse("http://pooyak.com/p/progjpeg/jpegload.cgi?o=1");
-////        mImageMain = (SimpleDraweeView) findViewById(R.id.my_image_view);
-////        mImageMain.setImageURI(uri);
-//
-////        Uri uri;
-//        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
-//                .setProgressiveRenderingEnabled(true)
-//                .build();
-//        DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                .setImageRequest(request)
-//                .setOldController(mImageMain.getController())
-//                .build();
-//        mImageMain.setController(controller);
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setOldController(mImageMain.getController())
+                    .setImageRequest(request)
+                    .build();
+
+            mImageMain.setHierarchy(builder.setFadeDuration(100).
+                    build());
+            mImageMain.setController(controller);
+        }
+
 
         mTextTitle.setText(cd.name);
         mTextPlace.setText(cd.place);
@@ -528,8 +545,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         else
             mEditorPickBage.setVisibility(View.GONE);
 
-        String name = (!(cd.personDetails.name.equals("")))? "By, "+cd.personDetails.name : " ";
-        mTextExpert.setText(name);
+
 
         if (mContentData.likedByUser == true)
             mImageLike.setImageResource(R.drawable.liked);
@@ -551,6 +567,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 if (cd.personDetails.imageUrl == null || cd.personDetails.imageUrl.trim().equals("")){
                     cd.personDetails.imageUrl = "http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803";
                 }
+                String name = (!(cd.personDetails.name.equals("")))? "By, "+cd.personDetails.name : " ";
+                mTextExpert.setText(name);
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
                 mTextDesc.setText(cd.personDetails.description);
@@ -777,14 +795,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                         } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                            mIsFling = true;
-//                            if(!isFullScreenShown){
-////                                showFullScreen();
-//                                isFullScreenShown = true;
-//                                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
-//                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-//                                        .put("PIXTORY_ID",""+mContentData.id)
-//                                        .build());
 
                         } else {
 //                            mIsFling = false;
@@ -811,7 +821,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         startActivity(intent);
 
     }
-    
+
     private boolean modifyScreenHeight(int offset) {
 
         imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
@@ -845,6 +855,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             return false;
         }
 
+        if (me.getAction() == MotionEvent.ACTION_SCROLL){
+            Log.i(TAG,"scrolling++"+me.getYPrecision());
+
+        }
+
         // Disallow the touch request for parent scroll on touch of child view
         if (me.getAction() == MotionEvent.ACTION_UP) {
             Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
@@ -857,6 +872,17 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         return false;
 
     }
+
+    final GestureDetector gesture1 = new GestureDetector(getActivity(),
+            new GestureDetector.SimpleOnGestureListener() {
+
+                @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+
+                    return true;
+                }
+            });
+
 
     int mHalfScreenSize;
     @OnTouch(R.id.image_details_layout)
@@ -883,9 +909,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         return false;
     }
 
-    private void setUpFullScreen(){
+    public void setUpFullScreen(){
         isFullScreenShown = true;
         mStoryParentLayout.fullScroll(View.FOCUS_UP);
+
         attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
         mImageDetailsLayout.setVisibility(View.VISIBLE);
@@ -903,7 +930,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     }
 
-    private void setUpHalfScreen(){
+    public void setUpHalfScreen(){
+        isFullScreenShown = false;
+
         mTextExpert.setVisibility(View.GONE);
         swipeUpArrow.setVisibility(View.GONE);
         swipeUpArrow.clearAnimation();
@@ -1296,7 +1325,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public  boolean isFullScreenShown(){return isFullScreenShown;}
-    
+
     private void showWallpaperAlert(){
         final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -1346,23 +1375,103 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     public void setWallpaper(){
 
-        if(App.getWallpaperTarget()!=null)
-            Picasso.with(mContext).load(mContentData.pictureUrl).into(App.getWallpaperTarget());
-        else
-            Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+        ImageRequest imageRequest = ImageRequestBuilder
+                .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
+                .setRequestPriority(Priority.HIGH)
+                .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+                .build();
+
+        DataSource<CloseableReference<CloseableImage>> dataSource =
+                frescoImagePipeline.fetchDecodedImage(imageRequest, mContext);
+
+        try {
+            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                @Override
+                public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                    if (bitmap == null) {
+                        Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+                        return;
+                    }
+                    Log.i(TAG,"Bitmap is not null-"+bitmap.toString());
+                    SetWallpaperTask setWallpaperTask = new SetWallpaperTask(mContext,bitmap);
+                    setWallpaperTask.execute();
+
+                    // The bitmap provided to this method is only guaranteed to be around
+                    // for the lifespan of this method. The image pipeline frees the
+                    // bitmap's memory after this method has completed.
+                    //
+                    // This is fine when passing the bitmap to a system process as
+                    // Android automatically creates a copy.
+                    //
+                    // If you need to keep the bitmap around, look into using a
+                    // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
+                }
+
+                @Override
+                public void onFailureImpl(DataSource dataSource) {
+                    // No cleanup required here
+                }
+            }, CallerThreadExecutor.getInstance());
+        } finally {
+            if (dataSource != null) {
+                dataSource.close();
+            }
+        }
+
+
     }
 
     public void sharePixtory(final ContentData contentData)
     {
-        Picasso.with(mContext).load(contentData.pictureUrl).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                try {
 
+//        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_out);
+//        anim.setTarget(mShareImg);
+////        anim.setDuration(0);
+//        anim.start();
+
+//        RotateAnimation rotate = new RotateAnimation(0, 360,
+//                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
+//                0.5f);
+//
+//        rotate.setDuration(200);
+//        rotate.setInterpolator(new LinearInterpolator());
+//        rotate.setRepeatCount(Animation.INFINITE);
+//        mShareImg.setAnimation(rotate);
+
+        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_in);
+        anim.setTarget(mShareImg);
+        anim.setDuration(200);
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+//                mImageLike.setImageResource(R.drawable.liked);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+
+        if(mImageBitmap == null)
+            mImageBitmap = ((BitmapDrawable)mImageMain.getDrawable()).getBitmap();
+
+                try{
                     File cachePath = new File(mContext.getCacheDir(), "images");
                     cachePath.mkdirs(); // don't forget to make the directory
                     FileOutputStream stream = new FileOutputStream(cachePath + "/"+contentData.name+".png"); // overwrites this image every time
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     stream.close();
 
                 } catch (FileNotFoundException e) {
@@ -1386,6 +1495,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     PackageManager packageManager = getActivity().getPackageManager();
                     List<Intent> targetInviteIntents=new ArrayList<Intent>();
                     List<ResolveInfo> resInfos=packageManager.queryIntentActivities(shareIntent, 0);
+
                     if(!resInfos.isEmpty()){
 
                         for(ResolveInfo resInfo : resInfos){
@@ -1441,6 +1551,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                             Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
                             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
+
+                            mShareImg.clearAnimation();
+
                             startActivity(chooserIntent);
                         }else{
                             Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
@@ -1453,17 +1566,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 }
             }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
 
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
-        }
 
     private boolean isTouchEnabled = true;
     public  void setActioUpEnabled(boolean isEnable){
@@ -1472,6 +1575,61 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     public boolean getActionUpEnabled(){
         return isTouchEnabled;
+    }
+
+    public class SetWallpaperTask extends AsyncTask<Void,Void, Void> {
+
+        Bitmap bitmap;
+        Context context;
+
+        public SetWallpaperTask(Context pContext , Bitmap pBitmap){
+            bitmap = pBitmap;
+            context = pContext;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            // Runs on the UI thread
+            // Do any pre-executing tasks here, for example display a progress bar
+            Log.d(TAG, "About to set wallpaper...");
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Runs on the background thread
+//            Utils.setWallpaper(context,bitmap);
+            if(bitmap != null && context !=null){
+                WallpaperManager wallpaperManager
+                        = WallpaperManager.getInstance(mContext);
+
+                try {
+                    wallpaperManager.setBitmap(bitmap);
+                    Log.i("WallPaper","Set wallpaper done");
+//                    Toast.makeText(mContext,"Yayy!! Wallpaper set",Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    Log.i("WallPaper","Set wallpaper IO exception");
+//                    Toast.makeText(mContext,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+            else {
+                Log.i("Utils-","imageBitMap or mContext is null");
+//                Toast.makeText(mContext,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void res) {
+            // Runs on the UI thread
+            // Here you can perform any post-execute tasks, for example remove the
+            // progress bar (if you set one).
+            Toast.makeText(mContext,"Yayy!! Wallpaper set",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "New wallpaper set");
+        }
+
+
+
     }
 
 }

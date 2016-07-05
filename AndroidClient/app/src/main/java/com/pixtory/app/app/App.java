@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.amplitude.api.Amplitude;
 import com.crittercism.app.Crittercism;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -70,13 +71,23 @@ public class App extends Application implements AppConstants {
 
     private static Target mWallpaperTarget;
 
+    public  static boolean isLoginRequired;
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
 
+        isLoginRequired = false;
+
+
         Crittercism.initialize(getApplicationContext(), "67496ab9c7094339adf79c54d369ccc900555300");
-        Fresco.initialize(getApplicationContext());
+
+
+        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(getApplicationContext())
+                .setDownsampleEnabled(true)
+                .build();
+
+        Fresco.initialize(getApplicationContext(), config);
 
         Stetho.initialize(
                 Stetho.newInitializerBuilder(this)

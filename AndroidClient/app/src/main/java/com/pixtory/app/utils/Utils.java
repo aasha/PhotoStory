@@ -1,5 +1,6 @@
 package com.pixtory.app.utils;
 
+import android.app.VoiceInteractor;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,6 +32,8 @@ import java.util.List;
  * Created by aasha.medhi on 08/10/15.
  */
 public class Utils {
+
+    private  String TAG = Utils.class.getName();
 
     public static void deleteFile(String fileUrl) {
         File file = new File(fileUrl);
@@ -144,38 +148,62 @@ public class Utils {
         editor.commit(); // commit changes
     }
 
-    public static void setWallpaper(final Context context , final Context appContext, String imgUrl){
+    public static void setWallpaper(Context mContext , Bitmap imageBitMap){
 
-        if(isNotEmpty(imgUrl))
-            Picasso.with(context).load(imgUrl).into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        if(imageBitMap != null && mContext !=null){
+            WallpaperManager wallpaperManager
+                    = WallpaperManager.getInstance(mContext);
 
-                    try {
+            try {
+                wallpaperManager.setBitmap(imageBitMap);
+                Log.i("WallPaper","Set wallpaper done");
+                Toast.makeText(mContext,"Yayy!! Wallpaper set",Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Log.i("WallPaper","Set wallpaper IO exception");
+                Toast.makeText(mContext,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        }
+        else {
+            Log.i("Utils-","imageBitMap or mContext is null");
+            Toast.makeText(mContext,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+        }
+    }
 
-                        WallpaperManager myWallpaperManager
-                                = WallpaperManager.getInstance(appContext);
 
-                        myWallpaperManager.setBitmap(bitmap);
+    public class SetWallpaperTask extends AsyncTask<Void,Void, Void> {
 
-                        Toast.makeText(appContext,"Wallpaper set",Toast.LENGTH_SHORT).show();
+        Bitmap bitmap;
+        Context context;
 
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
+        public SetWallpaperTask(Bitmap pBitmap, Context pContext){
+            bitmap = pBitmap;
+            context = pContext;
+        }
 
-                @Override
-                public void onBitmapFailed(Drawable errorDrawable) {
+        @Override
+        protected void onPreExecute() {
+            // Runs on the UI thread
+            // Do any pre-executing tasks here, for example display a progress bar
+            Log.d(TAG, "About to set wallpaper...");
+        }
 
-                }
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Runs on the background thread
+            setWallpaper(context,bitmap);
+            return null;
+        }
 
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
+        @Override
+        protected void onPostExecute(Void res) {
+            // Runs on the UI thread
+            // Here you can perform any post-execute tasks, for example remove the
+            // progress bar (if you set one).
 
-                }
-        });
+                Log.d(TAG, "New wallpaper set");
+        }
+
     }
 
 //    public static boolean isNDAAccepted(Context context) {
@@ -212,12 +240,11 @@ public class Utils {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
                 AppConstants.APP_PREFS, Context.MODE_PRIVATE);
 
-        //if(mSharedPrefs.getString("UID","") != null || m)
-        return mSharedPrefs.getString("UID", "");
-        //return mSharedPrefs.getString("UID", "1207785742565519");
+        if(App.isLoginRequired)
+            return mSharedPrefs.getString("UID", "");
+        else
+            return mSharedPrefs.getString("UID", "1");
 
-        //Log.i("Utils class->UserId::",mSharedPrefs.getString("UID", ""));
-       // return mSharedPrefs.getString("UID", "");
     }
 
     public static void putUserName(Context context, String fname) {

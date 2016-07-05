@@ -12,11 +12,13 @@ import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -56,6 +58,12 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.datasource.BaseDataSubscriber;
+import com.facebook.datasource.DataSource;
+import com.facebook.datasource.DataSubscriber;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
@@ -84,6 +92,7 @@ import com.pixtory.app.transformations.ParallaxPagerTransformer;
 import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
+import com.pixtory.app.utils.ImageDownloadManager;
 import com.pixtory.app.utils.Utils;
 
 import org.json.JSONObject;
@@ -102,7 +111,8 @@ import retrofit.client.Response;
 /**
  * Created by aasha.medhi on 12/23/15.
  */
-public class HomeActivity extends AppCompatActivity implements MainFragment.OnMainFragmentInteractionListener,CommentsDialogFragment.OnAddCommentButtonClickListener{
+public class HomeActivity extends AppCompatActivity implements
+        MainFragment.OnMainFragmentInteractionListener,CommentsDialogFragment.OnAddCommentButtonClickListener,ImageDownloadManager.ImageDownloadListener{
 
     private static final String Get_Feed_Done = "Get_Feed_Done";
     private static final String Get_Feed_Failed = "Get_Feed_Failed";
@@ -174,6 +184,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
     private Intent mWallpaperReceiverIntent = null;
 
     public String userId;
+    public int mFeedSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +193,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         userId = getIntent().getStringExtra("USER_ID");
         //TODO to be removed later
-//        checkForDeviceDensity();
+        checkForDeviceDensity();
         ButterKnife.bind(this);
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
@@ -225,12 +236,16 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
             @Override
             public void onPageSelected(int position) {
+//                checkForCachedImages(position+10);
+//                checkForCachedImages(position+20);
+                preFetchImages(position);
                 if (previousPage == 0)
                     previousPage = position;
                 else
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+
                //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
                if(mainFragment!=null && mainFragment.isFullScreenShown()){
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
@@ -396,17 +411,26 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                 mProgress.dismiss();
 
                 Log.i(TAG, "prepare feed successful!!");
-                mLoadingText.setVisibility(View.GONE);
-                mOuterContainer.setVisibility(View.VISIBLE);
+
                 if (o.contentList != null) {
+                    mFeedSize = o.contentList.size();
                     App.setContentData(o.contentList);
                     Utils.deleteOldVideos(o.contentList);
+
+                    ImageDownloadManager imageDownloadManager =
+                            new ImageDownloadManager(HomeActivity.this,o.contentList , 0 , 20);
+                    AsyncTaskCompat.executeParallel( imageDownloadManager);
+
+//                    imageDownloadManager.execute();
+
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Done)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                             .build());
                     mCursorPagerAdapter.setData(App.getContentData());
                     mPager.setAdapter(mCursorPagerAdapter);
 
+                    mLoadingText.setVisibility(View.GONE);
+                    mOuterContainer.setVisibility(View.VISIBLE);
 
                 } else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
@@ -478,7 +502,7 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
     }
 
@@ -556,6 +580,17 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
 
         if(mainFragment !=null)
             mainFragment.postComment(str);
+    }
+
+    int i=0;
+    @Override
+    public void onImageFetched() {
+        Log.i(TAG,"onImageFetched");
+        i++;
+        Log.i(TAG,"onImageFetched-"+i);
+        if(i==9){
+            Log.i(TAG,"Image fetching sucessful");
+        }
     }
 
     private class ConnectionChangedListener
@@ -1307,6 +1342,81 @@ public class HomeActivity extends AppCompatActivity implements MainFragment.OnMa
                     .build());
         }
         return firstRun;
+    }
+
+    private void preFetchImages(final int index){
+
+        if((index+10)> mFeedSize || (index+10)== mFeedSize){
+            Log.i(TAG,"Out of index");
+            return;
+        }else {
+
+            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+
+            if(Utils.isNotEmpty(App.getContentData().get(index+10).pictureUrl)) {
+                Log.i(TAG,"uri for--"+(index+10)+"is--"+App.getContentData().get(index+10).pictureUrl);
+                DataSource<Boolean> inDiskCacheSource = imagePipeline.isInDiskCache(Uri.parse(App.getContentData().get(index + 10).pictureUrl));
+
+
+                DataSubscriber<Boolean> subscriber = new BaseDataSubscriber<Boolean>() {
+                    @Override
+                    protected void onNewResultImpl(DataSource<Boolean> dataSource) {
+                        if (!dataSource.isFinished()) {
+                            return;
+                        }
+                        boolean isInCache = dataSource.getResult();
+                        if (isInCache) {
+                            Log.i(TAG, "image with index==" + (index + 10) + "is cached");
+                        } else {
+                            Log.i(TAG, "image with index==" + (index + 10) + "is not cached");
+                            ImageDownloadManager imageDownloadManager =
+                                    new ImageDownloadManager(HomeActivity.this, App.getContentData(), index + 10, 10);
+
+                            AsyncTaskCompat.executeParallel(imageDownloadManager);
+//                        imageDownloadManager.execute();
+                        }
+                        // your code here
+                    }
+
+                    @Override
+                    protected void onFailureImpl(DataSource<Boolean> dataSource) {
+
+                    }
+                };
+
+                inDiskCacheSource.subscribe(subscriber, CallerThreadExecutor.getInstance());
+            }else{
+                Log.i(TAG,"uri for--"+(index+10)+"is empty--url--"+App.getContentData().get(index+10).pictureUrl);
+
+            }
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+//        if (mainFragment == null)
+//            mainFragment = (MainFragment) mCursorPagerAdapter.getCurrentFragment();
+
+        Log.i(TAG,"current fragment position is ---"+mCurrentFragmentPosition);
+//        if (mainFragment == null)
+        mainFragment = (MainFragment)mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+
+        if (mainFragment.isCommentsVisible()) {
+
+            Log.i(TAG, "onBackPressed - User is navigated to story view");
+            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
+
+        } else if (!mainFragment.isFullScreenShown()) {
+            Log.i(TAG, "onBackPressed - User is navigated to full image view");
+
+            mainFragment.setUpFullScreen();
+        }
+        else{
+            super.onBackPressed();
+        }
+
     }
 
 }
