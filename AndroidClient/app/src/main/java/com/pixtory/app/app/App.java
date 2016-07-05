@@ -25,8 +25,12 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by aasha.medhi on 12/05/15.
@@ -40,7 +44,6 @@ public class App extends Application implements AppConstants {
     }
 
     private static ArrayList<ContentData> mCData = null;
-
     private static ArrayList<ContentData> mLikedContentData = null;
 
     private LayoutInflater mInfater = null;
@@ -72,6 +75,8 @@ public class App extends Application implements AppConstants {
     private static Target mWallpaperTarget;
 
     public  static boolean isLoginRequired;
+    private static Map<String,String> mOriginalIndices = new HashMap<String, String>();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -168,7 +173,8 @@ public class App extends Application implements AppConstants {
 
     public static void setContentData(ArrayList<ContentData> mC) {
         mCData = mC;
-
+        for(int i=0;i< mC.size();i++)
+            mOriginalIndices.put(mC.get(i).id+"",i+"");
     }
 
     public static ArrayList<ContentData> getContentData() {
@@ -192,7 +198,16 @@ public class App extends Application implements AppConstants {
         mPersonConentData = conentData;
     }
 
-    public static ArrayList<ContentData> getPersonConentData(){ return mPersonConentData; }
+    public static void addToPersonContentData(ContentData contentData){
+        mPersonConentData.add(contentData);
+    }
+
+    public static void removeFromPersonContentData(ContentData contentData){
+        mPersonConentData.remove(contentData);
+
+    }
+
+    public static ArrayList<ContentData> getPersonContentData(){ return mPersonConentData; }
 
     public static void setProfileContentData(ArrayList<ContentData> contentData){
         mProfileContentData = contentData;
@@ -226,5 +241,20 @@ public class App extends Application implements AppConstants {
         if(mWallpaperTarget!=null)
             return mWallpaperTarget;
         return null;
+    }
+
+    public static void shuffleContentData(int startPos){
+        if(mCData!=null&&startPos<mCData.size()&&startPos>0){
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos));
+            Collections.reverse(sublist);
+            mCData.subList(0,startPos).clear();
+            mCData.addAll(sublist);
+        }
+    }
+
+    public static int getOriginalIndex(int contentId){
+        if(mOriginalIndices!=null)
+            return Integer.parseInt(mOriginalIndices.get(contentId+""));
+        return 0;
     }
 }

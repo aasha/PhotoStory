@@ -44,7 +44,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
     private static final String SCREEN_NAME = "Notification";
-    private static final String App_Notification_Shown = "App_Notification_Shown";
+    private static final String App_Notification_Shown = "NF_Notification_Shown";
 
     PendingIntent pendingIntent ;
 
@@ -64,6 +64,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.d(TAG, "Message: " + message);
 
         Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra("NOTIFICATION_CLICK",true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

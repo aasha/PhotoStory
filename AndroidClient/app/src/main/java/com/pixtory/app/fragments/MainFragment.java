@@ -209,6 +209,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private int  scrollY,oldScrollY;
     private boolean isScrollingUp = true;
+    private boolean isPixtorySwipeUp = true;
+
 
     private Bitmap mImageBitmap = null;
 
@@ -372,7 +374,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(!isSwipeUpArrowShown){
             swipeUpArrow.setVisibility(View.VISIBLE);
             swipeUpArrow.setAnimation(mAnimation);
-            Log.i(TAG,"Swipe up Animation set");
             isSwipeUpArrowShown=true;
         }
 
@@ -909,7 +910,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         return false;
     }
 
-    public void setUpFullScreen(){
+    private void setUpFullScreen(){
+        isPixtorySwipeUp=true;
         isFullScreenShown = true;
         mStoryParentLayout.fullScroll(View.FOCUS_UP);
 
@@ -924,7 +926,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(!isSwipeUpArrowShown){
             swipeUpArrow.setVisibility(View.VISIBLE);
             swipeUpArrow.setAnimation(mAnimation);
-            Log.i(TAG,"Swipe up Animation set");
             isSwipeUpArrowShown=true;
         }
 
@@ -953,11 +954,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
                         Log.i(TAG, "MotionEvent.ACTION_DOWN");
+                        if(isPixtorySwipeUp){
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
                                 .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                 .put("PIXTORY_ID",""+mContentData.id)
                                 .build());
                         Log.i(TAG,"MF_Picture_StoryView_Amplitude");
+                        }
+                        isPixtorySwipeUp=false;
 
                     }
                     else {
@@ -977,10 +981,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         if(!isSwipeUpArrowShown){
                             swipeUpArrow.setVisibility(View.VISIBLE);
                             swipeUpArrow.setAnimation(mAnimation);
-                            Log.i(TAG,"Swipe up Animation set");
                             isSwipeUpArrowShown=true;
                         }
-
+                        isPixtorySwipeUp = true;
                     }
                 }
             });
@@ -1282,8 +1285,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void success(BaseResponse baseResponse, Response response) {
                 if(isLiked) {
+                    App.addToPersonContentData(mContentData);
                     mContentData.likeCount += 1;
                 }else{
+                    App.removeFromPersonContentData(mContentData);
                     if(mContentData.likeCount>0)
                         mContentData.likeCount -= 1;
                 }
@@ -1348,7 +1353,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress_Yes_Click")
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWallpaperConfirm_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")
@@ -1361,11 +1366,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress_Cancel_Click")
-                        .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                        .put("PIXTORY_ID", mContentData.id + "")
-                        .put("POSITION_ID", mContentIndex + "")
-                        .build());
                 dialog.dismiss();
             }
         });

@@ -21,4 +21,19 @@ public class ContentData {
     public PersonInfo personDetails = null;
     public List<CommentData> commentList = null;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof ContentData)) {
+            return false;
+        }
+
+        ContentData c = (ContentData) o;
+        if(c.id==this.id)
+            return true;
+        return false;
+    }
 }
