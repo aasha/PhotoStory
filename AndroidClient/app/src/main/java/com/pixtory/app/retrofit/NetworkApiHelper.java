@@ -30,7 +30,7 @@ public class NetworkApiHelper {
     }
 
 
-    private NetworkApiHelper(){
+    private NetworkApiHelper() {
         //Constructor is made private to ensure singleton behavior
     }
 
@@ -38,7 +38,7 @@ public class NetworkApiHelper {
      * ============================================================================================================================================================================================
      */
 
-    public void registerUser(final String userName, final String userEmail, final String userImageUrl,final String fbId ,final NetworkApiCallback cb) {
+    public void registerUser(final String userName, final String userEmail, final String userImageUrl, final String fbId, final NetworkApiCallback cb) {
         RegisterRequest req = new RegisterRequest();
         req.userName = userName;
         req.userEmail = userEmail;
@@ -47,7 +47,7 @@ public class NetworkApiHelper {
         sAPI.register(req, new Callback<RegisterResponse>() {
             @Override
             public void success(RegisterResponse registerResponse, Response response) {
-                if(registerResponse.success == true)
+                if (registerResponse.success == true)
                     cb.success(registerResponse, response);
                 else
                     cb.failure(registerResponse);
@@ -61,10 +61,10 @@ public class NetworkApiHelper {
         });
     }
 
-    public void getMainFeed(Context ctxt, String userId ,final NetworkApiCallback cb) {
+    public void getMainFeed(Context ctxt, String userId, final NetworkApiCallback cb) {
         GetMainFeedRequest req = new GetMainFeedRequest();
 //        req.userId = Integer.parseInt(Utils.getUserId(ctxt));
-        if(Utils.isNotEmpty(userId)){
+        if (Utils.isNotEmpty(userId)) {
             req.userId = Integer.parseInt(userId);
 
             sAPI.getMainFeed(req, new Callback<GetMainFeedResponse>() {
@@ -81,8 +81,8 @@ public class NetworkApiHelper {
                     cb.networkFailure(error);
                 }
             });
-        }else{
-            Log.i(TAG , "getMainFeed error--user Id is null");
+        } else {
+            Log.i(TAG, "getMainFeed error--user Id is null");
         }
     }
 
@@ -98,7 +98,7 @@ public class NetworkApiHelper {
         sAPI.likeContent(req, new Callback<BaseResponse>() {
             @Override
             public void success(BaseResponse resp, Response response) {
-                if(resp.success == true)
+                if (resp.success == true)
                     cb.success(resp, response);
                 else
                     cb.failure(resp);
@@ -135,6 +135,7 @@ public class NetworkApiHelper {
             }
         });
     }
+
     /**
      * ============================================================================================================================================================================================
      */
@@ -146,7 +147,7 @@ public class NetworkApiHelper {
         sAPI.addPushNotifsId(req, new Callback<BaseResponse>() {
             @Override
             public void success(BaseResponse resp, Response response) {
-                if(resp.success == true)
+                if (resp.success == true)
                     cb.success(resp, response);
                 else
                     cb.failure(resp);
@@ -158,6 +159,7 @@ public class NetworkApiHelper {
             }
         });
     }
+
     /**
      * ============================================================================================================================================================================================
      */
@@ -170,7 +172,7 @@ public class NetworkApiHelper {
         sAPI.deleteComment(req, new Callback<BaseResponse>() {
             @Override
             public void success(BaseResponse resp, Response response) {
-                if(resp.success == true)
+                if (resp.success == true)
                     cb.success(resp, response);
                 else
                     cb.failure(resp);
@@ -207,7 +209,7 @@ public class NetworkApiHelper {
         });
     }
 
-    public void getPersonDetails(int userId, int personId,final NetworkApiCallback cb) {
+    public void getPersonDetails(int userId, int personId, final NetworkApiCallback cb) {
         GetPersonDetailsRequest req = new GetPersonDetailsRequest();
         req.userId = userId;
         req.personId = personId;
@@ -229,7 +231,7 @@ public class NetworkApiHelper {
         });
     }
 
-    public void userFeedBack(int userId, String feedBack,String category, String subCategory, String details, final NetworkApiCallback cb) {
+    public void userFeedBack(int userId, String feedBack, String category, String subCategory, String details, final NetworkApiCallback cb) {
         userFeedBackRequest req = new userFeedBackRequest();
         req.userId = userId;
         req.feedBack = feedBack;
@@ -298,7 +300,7 @@ public class NetworkApiHelper {
         });
     }
 
-    public void getWallPaper(int userId,  final NetworkApiCallback cb) {
+    public void getWallPaper(int userId, final NetworkApiCallback cb) {
         GetWallPaperRequest req = new GetWallPaperRequest();
         req.userId = userId;
 
@@ -317,4 +319,27 @@ public class NetworkApiHelper {
             }
         });
     }
+
+    public void getContentByCategory(int userId, String categoryName, final NetworkApiCallback cb) {
+        GetContentByCategoryRequest req = new GetContentByCategoryRequest();
+        req.categoryName = categoryName;
+        req.userId = userId;
+
+        sAPI.getContentByCategory(req, new Callback<GetMainFeedResponse>() {
+            @Override
+            public void success(GetMainFeedResponse contentResponse, Response response) {
+                if (contentResponse.success == true)
+                    cb.success(contentResponse, response);
+                else
+                    cb.failure(contentResponse);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                cb.networkFailure(error);
+            }
+        });
+    }
+
+
 }

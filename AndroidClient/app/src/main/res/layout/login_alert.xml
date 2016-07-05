@@ -1,16 +1,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="170dp"
-    android:background="@drawable/shadow_background">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
 
     <TextView
         android:text="@string/login_text"
-        android:textSize="22sp"
+        android:textSize="16sp"
         android:textAlignment="center"
         android:paddingTop="15dp"
         android:layout_margin="10dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="center"
@@ -24,7 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="34dp"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/round_corners_blue"
         android:id="@+id/login_click"
         android:orientation="horizontal">

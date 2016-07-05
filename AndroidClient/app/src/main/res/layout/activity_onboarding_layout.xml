@@ -3,17 +3,53 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
-    android:background="@drawable/onboarding_bg">
+    android:background="@drawable/onboarding_bg"
+    >
 
 
     <LinearLayout
-        android:layout_width="@dimen/fb_signin_btn_width"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/round_corners_blue"
         android:id="@+id/fb_sign_btn"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:layout_width="31dp"
+            android:layout_height="31dp"
+            android:scaleType="centerInside"
+            android:background="@drawable/facebook_icon"/>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/white"
+                android:text="@string/fb_login"
+                android:textAlignment="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="8dp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+<!--
+
+    <LinearLayout
+        android:layout_width="@dimen/fb_signin_btn_width"
+        android:id="@+id/fb_login_click"
         android:layout_height="@dimen/fb_signin_btn_height"
         android:background="@drawable/fb_btn_bg"
         android:gravity="center"
         android:layout_centerInParent="true"
-        >
+        android:visibility="gone">
 
     <ImageView
         android:layout_width="@dimen/fb_btn_icon_width"
@@ -39,6 +75,7 @@
          />
 </LinearLayout>
 
+-->
 
     <com.pixtory.app.views.RobotoLightTextView
         android:layout_width="wrap_content"

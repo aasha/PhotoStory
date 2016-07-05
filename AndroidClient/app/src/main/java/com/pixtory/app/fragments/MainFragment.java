@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -559,6 +560,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         ImageView mProfileImage = (ImageView) mStoryLayout.findViewById(R.id.imgProfile);
         TextView mTextName = (TextView) mStoryLayout.findViewById(R.id.txtName);
         TextView mTextDesc = (TextView) mStoryLayout.findViewById(R.id.txtDesc);
+        TextView mCategory1 = (TextView)mStoryLayout.findViewById(R.id.category_1);
+        TextView mCategory2 = (TextView)mStoryLayout.findViewById(R.id.category_2);
+        TextView mCategory3 = (TextView)mStoryLayout.findViewById(R.id.category_3);
+        TextView mseperator1 = (TextView)mStoryLayout.findViewById(R.id.separator_1);
+        TextView mseperator2 = (TextView)mStoryLayout.findViewById(R.id.separator_2);
+        mCategory1.setPaintFlags(mCategory1.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        mCategory2.setPaintFlags(mCategory2.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        mCategory3.setPaintFlags(mCategory3.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
         DroidSerifTextView mTextStoryDetails = (DroidSerifTextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
         mShareBtn = (LinearLayout) mRootView.findViewById(R.id.btnShare);
         mCommentBtn = (LinearLayout) mRootView.findViewById(R.id.btnComment);
@@ -572,7 +582,44 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 mTextExpert.setText(name);
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
-                mTextDesc.setText(cd.personDetails.description);
+                if(cd.categoryNameList!=null){
+                mTextDesc.setVisibility(View.VISIBLE);
+                mCategory1.setVisibility(View.VISIBLE);
+                mCategory1.setText(cd.categoryNameList.get(0));
+                mCategory1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(mContext,cd.categoryNameList.get(0),Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                if(cd.categoryNameList.size()>1){
+                    mseperator1.setVisibility(View.VISIBLE);
+                    mCategory2.setVisibility(View.VISIBLE);
+                    mCategory2.setText(cd.categoryNameList.get(1));
+                    mCategory2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(mContext,cd.categoryNameList.get(1),Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    if(cd.categoryNameList.size()>2){
+                        //mseperator1.setVisibility(View.GONE);
+                        //mCategory1.setText(cd.categoryNameList.get(0)+",");
+                        mseperator2.setVisibility(View.VISIBLE);
+                        mCategory3.setVisibility(View.VISIBLE);
+                        mCategory3.setText(cd.categoryNameList.get(2));
+                        mCategory3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(mContext,cd.categoryNameList.get(2),Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+                }
+                }
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -580,7 +627,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         navigateToUserProfile(cd);
                     }
                 });
-                mTextName.setOnClickListener(new View.OnClickListener() {
+              /*  mTextName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         navigateToUserProfile(cd);
@@ -592,7 +639,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                      public void onClick(View v) {
                          navigateToUserProfile(cd);
                      }
-            });
+            });*/
             }
             Log.i(TAG,"bindStorycd data->date::"+cd.date);
             mTextStoryDetails.setText(Html.fromHtml(cd.pictureDescription+"<br></br><br></br><br></br><br></br><br>" +
