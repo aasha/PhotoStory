@@ -79,6 +79,7 @@ import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.SideMenuData;
 import com.pixtory.app.pushnotification.QuickstartPreferences;
 import com.pixtory.app.pushnotification.RegistrationIntentService;
@@ -131,6 +132,7 @@ public class HomeActivity extends AppCompatActivity implements
     private CallbackManager callbackManager;
 
     private ViewPager mPager = null;
+    private ViewPager mCategoryViewPager = null;
     private int mCurrentFragmentPosition = 0;
 
     //Analytics
@@ -145,6 +147,7 @@ public class HomeActivity extends AppCompatActivity implements
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     private OpinionViewerAdapter mCursorPagerAdapter = null;
+    private OpinionViewerAdapter mCategoryPagerAdapter = null;
 
     LinearLayout mUserProfileFragmentLayout = null;
     int previousPage = 0;
@@ -191,6 +194,11 @@ public class HomeActivity extends AppCompatActivity implements
     public String userId;
     public int mFeedSize;
 
+   
+
+    @Bind(R.id.other_frame)
+    FrameLayout mOtherFrame;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,6 +231,8 @@ public class HomeActivity extends AppCompatActivity implements
         setPersonDetails();
         isFirstTimeOpen();
         mPager = (ViewPager) findViewById(R.id.pager);
+        mCategoryViewPager = (ViewPager)findViewById(R.id.category_pager);
+
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
 
         //Measuring network condition
@@ -233,6 +243,9 @@ public class HomeActivity extends AppCompatActivity implements
         //while(App.getContentData()==null);
 
         mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
+        mCategoryPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
+
+
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
         //PagerParallaxTransformer pagerParallaxTransformer = new PagerParallaxTransformer().addViewToParallax(new PagerParallaxTransformer.ParallaxTransformParameters(R.id.image_main,1.5f,1.5f));
         ParallaxPagerTransformer parallaxPagerTransformer = new ParallaxPagerTransformer(HomeActivity.this,R.id.image_main,0.5f);
@@ -451,7 +464,12 @@ public class HomeActivity extends AppCompatActivity implements
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                             .build());
                     mCursorPagerAdapter.setData(App.getContentData());
+
+
+                    mCategoryPagerAdapter.setData(new ArrayList<ContentData>(App.getContentData().subList(3,9)));
+
                     mPager.setAdapter(mCursorPagerAdapter);
+                    mCategoryViewPager.setAdapter(mCategoryPagerAdapter);
 
                     mLoadingText.setVisibility(View.GONE);
                     mOuterContainer.setVisibility(View.VISIBLE);
@@ -1414,27 +1432,30 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
+//
+////        if (mainFragment == null)
+////            mainFragment = (MainFragment) mCursorPagerAdapter.getCurrentFragment();
+//
+//        Log.i(TAG,"current fragment position is ---"+mCurrentFragmentPosition);
+////        if (mainFragment == null)
+//        mainFragment = (MainFragment)mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+//
+//        if (mainFragment.isCommentsVisible()) {
+//
+//            Log.i(TAG, "onBackPressed - User is navigated to story view");
+//            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
+//
+//        } else if (!mainFragment.isFullScreenShown()) {
+//            Log.i(TAG, "onBackPressed - User is navigated to full image view");
+//
+//            mainFragment.setUpFullScreen();
+//        }
+//        else{
+//            super.onBackPressed();
+//        }
 
-//        if (mainFragment == null)
-//            mainFragment = (MainFragment) mCursorPagerAdapter.getCurrentFragment();
-
-        Log.i(TAG,"current fragment position is ---"+mCurrentFragmentPosition);
-//        if (mainFragment == null)
-        mainFragment = (MainFragment)mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-
-        if (mainFragment.isCommentsVisible()) {
-
-            Log.i(TAG, "onBackPressed - User is navigated to story view");
-            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
-
-        } else if (!mainFragment.isFullScreenShown()) {
-            Log.i(TAG, "onBackPressed - User is navigated to full image view");
-
-            mainFragment.setUpFullScreen();
-        }
-        else{
-            super.onBackPressed();
-        }
+        mOuterContainer.setVisibility(View.VISIBLE);
+        mOtherFrame.setVisibility(View.GONE);
 
     }
 
@@ -1476,6 +1497,12 @@ public class HomeActivity extends AppCompatActivity implements
         });
 
         dialog.show();
+    }
+
+    @Override
+    public void showCategoryStories(){
+        mOuterContainer.setVisibility(View.GONE);
+        mOtherFrame.setVisibility(View.VISIBLE);
     }
 
 }

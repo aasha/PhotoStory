@@ -156,5 +156,9 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
         });
     }
 
+    @Override
+    public void showCategoryStories(){
+
+    }
 
 }

@@ -49,6 +49,8 @@
                 android:orientation="horizontal"
                 android:visibility="gone"></LinearLayout>
 
+
+
             <ImageView android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="10dp"
@@ -62,6 +64,21 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
         </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/other_frame">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/category_pager"
+                android:visibility="gone"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@color/black"/>
+        </FrameLayout>
+
+
     </LinearLayout>
         <ImageView
             android:layout_width="match_parent"
@@ -241,6 +258,7 @@
                 android:paddingLeft="20dp"/>
         </FrameLayout>
 
+
     </FrameLayout>
 
     <!-- Slide Navigation Content-->
@@ -252,5 +270,7 @@
         android:divider="@color/app_blue"
         android:dividerHeight="0dp"
         android:background="#00ffffff" />
+
+
 
 </android.support.v4.widget.DrawerLayout>

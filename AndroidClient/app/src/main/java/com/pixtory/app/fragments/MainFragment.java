@@ -212,6 +212,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private boolean isScrollingUp = true;
     private boolean isPixtorySwipeUp = true;
 
+    private boolean isLongTap = false;
+
 
     private Bitmap mImageBitmap = null;
 
@@ -578,7 +580,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 if (cd.personDetails.imageUrl == null || cd.personDetails.imageUrl.trim().equals("")){
                     cd.personDetails.imageUrl = "http://vignette4.wikia.nocookie.net/naruto/images/0/09/Naruto_newshot.png/revision/latest/scale-to-width-down/300?cb=20150817151803";
                 }
-                String name = (!(cd.personDetails.name.equals("")))? "By, "+cd.personDetails.name : " ";
+                String name = (!(cd.personDetails.name.equals("")))? cd.personDetails.name : " ";
+                if(cd.categoryNameList!=null)
+                {
+                    name += (" in "+cd.categoryNameList.get(0));
+                    if(cd.categoryNameList.size()>1)
+                        name+=(", "+cd.categoryNameList.get(1));
+                }
                 mTextExpert.setText(name);
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
@@ -590,6 +598,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(mContext,cd.categoryNameList.get(0),Toast.LENGTH_SHORT).show();
+                        mListener.showCategoryStories();
                     }
                 });
 
@@ -791,6 +800,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public interface OnMainFragmentInteractionListener {
         void showMenuIcon(boolean showMenuIcon);
         void showLoginAlert();
+        void showCategoryStories();
     }
 
     public void resetFragmentState() {
@@ -816,6 +826,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
                     Log.i(TAG, "Long Tap");
                     if (isFullScreenShown) {
+                        isLongTap = true;
                         showWallpaperAlert();
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Wallpaper_LongPress")
                                 .put(AppConstants.USER_ID, Utils.getUserId(mContext))
@@ -903,6 +914,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             return false;
         }
 
+//        if (gesture1.onTouchEvent(me)) {
+//            return true;
+//        }
+
         if (me.getAction() == MotionEvent.ACTION_SCROLL){
             Log.i(TAG,"scrolling++"+me.getYPrecision());
 
@@ -921,15 +936,17 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     }
 
-    final GestureDetector gesture1 = new GestureDetector(getActivity(),
-            new GestureDetector.SimpleOnGestureListener() {
-
-                @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-
-                    return true;
-                }
-            });
+//    final GestureDetector gesture1 = new GestureDetector(getActivity(),
+//            new GestureDetector.SimpleOnGestureListener() {
+//
+//                @Override
+//            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+//
+//                    return true;
+//                }
+//
+//
+//            });
 
 
     int mHalfScreenSize;
@@ -946,12 +963,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         }
 
         if (me.getAction() == MotionEvent.ACTION_UP) {
-//            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
-            Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
-
+////            Log.i(TAG , "MotionEvent.ACTION_UP::"+isScrollingUp+"::scrollY::"+scrollY);
+//            Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
+//
             if( (scrollY-oldScrollY) != 0){
                 setUpHalfScreen();
             }
+//            if(!isLongTap) {
+//                setUpHalfScreen();
+//            }
+//            isLongTap = false;
         }
 
         return false;
@@ -1475,48 +1496,47 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public void sharePixtory(final ContentData contentData)
     {
 
-//        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_out);
-//        anim.setTarget(mShareImg);
-////        anim.setDuration(0);
-//        anim.start();
+        ImageRequest imageRequest = ImageRequestBuilder
+                .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
+                .setRequestPriority(Priority.HIGH)
+                .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+                .build();
 
-//        RotateAnimation rotate = new RotateAnimation(0, 360,
-//                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-//                0.5f);
-//
-//        rotate.setDuration(200);
-//        rotate.setInterpolator(new LinearInterpolator());
-//        rotate.setRepeatCount(Animation.INFINITE);
-//        mShareImg.setAnimation(rotate);
+        DataSource<CloseableReference<CloseableImage>> dataSource =
+                frescoImagePipeline.fetchDecodedImage(imageRequest, mContext);
 
-        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_in);
-        anim.setTarget(mShareImg);
-        anim.setDuration(200);
-        anim.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
+        try {
+            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                @Override
+                public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                    if (bitmap == null) {
+                        Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+                        return;
+                    }
+                    Log.i(TAG,"Bitmap is not null-"+bitmap.toString());
+                    mImageBitmap = bitmap;
+                    // The bitmap provided to this method is only guaranteed to be around
+                    // for the lifespan of this method. The image pipeline frees the
+                    // bitmap's memory after this method has completed.
+                    //
+                    // This is fine when passing the bitmap to a system process as
+                    // Android automatically creates a copy.
+                    //
+                    // If you need to keep the bitmap around, look into using a
+                    // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
+                }
 
+                @Override
+                public void onFailureImpl(DataSource dataSource) {
+                    // No cleanup required here
+                }
+            }, CallerThreadExecutor.getInstance());
+        } finally {
+            if (dataSource != null) {
+                dataSource.close();
             }
+        }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-//                mImageLike.setImageResource(R.drawable.liked);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        anim.start();
-
-        if(mImageBitmap == null)
-            mImageBitmap = ((BitmapDrawable)mImageMain.getDrawable()).getBitmap();
 
                 try{
                     File cachePath = new File(mContext.getCacheDir(), "images");
@@ -1602,8 +1622,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                             Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
                             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
-
-                            mShareImg.clearAnimation();
 
                             startActivity(chooserIntent);
                         }else{
