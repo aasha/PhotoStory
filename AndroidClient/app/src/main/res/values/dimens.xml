@@ -30,4 +30,8 @@
     <dimen name="story_layout_min_height">700dp</dimen>
     <dimen name="comment_min_height">320dp</dimen>
 
+    <dimen name="back_btn_height">28dp</dimen>
+    <dimen name="back_btn_width">28dp</dimen>
+
+
 </resources>

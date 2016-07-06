@@ -4,6 +4,7 @@ import android.app.VoiceInteractor;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -309,5 +310,19 @@ public class Utils {
             return false;
 
         return true;
+    }
+
+    /**
+     * To check if required app is installed
+     */
+
+    public static boolean isAppInstalled(Context context, String packageName) {
+        try {
+            context.getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i("Utils","NameNotFoundException-"+e.getMessage());
+            return false;
+        }
     }
 }

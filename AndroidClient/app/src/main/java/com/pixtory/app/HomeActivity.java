@@ -9,7 +9,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInstaller;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -69,6 +71,12 @@ import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
@@ -133,7 +141,9 @@ public class HomeActivity extends AppCompatActivity implements
 
     private ViewPager mPager = null;
     private ViewPager mCategoryViewPager = null;
+
     private int mCurrentFragmentPosition = 0;
+    private int mCurrentFragmentPositionInCategory =0;
 
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
@@ -194,10 +204,16 @@ public class HomeActivity extends AppCompatActivity implements
     public String userId;
     public int mFeedSize;
 
-   
-
     @Bind(R.id.other_frame)
     FrameLayout mOtherFrame;
+
+    @Bind(R.id.category_title)
+    TextView mCategoryTitle;
+
+    private int categoryDataSize;
+    private ShareDialog shareDialog = null;
+    private String categoryName;
+    public boolean isCategoryViewOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,7 +246,8 @@ public class HomeActivity extends AppCompatActivity implements
         prepareFeed();
         setPersonDetails();
         isFirstTimeOpen();
-        mPager = (ViewPager) findViewById(R.id.pager);
+
+        mPager = (ViewPager)findViewById(R.id.pager);
         mCategoryViewPager = (ViewPager)findViewById(R.id.category_pager);
 
         mUserProfileFragmentLayout = (LinearLayout) findViewById(R.id.user_profile_fragment_layout);
@@ -242,8 +259,8 @@ public class HomeActivity extends AppCompatActivity implements
         mListener = new ConnectionChangedListener();
         //while(App.getContentData()==null);
 
-        mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
         mCategoryPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
+        mCursorPagerAdapter = new OpinionViewerAdapter(getSupportFragmentManager());
 
 
         mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
@@ -288,6 +305,25 @@ public class HomeActivity extends AppCompatActivity implements
                }
                 swipeCount();
                 Log.i(TAG,"Page swipe");
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                //Log.d(TAG, "onPageScrollStateChanged = "+state);
+            }
+        });
+
+
+        mCategoryViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mCurrentFragmentPositionInCategory = position;
+                position = position+1;
+                mCategoryTitle.setText(categoryName+" ("+position+"/"+mFeedSize+")");
             }
 
             @Override
@@ -372,6 +408,9 @@ public class HomeActivity extends AppCompatActivity implements
 
         menuIcon.setImageResource(R.drawable.menu_icon);
         FacebookSdk.sdkInitialize(getApplicationContext());
+
+        shareDialog = new ShareDialog(this);
+
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -410,20 +449,22 @@ public class HomeActivity extends AppCompatActivity implements
         mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
 
+        mainFragment = getCurrentFragment();
+        mainFragment.setWallpaper();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.setTime(new Date());
-//        calendar.set(Calendar.HOUR_OF_DAY, 19);
-//        calendar.set(Calendar.MINUTE, 30);
+//        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        calendar.set(Calendar.MINUTE, 30);
 
 
 //        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 //                AlarmManager.INTERVAL_HALF_HOUR,
 //                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
 
-        //repeat alarm in 40 sec
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+        //repeat alarm in 40 sec 1000*60*60*24
+        mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000*60*60*24, mPendingIntent);
         Log.i("Alarm","setAlarmManagerToSetWallPaper called");
 
@@ -458,15 +499,13 @@ public class HomeActivity extends AppCompatActivity implements
                             new ImageDownloadManager(HomeActivity.this,o.contentList , 0 , 20);
                     AsyncTaskCompat.executeParallel( imageDownloadManager);
 
-//                    imageDownloadManager.execute();
-
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Done)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                             .build());
                     mCursorPagerAdapter.setData(App.getContentData());
 
 
-                    mCategoryPagerAdapter.setData(new ArrayList<ContentData>(App.getContentData().subList(3,9)));
+                    mCategoryPagerAdapter.setData(App.getContentData());
 
                     mPager.setAdapter(mCursorPagerAdapter);
                     mCategoryViewPager.setAdapter(mCategoryPagerAdapter);
@@ -544,7 +583,6 @@ public class HomeActivity extends AppCompatActivity implements
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
     }
 
@@ -618,7 +656,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void onAddCommentButtonClicked(String str) {
-        mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
+
+        mainFragment = getCurrentFragment();
 
         if(mainFragment !=null)
             mainFragment.postComment(str);
@@ -1432,34 +1471,30 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-//
-////        if (mainFragment == null)
-////            mainFragment = (MainFragment) mCursorPagerAdapter.getCurrentFragment();
-//
-//        Log.i(TAG,"current fragment position is ---"+mCurrentFragmentPosition);
-////        if (mainFragment == null)
-//        mainFragment = (MainFragment)mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
-//
-//        if (mainFragment.isCommentsVisible()) {
-//
-//            Log.i(TAG, "onBackPressed - User is navigated to story view");
-//            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
-//
-//        } else if (!mainFragment.isFullScreenShown()) {
-//            Log.i(TAG, "onBackPressed - User is navigated to full image view");
-//
-//            mainFragment.setUpFullScreen();
-//        }
-//        else{
-//            super.onBackPressed();
-//        }
 
-        mOuterContainer.setVisibility(View.VISIBLE);
-        mOtherFrame.setVisibility(View.GONE);
+
+        Log.i(TAG,"current fragment position is ---"+mCurrentFragmentPosition);
+
+        mainFragment = getCurrentFragment();
+
+        if (mainFragment.isCommentsVisible()) {
+            Log.i(TAG, "onBackPressed - User is navigated to story view");
+            mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
+
+        } else if (!mainFragment.isFullScreenShown()) {
+            Log.i(TAG, "onBackPressed - User is navigated to full image view");
+            mainFragment.setUpFullScreen();
+        }
+        else if(isCategoryViewOpen) {
+            mOuterContainer.setVisibility(View.VISIBLE);
+            mOtherFrame.setVisibility(View.GONE);
+            isCategoryViewOpen = false;
+        }
+        else{
+            super.onBackPressed();
+        }
 
     }
-
-
 
     public void showCoachmarksDialog(int CoachmarkType){
         final Dialog dialog = new Dialog(HomeActivity.this,R.style.PauseDialog);
@@ -1500,9 +1535,65 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void showCategoryStories(){
+    public void showCategoryStories(String name){
+        categoryName = name;
+        isCategoryViewOpen = true;
+        mCategoryViewPager.setCurrentItem(0);
+        mCategoryTitle.setText(categoryName+" ("+1+"/"+mFeedSize+")");
         mOuterContainer.setVisibility(View.GONE);
         mOtherFrame.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean isCategoryViewOpen(){
+        return isCategoryViewOpen;
+    }
+
+    public MainFragment getCurrentFragment(){
+
+        MainFragment mainFragment;
+        if(isCategoryViewOpen)
+            mainFragment = (MainFragment)mCategoryPagerAdapter.getFragmentAtIndex(mCurrentFragmentPositionInCategory);
+        else
+            mainFragment = (MainFragment)mCursorPagerAdapter.getFragmentAtIndex(mCurrentFragmentPosition);
+
+        return mainFragment;
+    }
+
+    public void showShareDialog(ContentData contentData ,Bitmap bitmap){
+
+        SharePhoto photo = new SharePhoto.Builder()
+                .setBitmap(bitmap)
+                .build();
+        SharePhotoContent content = new SharePhotoContent.Builder()
+                .addPhoto(photo)
+                .build();
+        shareDialog.show(content);
+
+        // Create an object
+
+//        Session.getActiveSession().requestNewReadPermissions(newPermissionsRequest);
+//                                    ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+//                                            .putString("og:type", "pixtory.data")
+//                                            .putString("og:title", contentData.pictureSummary)
+//                                            .putString("og:description", contentData.pictureDescription)
+//                                            .build();
+//
+//                                    // Create an action
+//                                    ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+//                                            .setActionType("pixtory.reads")
+//                                            .putObject("pixtory", object)
+//                                            .build();
+//
+//                                    // Create the content
+//                                    ShareOpenGraphContent graphContent = new ShareOpenGraphContent.Builder()
+//                                            .setPreviewPropertyName("pixtory")
+//                                            .setAction(action)
+//                                            .build();
+//
+//                                    ShareDialog.show(this
+//                                            , graphContent);
+
     }
 
 }

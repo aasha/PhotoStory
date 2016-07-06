@@ -1,5 +1,6 @@
 package com.pixtory.app.userprofile;
 import android.app.Dialog;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -15,11 +16,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.fragments.CommentsDialogFragment;
 import com.pixtory.app.fragments.MainFragment;
+import com.pixtory.app.model.ContentData;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
@@ -157,7 +161,25 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     }
 
     @Override
-    public void showCategoryStories(){
+    public void showCategoryStories(String name){
+
+    }
+
+    boolean isCategoryViewOpen = false;
+    @Override
+    public boolean isCategoryViewOpen(){
+        return isCategoryViewOpen;
+    }
+
+    public void showShareDialog(ContentData contentData, Bitmap bitmap){
+
+//        SharePhoto photo = new SharePhoto.Builder()
+//                .setBitmap(bitmap)
+//                .build();
+//        SharePhotoContent content = new SharePhotoContent.Builder()
+//                .addPhoto(photo)
+//                .build();
+//        shareDialog.show(content);
 
     }
 

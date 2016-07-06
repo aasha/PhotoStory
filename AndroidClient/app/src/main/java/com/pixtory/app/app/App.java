@@ -82,7 +82,7 @@ public class App extends Application implements AppConstants {
         super.onCreate();
         mInstance = this;
 
-        isLoginRequired = false;
+        isLoginRequired = true;
 
 
         Crittercism.initialize(getApplicationContext(), "67496ab9c7094339adf79c54d369ccc900555300");
@@ -119,37 +119,6 @@ public class App extends Application implements AppConstants {
         built.setIndicatorsEnabled(false);
         built.setLoggingEnabled(false);
         Picasso.setSingletonInstance(built);
-
-        mWallpaperTarget = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.i("WallPaper","Set wallpaper onBitmapLoaded called");
-                WallpaperManager myWallpaperManager
-                        = WallpaperManager.getInstance(getApplicationContext());
-                try {
-                    myWallpaperManager.setBitmap(bitmap);
-                    Log.i("WallPaper","Set wallpaper done");
-                    Toast.makeText(getApplicationContext(),"Wallpaper set",Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    Log.i("WallPaper","Set wallpaper IO exception");
-                    Toast.makeText(getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Log.i("WallPaper","Set wallpaper onBitmapFailed called");
-                Toast.makeText(getApplicationContext(),"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                Log.i("WallPaper","Set wallpaper onPrepareLoad called");
-            }
-        };
-
 
     }
 
@@ -237,11 +206,6 @@ public class App extends Application implements AppConstants {
         return null;
     }
 
-    public static Target getWallpaperTarget(){
-        if(mWallpaperTarget!=null)
-            return mWallpaperTarget;
-        return null;
-    }
 
     public static void shuffleContentData(int startPos){
         if(mCData!=null&&startPos<mCData.size()&&startPos>0){
