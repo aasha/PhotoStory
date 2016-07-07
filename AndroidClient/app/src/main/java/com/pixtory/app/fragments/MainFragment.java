@@ -308,14 +308,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (getArguments() != null) {
             isProfileContent = getArguments().getBoolean(ARG_PARAM4);
             if(!isProfileContent){
-
-            try {
-                mContentIndex = getArguments().getInt(ARG_PARAM1);
-                mContentData = App.getContentData().get(mContentIndex);
-                mCIDX = getArguments().getString(ARG_PARAM3);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                try {
+                    mContentIndex = getArguments().getInt(ARG_PARAM1);
+                    mContentData = App.getContentData().get(mContentIndex);
+                    mCIDX = getArguments().getString(ARG_PARAM3);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else{
                 try {
