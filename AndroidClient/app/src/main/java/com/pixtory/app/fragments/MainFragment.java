@@ -311,7 +311,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             if(!isProfileContent){
                 try {
                     mContentIndex = getArguments().getInt(ARG_PARAM1);
-                    mContentData = App.getContentData().get(mContentIndex);
+                    if(mListener.isCategoryViewOpen())
+                        mContentData = App.getCategoryContentData().get(mContentIndex);
+                    else
+                        mContentData = App.getContentData().get(mContentIndex);
                     mCIDX = getArguments().getString(ARG_PARAM3);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -358,6 +361,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
+
+        getView();
 
 //        storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
 //        storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
@@ -1028,7 +1033,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         isPixtorySwipeUp=true;
         isFullScreenShown = true;
         mStoryParentLayout.fullScroll(View.FOCUS_UP);
-
         attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
         mImageDetailsLayout.setVisibility(View.VISIBLE);
@@ -1043,6 +1047,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             isSwipeUpArrowShown=true;
         }
 
+        mListener.showMenuIcon(true);
     }
 
     public void setUpHalfScreen(){

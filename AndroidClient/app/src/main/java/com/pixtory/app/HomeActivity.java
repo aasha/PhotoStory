@@ -71,9 +71,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
-import com.facebook.share.model.ShareOpenGraphAction;
-import com.facebook.share.model.ShareOpenGraphContent;
-import com.facebook.share.model.ShareOpenGraphObject;
+
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
@@ -252,7 +250,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         prepareFeed();
         setPersonDetails();
-
 
         mPager = (ViewPager)findViewById(R.id.pager);
         mCategoryViewPager = (ViewPager)findViewById(R.id.category_pager);
@@ -856,8 +853,7 @@ public class HomeActivity extends AppCompatActivity implements
                 mCategoryTitle.setVisibility(View.GONE);
             }
         }
-
-            else{
+        else{
             if(show)
                 menuIcon.setVisibility(View.VISIBLE);
             else
@@ -1587,7 +1583,9 @@ public class HomeActivity extends AppCompatActivity implements
                     }
 //                    App.setCategoryContentData(getMainFeedResponse.contentList);
                     mCategoryPagerAdapter.clearData();
-                    mCategoryPagerAdapter.setData(feedResponse.contentList);
+                    App.setCategoryContentData(feedResponse.contentList);
+
+                    mCategoryPagerAdapter.setData(App.getCategoryContentData());
 
                     Log.i(TAG,"categoryData->"+feedResponse.contentList.toString());
                     mCategoryViewPager.setAdapter(mCategoryPagerAdapter);
