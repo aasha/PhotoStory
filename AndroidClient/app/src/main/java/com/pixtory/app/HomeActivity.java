@@ -232,7 +232,7 @@ public class HomeActivity extends AppCompatActivity implements
             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
             .build());
         //TODO to be removed later
-        checkForDeviceDensity();
+//        checkForDeviceDensity();
         ButterKnife.bind(this);
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
@@ -273,6 +273,7 @@ public class HomeActivity extends AppCompatActivity implements
         mPager.setPageTransformer(true,parallaxPagerTransformer);
         mPager.setPageMargin(6);
         isFirstTimeOpen();
+        swipeCount();
 
         mCategoryViewPager.setPageTransformer(true,parallaxPagerTransformer);
         mCategoryViewPager.setPageMargin(6);
@@ -1314,13 +1315,13 @@ public class HomeActivity extends AppCompatActivity implements
             final Handler handler = new Handler();
 
             switch (count){
-//                case 1:handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        showCoachmarksDialog(SWIPE_UP);
-//                    }
-//                },500);
-//                    break;
+                case 1:handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showCoachmarksDialog(SWIPE_UP);
+                    }
+                },3000);
+                    break;
 
                 case 10: showWallPaperCoachMark();
                     break;

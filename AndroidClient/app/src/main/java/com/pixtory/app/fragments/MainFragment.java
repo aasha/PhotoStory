@@ -557,8 +557,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
                     .build();
             GenericDraweeHierarchyBuilder builder =
-                    new GenericDraweeHierarchyBuilder(getResources());
-//                            .setPlaceholderImage(getResources().getDrawable(R.drawable.progress_image))
+                    new GenericDraweeHierarchyBuilder(getResources())
+                            .setPlaceholderImage(getResources().getDrawable(R.drawable.progress_image));
 //                            .setFailureImage(getResources().getDrawable(R.drawable.splash_bg));
 
             DraweeController controller = Fresco.newDraweeControllerBuilder()

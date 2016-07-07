@@ -64,18 +64,24 @@ public class CommentsListAdapter extends RecyclerView.Adapter<CommentsListAdapte
         CommentData data = mDataSetList.get(position);
 
         holder.id = data.commentId;
-        holder.mTVName.setText(data.personDetails.name);
-        if( data.personDetails.imageUrl != null)
-            Picasso.with(mContext).load(data.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(holder.mImgAvatar);
-        else
-            holder.mImgAvatar.setImageResource(R.drawable.hexagon_bg);
+        if(data.personDetails!=null){
+            holder.mTVName.setText(data.personDetails.name);
+            if( data.personDetails.imageUrl != null)
+                Picasso.with(mContext).load(data.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(holder.mImgAvatar);
+            else
+                holder.mImgAvatar.setImageResource(R.drawable.hexagon_bg);
 
-        if(Utils.isNotEmpty(data.personDetails.description)){
-            holder.mTVShortDesc.setVisibility(View.VISIBLE);
-            holder.mTVShortDesc.setText(data.personDetails.description);
-        }else{
-            holder.mTVShortDesc.setVisibility(View.GONE);
+            if(Utils.isNotEmpty(data.personDetails.description)){
+                holder.mTVShortDesc.setVisibility(View.VISIBLE);
+                holder.mTVShortDesc.setText(data.personDetails.description);
+            }else{
+                holder.mTVShortDesc.setVisibility(View.GONE);
+            }
         }
+
+
+
+
 
         holder.mTVDate.setText(Utils.getFormattedDate(data.ingestionTime));
         holder.mTVCommentText.setText(data.comment);
