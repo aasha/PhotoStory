@@ -31,14 +31,6 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
 
-        <ImageView
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:id="@+id/editor_pick_badge"
-            android:visibility="gone"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/editor_pick_badge"/>
-
         <com.pixtory.app.views.ObservableScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -57,16 +49,31 @@
                     android:background="@drawable/dim_background"
                     android:paddingTop="@dimen/image_layout_padding_top"
                     android:layout_height="@dimen/image_layout_height">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Editor's pick"
+                        android:layout_marginLeft="30dp"
+                        android:id="@+id/editor_pick_text"
+                        android:visibility="visible"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-thin"
+                        android:textSize="11sp"/>
+
                         <View android:layout_width="match_parent"
                             android:layout_height="0.1dp"
                             android:background="@color/grey_5"
                             android:layout_marginLeft="30dp"
-                            android:layout_marginRight="60dp"/>
+                            android:layout_marginRight="60dp"
+                            android:id="@+id/main_separator"
+                            android:layout_below="@+id/editor_pick_text"/>
                         <View android:layout_width="0.1dp"
                             android:layout_height="30dp"
                             android:background="@color/grey_5"
                             android:layout_alignParentRight="true"
-                            android:layout_marginRight="60dp"/>
+                            android:layout_marginRight="60dp"
+                            android:layout_below="@+id/editor_pick_text"
+                            android:id="@+id/vertical_line"/>
                         <TextView android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-light"
@@ -76,7 +83,8 @@
                             android:text="RAJASTHAN INDIA"
                             android:textSize="11sp"
                             android:textAllCaps="true"
-                            android:textColor="@color/grey_5"/>
+                            android:textColor="@color/grey_5"
+                            android:layout_below="@+id/main_separator"/>
                         <TextView android:layout_width="@dimen/image_detail_width"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/text_place"
@@ -118,7 +126,7 @@
                             android:layout_alignParentRight="true"
                             android:id="@+id/image_like"
                             android:src="@drawable/like"
-                            android:layout_marginTop="30dp"
+                            android:layout_below="@id/vertical_line"
                             android:layout_marginRight="45dp"/>
 
                         <TextView
@@ -134,7 +142,7 @@
                             android:paddingBottom="10dp"
                             android:layout_alignLeft="@+id/image_like"
                             android:layout_below="@+id/image_like"/>
-                    
+
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="70dp"
@@ -153,13 +161,13 @@
                         android:scaleType="fitXY"
                         android:gravity="center_horizontal"
                         android:id="@+id/swipe_up_arrow"
-                        android:layout_marginTop="30dp"/>
+                        android:layout_marginTop="45dp"/>
 
                     <com.pixtory.app.views.SlantView
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:id="@+id/slant_view"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="35dp"
                         android:layout_below="@+id/like_count"
                         android:visibility="visible"/>
 
@@ -288,6 +296,22 @@ S
             android:src="@drawable/back"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:id="@+id/wallpaper_settings"
+        android:layout_gravity="right"
+        android:visibility="visible">
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_margin="25dp"
+            android:src="@drawable/wallpaper_settings_icon"/>
+    </LinearLayout>
+
+
 
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"

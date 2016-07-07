@@ -15,7 +15,7 @@
     <dimen name="image_detail_width">210dp</dimen>
     <dimen name="image_layout_height">220dp</dimen>
     <dimen name="story_layout_min_height">300dp</dimen>
-    <dimen name="image_layout_padding_top">110dp</dimen>
+    <dimen name="image_layout_padding_top">95dp</dimen>
     <dimen name="story_min_height">200dp</dimen>
 
     <dimen name="story_nestedscrollview_height">400dp</dimen>
