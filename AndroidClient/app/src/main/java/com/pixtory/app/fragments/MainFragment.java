@@ -1787,7 +1787,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         });
 
         boolean isOpted = getActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(HomeActivity.OPT_FOR_DAILY_WALLPAPER,false);
-        if(isOpted || isProfileContent)
+        if(isOpted || isProfileContent || mListener.isCategoryViewOpen())
             popupMenu.getMenu().removeItem(R.id.wallpaper_overflow_daily);
         popupMenu.show();
     }
