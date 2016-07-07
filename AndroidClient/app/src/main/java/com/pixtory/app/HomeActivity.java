@@ -287,7 +287,10 @@ public class HomeActivity extends AppCompatActivity implements
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
                 SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                sharedPreferences.edit().putInt(Page_Index,App.getOriginalIndex(App.getContentData().get(mCurrentFragmentPosition).id)).apply();
+                int lastIndex = sharedPreferences.getInt(Page_Index,0);
+                int currentIndex = App.getOriginalIndex(App.getContentData().get(mCurrentFragmentPosition).id);
+                if(currentIndex>lastIndex)
+                    sharedPreferences.edit().putInt(Page_Index,currentIndex).apply();
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
 
                //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
@@ -453,7 +456,8 @@ public class HomeActivity extends AppCompatActivity implements
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
 
         mainFragment = getCurrentFragment();
-        mainFragment.setWallpaper();
+        if(mainFragment!=null)
+            mainFragment.setWallpaper();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -515,6 +519,7 @@ public class HomeActivity extends AppCompatActivity implements
 
                     mLoadingText.setVisibility(View.GONE);
                     mOuterContainer.setVisibility(View.VISIBLE);
+                    swipeCount();
 
                 } else {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
@@ -1288,7 +1293,7 @@ public class HomeActivity extends AppCompatActivity implements
                     public void run() {
                         showCoachmarksDialog(SWIPE_UP);
                     }
-                },500);
+                },1500);
                     break;
 
                 case 10: showWallPaperCoachMark();
@@ -1362,7 +1367,7 @@ public class HomeActivity extends AppCompatActivity implements
                 coachMarkView.setVisibility(View.VISIBLE);
                 coachMarkView.setAnimation(animation);
             }
-        },500);
+        },1500);
 
     }
 
@@ -1410,16 +1415,6 @@ public class HomeActivity extends AppCompatActivity implements
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(Is_First_Run,false);
             editor.commit();
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("App_FirstOpen")
-                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                    .build());
-            final Handler handler =  new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    showCoachmarksDialog(SWIPE_UP);
-                }
-            },1000);
         }
         return firstRun;
     }

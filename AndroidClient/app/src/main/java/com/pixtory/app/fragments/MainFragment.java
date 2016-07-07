@@ -865,7 +865,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
                     //Toast.makeText(mContext,"Long tap detected",Toast.LENGTH_SHORT).show();
-                    Log.i(TAG, "Long Tap");
+                    /*Log.i(TAG, "Long Tap");
                     if (isFullScreenShown) {
                         isLongTap = true;
                         showWallpaperAlert();
@@ -874,7 +874,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                 .put("PIXTORY_ID", mContentData.id + "")
                                 .put("POSITION_ID", mContentIndex + "")
                                 .build());
-                    }
+                    }*/
                 }
 
                 @Override
