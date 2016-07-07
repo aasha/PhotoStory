@@ -74,6 +74,7 @@ import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
+import com.pixtory.app.model.Category;
 import com.pixtory.app.model.CommentData;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.retrofit.AddCommentResponse;
@@ -551,9 +552,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
                     .build();
             GenericDraweeHierarchyBuilder builder =
-                    new GenericDraweeHierarchyBuilder(getResources())
-                            .setPlaceholderImage(getResources().getDrawable(R.drawable.progress_image))
-                            .setFailureImage(getResources().getDrawable(R.drawable.splash_bg));
+                    new GenericDraweeHierarchyBuilder(getResources());
+//                            .setPlaceholderImage(getResources().getDrawable(R.drawable.progress_image))
+//                            .setFailureImage(getResources().getDrawable(R.drawable.splash_bg));
 
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setOldController(mImageMain.getController())
@@ -624,8 +625,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     @Override
                     public void onClick(View v) {
                         if(!mListener.isCategoryViewOpen()) {
-                            Toast.makeText(mContext, cd.categoryNameList.get(0).categoryName, Toast.LENGTH_SHORT).show();
-                            mListener.showCategoryStories(cd.categoryNameList.get(0).categoryName);
+
+                            Category category = cd.categoryNameList.get(0);
+                            Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
+                            mListener.showCategoryStories(category.categoryId ,category.categoryName );
                         }
                     }
                 });
@@ -638,8 +641,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         @Override
                         public void onClick(View v) {
                             if(!mListener.isCategoryViewOpen()) {
-                                Toast.makeText(mContext, cd.categoryNameList.get(1).categoryName, Toast.LENGTH_SHORT).show();
-                                mListener.showCategoryStories(cd.categoryNameList.get(1).categoryName);
+                                Category category = cd.categoryNameList.get(1);
+                                Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
+                                mListener.showCategoryStories(category.categoryId ,category.categoryName );
                             }
 
                         }
@@ -655,8 +659,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             @Override
                             public void onClick(View v) {
                                 if(!mListener.isCategoryViewOpen()) {
-                                    Toast.makeText(mContext, cd.categoryNameList.get(2).categoryName, Toast.LENGTH_SHORT).show();
-                                    mListener.showCategoryStories(cd.categoryNameList.get(2).categoryName);
+                                    Category category = cd.categoryNameList.get(2);
+                                    Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
+                                    mListener.showCategoryStories(category.categoryId ,category.categoryName );
                                 }
                             }
                         });
@@ -837,10 +842,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public interface OnMainFragmentInteractionListener {
         void showMenuIcon(boolean showMenuIcon);
         void showLoginAlert();
-        void showCategoryStories(String categoryName);
+        void showCategoryStories(int categoryId,String categoryName);
         void showShareDialog(ContentData contentData,Bitmap bitmap);
         boolean isCategoryViewOpen();
         void showWallPaperCoachMark();
+
     }
 
     public void resetFragmentState() {

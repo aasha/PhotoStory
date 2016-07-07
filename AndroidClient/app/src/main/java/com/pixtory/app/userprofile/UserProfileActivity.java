@@ -120,6 +120,11 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     }
 
     @Override
+    public void showCategoryStories(int categoryId, String categoryName) {
+
+    }
+
+    @Override
     public void onAddCommentButtonClicked(String str) {
         if(mainFragment!=null)
             mainFragment.postComment(str);
@@ -158,11 +163,6 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
                 Toast.makeText(UserProfileActivity.this, "Please check your network connection", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    public void showCategoryStories(String name){
-
     }
 
     boolean isCategoryViewOpen = false;

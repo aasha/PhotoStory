@@ -73,6 +73,11 @@ public class OpinionViewerAdapter extends PagerAdapter {
         notifyDataSetChanged();
     }
 
+    public void clearData(){
+        if(mData!=null)
+            mData.clear();
+    }
+
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         if (mFragments.size() > position) {

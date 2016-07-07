@@ -5,5 +5,5 @@ package com.pixtory.app.retrofit;
  */
 public class   GetContentByCategoryRequest {
     public int userId;
-    public String categoryName;
+    public int categoryId;
 }

@@ -44,6 +44,8 @@ public class App extends Application implements AppConstants {
     }
 
     private static ArrayList<ContentData> mCData = null;
+    private static ArrayList<ContentData> mCategoryContentData = null;
+
     private static ArrayList<ContentData> mLikedContentData = null;
 
     private LayoutInflater mInfater = null;
@@ -76,6 +78,8 @@ public class App extends Application implements AppConstants {
 
     public  static boolean isLoginRequired;
     private static Map<String,String> mOriginalIndices = new HashMap<String, String>();
+    private static Map<String,String> mOriginalCategoryIndices = new HashMap<String, String>();
+
 
     @Override
     public void onCreate() {
@@ -146,9 +150,22 @@ public class App extends Application implements AppConstants {
             mOriginalIndices.put(mC.get(i).id+"",i+"");
     }
 
+
+    public static void setCategoryContentData(ArrayList<ContentData> mC){
+        mCategoryContentData = mC;
+        for(int i=0;i< mC.size();i++)
+            mOriginalCategoryIndices.put(mC.get(i).id+"",i+"");
+    }
+
     public static ArrayList<ContentData> getContentData() {
         return mCData;
     }
+
+    public static ArrayList<ContentData> getCategoryContentData() {
+        return mCategoryContentData;
+    }
+
+
 
 
     @Override

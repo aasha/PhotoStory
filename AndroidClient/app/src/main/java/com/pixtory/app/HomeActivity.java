@@ -205,12 +205,17 @@ public class HomeActivity extends AppCompatActivity implements
 
     public String userId;
     public int mFeedSize;
+    public int mCategoryFeedSize;
 
     @Bind(R.id.other_frame)
     FrameLayout mOtherFrame;
 
     @Bind(R.id.category_title)
     TextView mCategoryTitle;
+
+    @Bind(R.id.backButton)
+    ImageView backButton;
+
 
     private int categoryDataSize;
     private ShareDialog shareDialog = null;
@@ -247,7 +252,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         prepareFeed();
         setPersonDetails();
-        isFirstTimeOpen();
+
 
         mPager = (ViewPager)findViewById(R.id.pager);
         mCategoryViewPager = (ViewPager)findViewById(R.id.category_pager);
@@ -270,6 +275,10 @@ public class HomeActivity extends AppCompatActivity implements
         ParallaxPagerTransformer parallaxPagerTransformer = new ParallaxPagerTransformer(HomeActivity.this,R.id.image_main,0.5f);
         mPager.setPageTransformer(true,parallaxPagerTransformer);
         mPager.setPageMargin(6);
+        isFirstTimeOpen();
+
+        mCategoryViewPager.setPageTransformer(true,parallaxPagerTransformer);
+        mCategoryViewPager.setPageMargin(6);
 
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -325,7 +334,7 @@ public class HomeActivity extends AppCompatActivity implements
             public void onPageSelected(int position) {
                 mCurrentFragmentPositionInCategory = position;
                 position = position+1;
-                mCategoryTitle.setText(categoryName+" ("+position+"/"+mFeedSize+")");
+                mCategoryTitle.setText(categoryName+" ("+position+"/"+mCategoryFeedSize+")");
             }
 
             @Override
@@ -443,6 +452,15 @@ public class HomeActivity extends AppCompatActivity implements
                     }
                 });
 
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isCategoryViewOpen = false;
+                mOuterContainer.setVisibility(View.VISIBLE);
+                mOtherFrame.setVisibility(View.GONE);
+            }
+        });
+
     }
 
     public void setAlarmManagerToSetWallPaper(){
@@ -495,6 +513,7 @@ public class HomeActivity extends AppCompatActivity implements
                     App.setContentData(o.contentList);
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     int startPos = sharedPreferences.getInt(Page_Index,0);
+
                     App.shuffleContentData(startPos);
                     Utils.deleteOldVideos(o.contentList);
 
@@ -507,11 +526,7 @@ public class HomeActivity extends AppCompatActivity implements
                             .build());
                     mCursorPagerAdapter.setData(App.getContentData());
 
-
-                    mCategoryPagerAdapter.setData(App.getContentData());
-
                     mPager.setAdapter(mCursorPagerAdapter);
-                    mCategoryViewPager.setAdapter(mCategoryPagerAdapter);
 
                     mLoadingText.setVisibility(View.GONE);
                     mOuterContainer.setVisibility(View.VISIBLE);
@@ -825,10 +840,25 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void showMenuIcon(boolean show){
-        if(show)
-            menuIcon.setVisibility(View.VISIBLE);
-        else
-            menuIcon.setVisibility(View.GONE);
+
+        if(isCategoryViewOpen){
+            if(show) {
+                backButton.setVisibility(View.VISIBLE);
+                mCategoryTitle.setVisibility(View.VISIBLE);
+            }
+            else {
+                backButton.setVisibility(View.GONE);
+                mCategoryTitle.setVisibility(View.GONE);
+            }
+        }
+
+            else{
+            if(show)
+                menuIcon.setVisibility(View.VISIBLE);
+            else
+                menuIcon.setVisibility(View.GONE);
+        }
+
     }
 
 
@@ -1283,13 +1313,13 @@ public class HomeActivity extends AppCompatActivity implements
             final Handler handler = new Handler();
 
             switch (count){
-                case 1:handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showCoachmarksDialog(SWIPE_UP);
-                    }
-                },500);
-                    break;
+//                case 1:handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        showCoachmarksDialog(SWIPE_UP);
+//                    }
+//                },500);
+//                    break;
 
                 case 10: showWallPaperCoachMark();
                     break;
@@ -1419,7 +1449,7 @@ public class HomeActivity extends AppCompatActivity implements
                 public void run() {
                     showCoachmarksDialog(SWIPE_UP);
                 }
-            },1000);
+            },2000);
         }
         return firstRun;
     }
@@ -1540,13 +1570,57 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void showCategoryStories(String name){
+    public void showCategoryStories(int id,String name){
         categoryName = name;
         isCategoryViewOpen = true;
-        mCategoryViewPager.setCurrentItem(0);
-        mCategoryTitle.setText(categoryName+" ("+1+"/"+mFeedSize+")");
-        mOuterContainer.setVisibility(View.GONE);
-        mOtherFrame.setVisibility(View.VISIBLE);
+
+        if(Utils.isNotEmpty(Utils.getUserId(this))) {
+
+            mProgress.setMessage("Fetching Pixtories");
+            mProgress.show();
+
+            Log.d(TAG,"showCategoryStories->id="+id+"::name="+name);
+            NetworkApiHelper.getInstance().getContentByCategory(Integer.parseInt(Utils.getUserId(this)), id, new NetworkApiCallback<GetMainFeedResponse>() {
+
+                @Override
+                public void success(GetMainFeedResponse feedResponse, Response response) {
+
+                    mCategoryFeedSize = feedResponse.contentList.size();
+
+                    for(ContentData data : feedResponse.contentList){
+                        Log.i(TAG,data.pictureSummary);
+                    }
+//                    App.setCategoryContentData(getMainFeedResponse.contentList);
+                    mCategoryPagerAdapter.clearData();
+                    mCategoryPagerAdapter.setData(feedResponse.contentList);
+
+                    Log.i(TAG,"categoryData->"+feedResponse.contentList.toString());
+                    mCategoryViewPager.setAdapter(mCategoryPagerAdapter);
+
+                    mProgress.dismiss();
+
+                    mCategoryViewPager.setCurrentItem(0);
+                    mCategoryTitle.setText(categoryName + " (" + 1 + "/" + mCategoryFeedSize + ")");
+                    mOuterContainer.setVisibility(View.GONE);
+                    mOtherFrame.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void failure(GetMainFeedResponse getMainFeedResponse) {
+                    mProgress.dismiss();
+                   Utils.showToastMessage(HomeActivity.this,"Internal error occurred::"+getMainFeedResponse.errorMessage,0);
+                }
+
+                @Override
+                public void networkFailure(RetrofitError error) {
+                    mProgress.dismiss();
+                    Utils.showToastMessage(HomeActivity.this,"Internal error occurred::"+error.getMessage(),0);
+                }
+            });
+
+        }else{
+            Log.d(TAG,"showCategoryStories method-> user id is null");
+        }
     }
 
     @Override

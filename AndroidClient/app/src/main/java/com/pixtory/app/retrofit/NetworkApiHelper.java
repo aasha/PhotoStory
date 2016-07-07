@@ -20,7 +20,7 @@ public class NetworkApiHelper {
     private static RetrofitManager sRetrofit = null;
     private static NetworkInterface sAPI = null;
 
-    public static NetworkApiHelper getInstance() {
+    public synchronized static NetworkApiHelper getInstance() {
         if (sInstance == null) {
             sInstance = new NetworkApiHelper();
             sRetrofit = RetrofitManager.getInstance();
@@ -320,9 +320,9 @@ public class NetworkApiHelper {
         });
     }
 
-    public void getContentByCategory(int userId, String categoryName, final NetworkApiCallback cb) {
+    public void getContentByCategory(int userId, int categoryIdParam, final NetworkApiCallback cb) {
         GetContentByCategoryRequest req = new GetContentByCategoryRequest();
-        req.categoryName = categoryName;
+        req.categoryId = categoryIdParam;
         req.userId = userId;
 
         sAPI.getContentByCategory(req, new Callback<GetMainFeedResponse>() {

@@ -325,4 +325,13 @@ public class Utils {
             return false;
         }
     }
+
+    public static void showToastMessage(Context ctx,String message,int duration){
+        if(duration == 0)
+            Toast.makeText(ctx,message,Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(ctx,message,Toast.LENGTH_LONG).show();
+
+
+    }
 }
