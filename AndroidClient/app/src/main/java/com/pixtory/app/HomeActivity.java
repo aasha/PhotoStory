@@ -183,6 +183,8 @@ public class HomeActivity extends AppCompatActivity implements
     private TextView mWallpaperCoachMarkText;
     private LinearLayout mSwipeUpCoachMarkLongTap;
     private ImageView mWallpaperCoachMarkBlurBg;
+    private TextView mWallpaperClose;
+    private TextView mSwipeUpClose;
     private TextView mWallpaperYes;
     private TextView mWallpaperNo;
     private TextView mSwipeUpText1;
@@ -339,6 +341,7 @@ public class HomeActivity extends AppCompatActivity implements
         mWallpaperCoachMark = (FrameLayout) findViewById(R.id.top_overlay_wallpaper_setting);
         mWallpaperCoachMarkText = (TextView)findViewById(R.id.wallpaper_coachmark_text);
         mSwipeUpCoachMarkLongTap = (LinearLayout)findViewById(R.id.top_overlay_long_tap);
+        mWallpaperClose = (TextView)findViewById(R.id.wallpaper_close);
 
         
         mSwipeUpText1 = (TextView)findViewById(R.id.swipe_up_text_1);
@@ -391,7 +394,7 @@ public class HomeActivity extends AppCompatActivity implements
                 }
             }
         });
-        mWallpaperCoachMark.setOnClickListener(new View.OnClickListener() {
+        mWallpaperClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mWallpaperCoachMark.setVisibility(View.INVISIBLE);
@@ -583,6 +586,7 @@ public class HomeActivity extends AppCompatActivity implements
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
     }
 
@@ -1275,31 +1279,24 @@ public class HomeActivity extends AppCompatActivity implements
         {
          editor.putInt(Swipe_Count,count+1);
          editor.commit();
-        }
 
-        final Handler handler = new Handler();
+            final Handler handler = new Handler();
 
-        switch (count){
-            case 1:handler.postDelayed(new Runnable() {
+            switch (count){
+                case 1:handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         showCoachmarksDialog(SWIPE_UP);
                     }
                 },500);
-                break;
+                    break;
 
-            case 6:  handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showCoachmarksDialog(LONG_TAP);
-                    }
-                },500);
-                break;
+                case 10: showWallPaperCoachMark();
+                    break;
 
-            case 10: showWallPaperCoachMark();
-                break;
-
+            }
         }
+
         return count;
     }
 
@@ -1369,7 +1366,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     }
 
-    private void showWallPaperCoachMark(){
+    public void showWallPaperCoachMark(){
 
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -1416,6 +1413,13 @@ public class HomeActivity extends AppCompatActivity implements
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("App_FirstOpen")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
+            final Handler handler =  new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showCoachmarksDialog(SWIPE_UP);
+                }
+            },1000);
         }
         return firstRun;
     }
@@ -1506,13 +1510,14 @@ public class HomeActivity extends AppCompatActivity implements
                 ((TextView)dialog.findViewById(R.id.long_tap_text)).setText(Html.fromHtml(longTapText));
                 break;
 
-            case SWIPE_UP:LONG_TAP:dialog.setContentView(R.layout.swipe_up_caochmark_dialog);
+            case SWIPE_UP:dialog.setContentView(R.layout.swipe_up_caochmark_dialog);
                 ((TextView)dialog.findViewById(R.id.swipe_up_text_top)).setText(Html.fromHtml(swipeUpTextTop));
                 ((TextView)dialog.findViewById(R.id.swipe_up_text_bottom)).setText(Html.fromHtml(swipeUpTextBottom));
                 break;
         }
 
-        testView = dialog.findViewById(R.id.dialog_layout);
+        testView = dialog.findViewById(R.id.swipe_up_coachmark_close);
+
         dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().getDecorView().setSystemUiVisibility(

@@ -2,11 +2,11 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/shadow_background">
+    android:background="@color/white">
 
     <TextView
         android:text="Set this pixtory as your wallpaper?"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textAlignment="center"
         android:paddingTop="15dp"
         android:layout_margin="10dp"
@@ -21,7 +21,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/opaque_black"/>
+        android:background="@color/grey_4"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="52dp"
@@ -38,17 +38,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
-                android:textColor="@color/black"
+                android:textColor="@color/gray"
                 android:text="Cancel"
                 android:textSize="20sp"
-                android:layout_gravity="center_horizontal|center_vertical"/>
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:fontFamily="sans-serif-light"/>
         </FrameLayout>
 
 
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/opaque_black"/>
+            android:background="@color/grey_4"/>
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"

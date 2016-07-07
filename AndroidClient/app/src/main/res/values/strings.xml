@@ -68,4 +68,6 @@
     <string name="wallpaper_changed_text">Daily wallpaper set. \n\nYou\'ll now have a new wallpaper every day</string>
     <string name="wallpaper_text_2">Everyday, We\'ll refresh your wallpaper to a gorgeous new image curated by us. You can always turn it off in your settings.</string>
     <string name="swipe_up_coach_mark_text_2">A story is the photographer\'s experience, emotion, inspiration or expression behind the picture.</string>
+    <string name="set_as_wallpaper">Set pic as Wallpaper</string>
+    <string name="daily_wallpaper">Set up Daily wallpapers</string>
 </resources>

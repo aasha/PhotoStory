@@ -109,7 +109,7 @@ public class App extends Application implements AppConstants {
 //        GoogleAnalytics.getInstance(this).getLogger()
 //                .setLogLevel(Logger.LogLevel.VERBOSE);
         Log.d("Amplitude", "Amplitude init");
-        Amplitude.getInstance().initialize(this, "7c657990d3385956001836ca63567102").enableForegroundTracking(this);
+        Amplitude.getInstance().initialize(this, "b989dd1aa701c0c4a5533a9c81925e3a").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
 
         /**Enabling disk caching for Picasso**/

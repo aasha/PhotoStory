@@ -9,6 +9,7 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -68,6 +69,7 @@ import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.adapters.CommentsListAdapter;
 import com.pixtory.app.app.App;
@@ -190,8 +192,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.swipe_up_sign)
     TextView swipeUpSign = null;
 
-    @Bind(R.id.editor_pick_badge)
-    ImageView mEditorPickBage;
+
+    @Bind(R.id.wallpaper_settings)
+    LinearLayout mWallpaperSettingsIcon;
+
 
     @Bind(R.id.loading_text)
     TextView mLoadingText;
@@ -202,6 +206,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     @Bind(R.id.share_img)
     ImageView mShareImg;
+
+    @Bind(R.id.editor_pick_text)
+    TextView mEditorPickText;
 
     ImageView swipeUpArrow;
 
@@ -348,9 +355,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
-        storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
-        storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
-        swipeUpSign = (TextView)mRootView.findViewById(R.id.swipe_up_sign);
+        Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
+        ButterKnife.bind(this, mRootView);
+
+//        storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
+//        storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
+//        swipeUpSign = (TextView)mRootView.findViewById(R.id.swipe_up_sign);
 
         //Animation animation = AnimationUtils.loadAnimation(mContext,R.anim.bounce);
         Animation upAnimation = new TranslateAnimation(
@@ -420,8 +430,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             }
         });
 
-        Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
-        ButterKnife.bind(this, mRootView);
+        mWallpaperSettingsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpMenu();
+            }
+        });
 
         mImageInfoLayoutHeight = (int)getResources().getDimension(R.dimen.image_layout_height);
         Log.i("mImageInfoHeight is :::",""+mImageInfoLayoutHeight);
@@ -557,9 +571,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mPicSummary.setText(cd.pictureSummary);
 
         if(cd.editorsPick)
-            mEditorPickBage.setVisibility(View.VISIBLE);
+            mEditorPickText.setVisibility(View.VISIBLE);
         else
-            mEditorPickBage.setVisibility(View.GONE);
+            mEditorPickText.setVisibility(View.INVISIBLE);
 
 
 
@@ -595,9 +609,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 String name = (!(cd.personDetails.name.equals("")))? cd.personDetails.name : " ";
                 if(cd.categoryNameList!=null)
                 {
-                    name += (" in "+cd.categoryNameList.get(0));
+                    name += (" in "+cd.categoryNameList.get(0).categoryName);
                     if(cd.categoryNameList.size()>1)
-                        name+=(", "+cd.categoryNameList.get(1));
+                        name+=(", "+cd.categoryNameList.get(1).categoryName);
                 }
                 mTextExpert.setText(name);
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(mProfileImage);
@@ -650,6 +664,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                 }
                 }
+                if(!isProfileContent)
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -825,6 +840,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         void showCategoryStories(String categoryName);
         void showShareDialog(ContentData contentData,Bitmap bitmap);
         boolean isCategoryViewOpen();
+        void showWallPaperCoachMark();
     }
 
     public void resetFragmentState() {
@@ -1043,6 +1059,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     if(isScrollingUp){
                         mListener.showMenuIcon(false);
                         storyBackImg.setVisibility(View.GONE);
+                        mWallpaperSettingsIcon.setVisibility(View.GONE);
                         mImageDetailsLayout.smoothScrollTo(0,mHalfScreenSize);
                         isFullScreenShown=false;
                         Log.i(TAG, "MotionEvent.ACTION_DOWN");
@@ -1060,6 +1077,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                         mListener.showMenuIcon(true);
                         storyBackImg.setVisibility(View.VISIBLE);
+                        mWallpaperSettingsIcon.setVisibility(View.VISIBLE);
                         mImageDetailsLayout.smoothScrollTo(0, 0);
                         isFullScreenShown = true;
                         mStoryParentLayout.fullScroll(View.FOCUS_UP);
@@ -1738,4 +1756,33 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 //
 //    }
 
+    public void showPopUpMenu(){
+        final PopupMenu popupMenu = new PopupMenu(mContext,mWallpaperSettingsIcon);
+        popupMenu.inflate(R.menu.wallpaper_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.wallpaper_overflow_set:showWallpaperAlert();
+                        popupMenu.dismiss();
+                        return true;
+
+                    case R.id.wallpaper_overflow_daily:mListener.showWallPaperCoachMark();
+                        popupMenu.dismiss();
+                        return true;
+
+                    case R.id.wallpaper_overflow_close:popupMenu.dismiss();
+                        return true;
+
+                    default:return true;
+                }
+
+            }
+        });
+
+        boolean isOpted = getActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(HomeActivity.OPT_FOR_DAILY_WALLPAPER,false);
+        if(isOpted || isProfileContent)
+            popupMenu.getMenu().removeItem(R.id.wallpaper_overflow_daily);
+        popupMenu.show();
+    }
 }
