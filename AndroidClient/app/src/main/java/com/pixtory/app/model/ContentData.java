@@ -20,7 +20,7 @@ public class ContentData {
     public boolean likedByUser = false;
     public PersonInfo personDetails = null;
     public List<CommentData> commentList = null;
-    public List<String> categoryNameList = null;
+    public List<Category> categoryNameList = null;
 
     @Override
     public boolean equals(Object o) {

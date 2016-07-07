@@ -301,14 +301,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (getArguments() != null) {
             isProfileContent = getArguments().getBoolean(ARG_PARAM4);
             if(!isProfileContent){
-
-            try {
-                mContentIndex = getArguments().getInt(ARG_PARAM1);
-                mContentData = App.getContentData().get(mContentIndex);
-                mCIDX = getArguments().getString(ARG_PARAM3);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                try {
+                    mContentIndex = getArguments().getInt(ARG_PARAM1);
+                    mContentData = App.getContentData().get(mContentIndex);
+                    mCIDX = getArguments().getString(ARG_PARAM3);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             else{
                 try {
@@ -606,13 +605,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 if(cd.categoryNameList!=null){
                 mTextDesc.setVisibility(View.VISIBLE);
                 mCategory1.setVisibility(View.VISIBLE);
-                mCategory1.setText(cd.categoryNameList.get(0));
+                mCategory1.setText(cd.categoryNameList.get(0).categoryName);
                 mCategory1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if(!mListener.isCategoryViewOpen()) {
-                            Toast.makeText(mContext, cd.categoryNameList.get(0), Toast.LENGTH_SHORT).show();
-                            mListener.showCategoryStories(cd.categoryNameList.get(0));
+                            Toast.makeText(mContext, cd.categoryNameList.get(0).categoryName, Toast.LENGTH_SHORT).show();
+                            mListener.showCategoryStories(cd.categoryNameList.get(0).categoryName);
                         }
                     }
                 });
@@ -620,13 +619,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 if(cd.categoryNameList.size()>1){
                     mseperator1.setVisibility(View.VISIBLE);
                     mCategory2.setVisibility(View.VISIBLE);
-                    mCategory2.setText(cd.categoryNameList.get(1));
+                    mCategory2.setText(cd.categoryNameList.get(1).categoryName);
                     mCategory2.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if(!mListener.isCategoryViewOpen()) {
-                                Toast.makeText(mContext, cd.categoryNameList.get(1), Toast.LENGTH_SHORT).show();
-                                mListener.showCategoryStories(cd.categoryNameList.get(1));
+                                Toast.makeText(mContext, cd.categoryNameList.get(1).categoryName, Toast.LENGTH_SHORT).show();
+                                mListener.showCategoryStories(cd.categoryNameList.get(1).categoryName);
                             }
 
                         }
@@ -637,13 +636,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         //mCategory1.setText(cd.categoryNameList.get(0)+",");
                         mseperator2.setVisibility(View.VISIBLE);
                         mCategory3.setVisibility(View.VISIBLE);
-                        mCategory3.setText(cd.categoryNameList.get(2));
+                        mCategory3.setText(cd.categoryNameList.get(2).categoryName);
                         mCategory3.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if(!mListener.isCategoryViewOpen()) {
-                                    Toast.makeText(mContext, cd.categoryNameList.get(2), Toast.LENGTH_SHORT).show();
-                                    mListener.showCategoryStories(cd.categoryNameList.get(2));
+                                    Toast.makeText(mContext, cd.categoryNameList.get(2).categoryName, Toast.LENGTH_SHORT).show();
+                                    mListener.showCategoryStories(cd.categoryNameList.get(2).categoryName);
                                 }
                             }
                         });
