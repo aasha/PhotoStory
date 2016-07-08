@@ -72,6 +72,7 @@ import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
 
+import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
@@ -128,7 +129,7 @@ public class HomeActivity extends AppCompatActivity implements
     private static String Page_Index = "View_Pager_Index";
     private final static String TAG = HomeActivity.class.getName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private ProgressDialog mProgress = null;
+    public ProgressDialog mProgress = null;
     private Context mCtx = null;
 
     private static final int LONG_TAP = 0;
@@ -1459,7 +1460,6 @@ public class HomeActivity extends AppCompatActivity implements
                 Log.i(TAG,"uri for--"+(index+10)+"is--"+App.getContentData().get(index+10).pictureUrl);
                 DataSource<Boolean> inDiskCacheSource = imagePipeline.isInDiskCache(Uri.parse(App.getContentData().get(index + 10).pictureUrl));
 
-
                 DataSubscriber<Boolean> subscriber = new BaseDataSubscriber<Boolean>() {
                     @Override
                     protected void onNewResultImpl(DataSource<Boolean> dataSource) {
@@ -1633,41 +1633,23 @@ public class HomeActivity extends AppCompatActivity implements
         return mainFragment;
     }
 
-    public void showShareDialog(ContentData contentData ,Bitmap bitmap){
+    public void showShareDialog(ContentData contentData){
 
-        SharePhoto photo = new SharePhoto.Builder()
-                .setBitmap(bitmap)
+        String description = contentData.pictureDescription;
+        description = description.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse("www.pixtory.in"))
+                .setContentTitle(contentData.pictureSummary)
+                .setContentDescription(description)
+                .setImageUrl(Uri.parse(contentData.pictureUrl))
                 .build();
-        SharePhotoContent content = new SharePhotoContent.Builder()
-                .addPhoto(photo)
-                .build();
+
         shareDialog.show(content);
 
-        // Create an object
-
-//        Session.getActiveSession().requestNewReadPermissions(newPermissionsRequest);
-//                                    ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-//                                            .putString("og:type", "pixtory.data")
-//                                            .putString("og:title", contentData.pictureSummary)
-//                                            .putString("og:description", contentData.pictureDescription)
-//                                            .build();
-//
-//                                    // Create an action
-//                                    ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-//                                            .setActionType("pixtory.reads")
-//                                            .putObject("pixtory", object)
-//                                            .build();
-//
-//                                    // Create the content
-//                                    ShareOpenGraphContent graphContent = new ShareOpenGraphContent.Builder()
-//                                            .setPreviewPropertyName("pixtory")
-//                                            .setAction(action)
-//                                            .build();
-//
-//                                    ShareDialog.show(this
-//                                            , graphContent);
 
     }
+
 
 }
 

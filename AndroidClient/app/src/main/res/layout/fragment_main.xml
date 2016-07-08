@@ -216,7 +216,7 @@ S
         android:layout_height="50dp"
         android:id="@+id/comment_share_ll"
         android:orientation="horizontal"
-        android:visibility="gone"
+        android:visibility="visible"
         android:weightSum="2"
         android:layout_alignParentBottom="true">
 
@@ -258,6 +258,16 @@ S
         android:layout_height="match_parent"
         android:gravity="center"
         android:layout_weight="1">
+
+        <RelativeLayout
+            style="@style/GenericProgressBackground"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="gone"
+            android:id="@+id/loadingPanel">
+            <ProgressBar
+                style="@style/GenericProgressIndicator"/>
+        </RelativeLayout>
 
         <ImageView
             android:layout_width="15dp"
@@ -319,6 +329,7 @@ S
         android:gravity="center"
         android:background="@color/white"
         android:layout_gravity="bottom"
+        android:visibility="gone"
         android:weightSum="1">
 
         <Button

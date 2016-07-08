@@ -171,15 +171,8 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
         return isCategoryViewOpen;
     }
 
-    public void showShareDialog(ContentData contentData, Bitmap bitmap){
+    public void showShareDialog(ContentData contentData){
 
-//        SharePhoto photo = new SharePhoto.Builder()
-//                .setBitmap(bitmap)
-//                .build();
-//        SharePhotoContent content = new SharePhotoContent.Builder()
-//                .addPhoto(photo)
-//                .build();
-//        shareDialog.show(content);
 
     }
 
@@ -187,4 +180,6 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     public void showWallPaperCoachMark() {
 
     }
+
+
 }

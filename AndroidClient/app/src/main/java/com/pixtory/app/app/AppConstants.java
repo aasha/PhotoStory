@@ -52,6 +52,11 @@ public interface AppConstants {
     static final int SHOW_PIC_STORY = 88;
     static final int SHOW_PIC_COMMENTS = 89;
 
+    static final int WHATSAPP = 0;
+    static final int FACEBOOK = 1;
+    static final int GMAIL = 2;
+    static final int INSTAGRAM = 3;
+
     final static List<String> mFBPermissions = Arrays.asList("public_profile",
             "email", "user_about_me");
 }

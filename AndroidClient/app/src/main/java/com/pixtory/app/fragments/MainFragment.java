@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -28,6 +29,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -95,6 +97,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -211,6 +214,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.editor_pick_text)
     TextView mEditorPickText;
 
+    @Bind(R.id.loadingPanel)
+    RelativeLayout mLoadingPanel;
+
     ImageView swipeUpArrow;
 
     private boolean isSwipeUpArrowShown = false;
@@ -301,8 +307,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         Log.i(TAG,"callback->main fragment on create");
         mContext = getActivity();
 
-        mProgressDialog = new ProgressDialog(mContext);
-        mProgressDialog.setMessage("Loading Pixstory For You...!!");
+        mProgressDialog = new ProgressDialog(getActivity());
+        mProgressDialog.setTitle("Loading Pixstory For You...!!");
         mProgressDialog.setCanceledOnTouchOutside(false);
 
 //        mProgressDialog.show();
@@ -709,6 +715,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                 if(Utils.isNotEmpty(Utils.getFbID(mContext))) {
 
+                    mShareImg.setVisibility(View.GONE);
+                    mLoadingPanel.setVisibility(View.VISIBLE);
+
                     sharePixtory(cd);
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Share_Click")
                             .put(AppConstants.USER_ID, Utils.getUserId(mContext))
@@ -848,10 +857,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         void showMenuIcon(boolean showMenuIcon);
         void showLoginAlert();
         void showCategoryStories(int categoryId,String categoryName);
-        void showShareDialog(ContentData contentData,Bitmap bitmap);
+        void showShareDialog(ContentData contentData);
         boolean isCategoryViewOpen();
         void showWallPaperCoachMark();
-
     }
 
     public void resetFragmentState() {
@@ -1604,92 +1612,191 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                 File imagePath = new File(mContext.getCacheDir(), "images");
                 File newFile = new File(imagePath, contentData.name+".png");
-                Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
+                final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
 
-                if (contentUri != null) {
+//                if (contentUri != null) {
+//
+//                    mListener.showShareDialog(mContentData , mImageBitmap);
+//                }
 
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                    shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        final List<String> sharingAppList = new ArrayList<String>();
 
-                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
+        if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
+            sharingAppList.add("Whatsapp");
+        }
 
-                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
+        if(Utils.isAppInstalled(mContext,Fb_Package_name)){
+            sharingAppList.add("Facebook");
+        }
 
-                        String data = contentData.pictureDescription;
-                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-                        //data = Html.fromHtml(data).toString();
-                        Intent whatsappIntent=new Intent();
-//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                        whatsappIntent.setAction(Intent.ACTION_SEND);
-                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
-                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
-                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
-                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
-                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
-                        whatsappIntent.setPackage(Whatsapp_Package_name);
-                        targetInviteIntents.add(whatsappIntent);
+        if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
+            sharingAppList.add("Instagram");
+        }
+
+        if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
+            sharingAppList.add("Gmail");
+        }
+
+        if(sharingAppList.size() > 0  ){
+
+            final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle("Share Pixtory Via");
+            builder.setItems(AppList, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    // Do something with the selection
+                    if (sharingAppList.get(item).equals("Whatsapp")) {
+                        shareOnWassapp(contentUri);
+                    } else if (sharingAppList.get(item).equals("Facebook")) {
+                        mListener.showShareDialog(mContentData);
+                    } else if (sharingAppList.get(item).equals("Instagram")) {
+                        shareOnInstagram(contentUri);
+                    } else if (sharingAppList.get(item).equals("Gmail")) {
+                        shareOnGmail(contentUri);
                     }
+                }
+            });
 
-                    if(Utils.isAppInstalled(mContext,Fb_Package_name)){
-                        String content = contentData.pictureDescription;
-                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-                        Intent intent=new Intent();
-//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                        intent.setAction(Intent.ACTION_SEND);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-                        intent.setPackage(Fb_Package_name);
-                        targetInviteIntents.add(intent);
-                    }
 
-                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
-                        String content = contentData.pictureDescription;
-                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-                        Intent intent=new Intent();
-//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                        intent.setAction(Intent.ACTION_SEND);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-                        intent.setPackage(Instagram_Package_name);
-                        targetInviteIntents.add(intent);
-                    }
+            AlertDialog alert = builder.create();
+            mShareImg.setVisibility(View.VISIBLE);
+            mLoadingPanel.setVisibility(View.GONE);
+            alert.show();
+        }
+        else {
+            Utils.showToastMessage(mContext,"No Apps To Share",0);
+        }
 
-                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
-                        String content = contentData.pictureDescription;
-                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-                        Intent intent=new Intent();
-//                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
-                        intent.setAction(Intent.ACTION_SEND);
+        //   if(Utils.isAppInstalled(mContext,Fb_Package_name)){
+//                        String content = contentData.pictureDescription;
+//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        Intent intent=new Intent();
+////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+//                        intent.setAction(Intent.ACTION_SEND);
 //                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                        intent.setType("application/image");
-                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+//                        intent.setPackage(Fb_Package_name);
+//                        targetInviteIntents.add(intent);
+//                    }
+//
+//                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
+//                        String content = contentData.pictureDescription;
+//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        Intent intent=new Intent();
+////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+//                        intent.setAction(Intent.ACTION_SEND);
+//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+//                        intent.setPackage(Instagram_Package_name);
+//                        targetInviteIntents.add(intent);
+//                    }
+//
+//                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
+//                        String content = contentData.pictureDescription;
+//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        Intent intent=new Intent();
+////                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
+//                        intent.setAction(Intent.ACTION_SEND);
+////                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                        intent.setType("application/image");
+//                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
+//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+//                        intent.setPackage(Gmail_Package_name);
+//                        targetInviteIntents.add(intent);
+//                    }
 
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
-                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-                        intent.setPackage(Gmail_Package_name);
-                        targetInviteIntents.add(intent);
-                    }
-                    if(!targetInviteIntents.isEmpty()){
 
-                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
-                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
 
-                            startActivity(chooserIntent);
-                        }else{
-                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
-                        }
-                    }
+//                    Intent shareIntent = new Intent();
+//                    shareIntent.setAction(Intent.ACTION_SEND);
+//                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                    shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+//                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//
+//                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
+//
+//                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
+//
+//                        String data = contentData.pictureDescription;
+//                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        //data = Html.fromHtml(data).toString();
+//                        Intent whatsappIntent=new Intent();
+////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+//                        whatsappIntent.setAction(Intent.ACTION_SEND);
+//                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+//                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
+//                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
+//                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
+//                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
+//                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
+//                        whatsappIntent.setPackage(Whatsapp_Package_name);
+//                        targetInviteIntents.add(whatsappIntent);
+//                    }
+//
+//                    if(Utils.isAppInstalled(mContext,Fb_Package_name)){
+//                        String content = contentData.pictureDescription;
+//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        Intent intent=new Intent();
+////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+//                        intent.setAction(Intent.ACTION_SEND);
+//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+//                        intent.setPackage(Fb_Package_name);
+//                        targetInviteIntents.add(intent);
+//                    }
+//
+//                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
+//                        String content = contentData.pictureDescription;
+//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        Intent intent=new Intent();
+////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+//                        intent.setAction(Intent.ACTION_SEND);
+//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+//                        intent.setPackage(Instagram_Package_name);
+//                        targetInviteIntents.add(intent);
+//                    }
+//
+//                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
+//                        String content = contentData.pictureDescription;
+//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+//                        Intent intent=new Intent();
+////                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
+//                        intent.setAction(Intent.ACTION_SEND);
+////                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+//                        intent.setType("application/image");
+//                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
+//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+//                        intent.setPackage(Gmail_Package_name);
+//                        targetInviteIntents.add(intent);
+//                    }
+//                    if(!targetInviteIntents.isEmpty()){
+//
+//                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
+//                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
+//
+//                            startActivity(chooserIntent);
+//                        }else{
+//                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
 
             }
 
@@ -1795,5 +1902,58 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if(isOpted || isProfileContent || mListener.isCategoryViewOpen())
             popupMenu.getMenu().removeItem(R.id.wallpaper_overflow_daily);
         popupMenu.show();
+    }
+
+    public void shareOnWassapp(Uri contentUri){
+        String data = mContentData.pictureDescription;
+        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+        //data = Html.fromHtml(data).toString();
+        Intent whatsappIntent=new Intent();
+    //                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+        whatsappIntent.setAction(Intent.ACTION_SEND);
+        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
+        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name
+                +"_\n\n"+mContentData.pictureDescription + "Check out our website www.pixtory.in");
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name+"_\n\n"+data);
+        whatsappIntent.setPackage(Whatsapp_Package_name);
+
+        startActivity(whatsappIntent);
+//        targetInviteIntents.add(whatsappIntent);
+    }
+
+
+    public  void shareOnInstagram(Uri contentUri){
+        String content = mContentData.pictureDescription;
+        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+        Intent intent=new Intent();
+//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+        intent.setAction(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        intent.putExtra(Intent.EXTRA_TEXT,mContentData.name+"\nBy "+mContentData.personDetails.name+"\n\n"+content);
+        intent.setPackage(Instagram_Package_name);
+        startActivity(intent);
+    }
+
+    public void shareOnGmail(Uri contentUri){
+        String content = mContentData.pictureDescription;
+        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+        Intent intent=new Intent();
+//                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
+        intent.setAction(Intent.ACTION_SEND);
+//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+        intent.setType("application/image");
+        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
+        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        intent.putExtra(Intent.EXTRA_TEXT,mContentData.name+"\nBy "+mContentData.personDetails.name+"\n\n"+content);
+        intent.setPackage(Gmail_Package_name);
+        startActivity(intent);
     }
 }
