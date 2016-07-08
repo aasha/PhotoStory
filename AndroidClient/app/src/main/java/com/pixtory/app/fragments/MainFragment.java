@@ -132,10 +132,17 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     private static final String Fb_Package_name = "com.facebook.katana";
     private static final String Instagram_Package_name = "com.instagram.android";
     private static final String Gmail_Package_name = "com.google.android.gm";
+    private static final String MF_Picture_StoryView = "MF_Picture_StoryView";
+    private static final String ST_Story_PictureView = "ST_Story_PictureView";
+    private static final String Like_Count = "Like_Count";
+    private static final String Have_Commented = "Have_Commented";
+
+    private String PreviousEvent;
 
     private static Animation mAnimation;
 
     private Context mContext;
+    private Activity mActivity;
 
     @Bind(R.id.pic_story_layout)
     NestedScrollView mStoryParentLayout = null;
@@ -305,7 +312,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         super.onCreate(savedInstanceState);
 
         Log.i(TAG,"callback->main fragment on create");
-        mContext = getActivity();
+        mContext = mActivity =  getActivity();
 
         mProgressDialog = new ProgressDialog(getActivity());
         mProgressDialog.setTitle("Loading Pixstory For You...!!");
@@ -445,6 +452,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mWallpaperSettingsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_Wallpaper_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                        .put("PIXTORY_ID",mContentData.id+"");
+
+                sendAmplitudeLog(appEventBuilder);
                 showPopUpMenu();
             }
         });
@@ -605,9 +617,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         TextView mCategory3 = (TextView)mStoryLayout.findViewById(R.id.category_3);
         TextView mseperator1 = (TextView)mStoryLayout.findViewById(R.id.separator_1);
         TextView mseperator2 = (TextView)mStoryLayout.findViewById(R.id.separator_2);
-        mCategory1.setPaintFlags(mCategory1.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        mCategory2.setPaintFlags(mCategory2.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        mCategory3.setPaintFlags(mCategory3.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        //mCategory1.setPaintFlags(mCategory1.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        //mCategory2.setPaintFlags(mCategory2.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        //mCategory3.setPaintFlags(mCategory3.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         DroidSerifTextView mTextStoryDetails = (DroidSerifTextView) mStoryLayout.findViewById(R.id.txtDetailsPara);
         mShareBtn = (LinearLayout) mRootView.findViewById(R.id.btnShare);
@@ -621,17 +633,19 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 String name = (!(cd.personDetails.name.equals("")))? cd.personDetails.name : " ";
                 if(cd.categoryNameList!=null)
                 {
-                    name += (" in "+cd.categoryNameList.get(0).categoryName);
+                    name += (" in #"+cd.categoryNameList.get(0).categoryName);
                     if(cd.categoryNameList.size()>1)
-                        name+=(", "+cd.categoryNameList.get(1).categoryName);
+                        name+=(" #"+cd.categoryNameList.get(1).categoryName);
+                    if(cd.categoryNameList.size()>2)
+                        name+=(" #"+cd.categoryNameList.get(2).categoryName);
                 }
                 mTextExpert.setText(name);
                 Picasso.with(mContext).load(cd.personDetails.imageUrl).placeholder(R.drawable.profile_icon_3).fit().into(mProfileImage);
                 mTextName.setText(cd.personDetails.name);
                 if(cd.categoryNameList!=null){
-                mTextDesc.setVisibility(View.VISIBLE);
+                //mTextDesc.setVisibility(View.VISIBLE);
                 mCategory1.setVisibility(View.VISIBLE);
-                mCategory1.setText(cd.categoryNameList.get(0).categoryName);
+                mCategory1.setText("#"+cd.categoryNameList.get(0).categoryName);
                 mCategory1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -639,22 +653,22 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                             Category category = cd.categoryNameList.get(0);
                             Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-                            mListener.showCategoryStories(category.categoryId ,category.categoryName );
+                            mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                         }
                     }
                 });
 
                 if(cd.categoryNameList.size()>1){
-                    mseperator1.setVisibility(View.VISIBLE);
+                    //mseperator1.setVisibility(View.VISIBLE);
                     mCategory2.setVisibility(View.VISIBLE);
-                    mCategory2.setText(cd.categoryNameList.get(1).categoryName);
+                    mCategory2.setText("#"+cd.categoryNameList.get(1).categoryName);
                     mCategory2.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if(!mListener.isCategoryViewOpen()) {
                                 Category category = cd.categoryNameList.get(1);
                                 Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-                                mListener.showCategoryStories(category.categoryId ,category.categoryName );
+                                mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                             }
 
                         }
@@ -663,16 +677,16 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     if(cd.categoryNameList.size()>2){
                         //mseperator1.setVisibility(View.GONE);
                         //mCategory1.setText(cd.categoryNameList.get(0)+",");
-                        mseperator2.setVisibility(View.VISIBLE);
+                        //mseperator2.setVisibility(View.VISIBLE);
                         mCategory3.setVisibility(View.VISIBLE);
-                        mCategory3.setText(cd.categoryNameList.get(2).categoryName);
+                        mCategory3.setText("#"+cd.categoryNameList.get(2).categoryName);
                         mCategory3.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if(!mListener.isCategoryViewOpen()) {
                                     Category category = cd.categoryNameList.get(2);
                                     Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-                                    mListener.showCategoryStories(category.categoryId ,category.categoryName );
+                                    mListener.showCategoryStories(category.categoryId ,category.categoryName, cd.id );
                                 }
                             }
                         });
@@ -719,10 +733,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     mLoadingPanel.setVisibility(View.VISIBLE);
 
                     sharePixtory(cd);
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Share_Click")
+                    AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("ST_Share_Click")
                             .put(AppConstants.USER_ID, Utils.getUserId(mContext))
-                            .put("PIXTORY_ID", cd.id + "")
-                            .build());
+                            .put("PIXTORY_ID", cd.id + "");
+                    sendAmplitudeLog(appEventBuilder);
                 }else {
                     mListener.showLoginAlert();
                 }
@@ -732,10 +746,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void onClick(View v) {
 
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
+                AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("ST_Comment_Click")
                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                        .put("PIXTORY_ID",cd.id+"")
-                        .build());
+                        .put("PIXTORY_ID",cd.id+"");
+                sendAmplitudeLog(appEventBuilder);
 
                 buildCommentsLayout(cd);
                 attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
@@ -856,7 +870,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     public interface OnMainFragmentInteractionListener {
         void showMenuIcon(boolean showMenuIcon);
         void showLoginAlert();
-        void showCategoryStories(int categoryId,String categoryName);
+        void showCategoryStories(int categoryId,String categoryName,int pixtoryId);
         void showShareDialog(ContentData contentData);
         boolean isCategoryViewOpen();
         void showWallPaperCoachMark();
@@ -1083,11 +1097,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         isFullScreenShown=false;
                         Log.i(TAG, "MotionEvent.ACTION_DOWN");
                         if(isPixtorySwipeUp){
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_StoryView")
+                        AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder(MF_Picture_StoryView)
                                 .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                                .put("PIXTORY_ID",""+mContentData.id)
-                                .build());
+                                .put("PIXTORY_ID",""+mContentData.id);
+                        sendAmplitudeLog(appEventBuilder);
                         Log.i(TAG,"MF_Picture_StoryView_Amplitude");
+                        PreviousEvent = MF_Picture_StoryView;
                         }
                         isPixtorySwipeUp=false;
 
@@ -1102,11 +1117,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         mStoryParentLayout.fullScroll(View.FOCUS_UP);
 
                         mTextExpert.setVisibility(View.VISIBLE);
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PictureView")
-                                        .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                                        .put("PIXTORY_ID",""+mContentData.id)
-                                        .build());
-                        Log.i(TAG,"ST_Story_PictureView_Amplitude");
+                        if(PreviousEvent==MF_Picture_StoryView){
+                            AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder(ST_Story_PictureView)
+                                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",""+mContentData.id);
+                            sendAmplitudeLog(appEventBuilder);
+                            PreviousEvent = ST_Story_PictureView;
+                            Log.i(TAG,"ST_Story_PictureView_Amplitude");
+                        }
                         if(!isSwipeUpArrowShown){
                             swipeUpArrow.setVisibility(View.VISIBLE);
                             swipeUpArrow.setAnimation(mAnimation);
@@ -1273,7 +1291,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         }else{
             Log.i(TAG,"No Comment Yet for this story");
-            mTVCommentCount.setText(" NO COMMENT YET ");
+            mTVCommentCount.setText("Be the first to comment! ");
             mCommentText.setVisibility(View.GONE);
         }
         mTVLoading.setVisibility(View.GONE);
@@ -1349,20 +1367,23 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 });
                 mContentData.likedByUser = true;
                 anim.start();
-                if(isFullScreenShown)
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_Like")
-                        .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
-                        .put("PIXTORY_ID", "" + mContentData.id)
-                        .put("POSITION_ID",""+mContentIndex)
-                        .put("BOOLEAN","True")
-                        .build());
-                else
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_Like")
+                if(isFullScreenShown){
+                    AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_Picture_Like")
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
                             .put("PIXTORY_ID", "" + mContentData.id)
                             .put("POSITION_ID",""+mContentIndex)
-                            .put("BOOLEAN","False")
-                            .build());
+                            .put("BOOLEAN","True");
+                    sendAmplitudeLog(appEventBuilder);
+                }
+                else{
+                    AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("ST_Story_Like")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
+                            .put("PIXTORY_ID", "" + mContentData.id)
+                            .put("POSITION_ID",""+mContentIndex)
+                            .put("BOOLEAN","False");
+                    sendAmplitudeLog(appEventBuilder);
+
+                }
 
             } else {
                 ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flip_out);
@@ -1390,20 +1411,23 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 });
                 anim.start();
                 mContentData.likedByUser = false;
-                if(isFullScreenShown)
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_UnLike")
+                if(isFullScreenShown){
+                    AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_Picture_UnLike")
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
                             .put("PIXTORY_ID", "" + mContentData.id)
                             .put("POSITION_ID",""+mContentIndex)
-                            .put("BOOLEAN","True")
-                            .build());
-                else
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_UnLike")
+                            .put("BOOLEAN","True");
+                    sendAmplitudeLog(appEventBuilder);
+
+                }
+                else{
+                    AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("ST_Story_UnLike")
                             .put(AppConstants.USER_ID, Utils.getUserId(getActivity()))
                             .put("PIXTORY_ID", "" + mContentData.id)
                             .put("POSITION_ID",""+mContentIndex)
-                            .put("BOOLEAN","False")
-                            .build());
+                            .put("BOOLEAN","False");
+                    sendAmplitudeLog(appEventBuilder);
+                }
             }
             sendLikeToBackend(mContentData.id, mContentData.likedByUser);
         }
@@ -1486,7 +1510,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWallpaperConfirm_Click")
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_SingleWallpaperConfirm_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")
@@ -1499,6 +1523,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_SingleWallpaperCancel_Click")
+                        .put(AppConstants.USER_ID, Utils.getUserId(mContext))
+                        .put("PIXTORY_ID", mContentData.id + "")
+                        .put("POSITION_ID", mContentIndex + "")
+                        .build());
                 dialog.dismiss();
             }
         });
@@ -1612,191 +1641,92 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                 File imagePath = new File(mContext.getCacheDir(), "images");
                 File newFile = new File(imagePath, contentData.name+".png");
-                final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
+                Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
 
-//                if (contentUri != null) {
-//
-//                    mListener.showShareDialog(mContentData , mImageBitmap);
-//                }
+                if (contentUri != null) {
 
-        final List<String> sharingAppList = new ArrayList<String>();
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                    shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
 
-        if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
-            sharingAppList.add("Whatsapp");
-        }
+                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
 
-        if(Utils.isAppInstalled(mContext,Fb_Package_name)){
-            sharingAppList.add("Facebook");
-        }
+                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
 
-        if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
-            sharingAppList.add("Instagram");
-        }
-
-        if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
-            sharingAppList.add("Gmail");
-        }
-
-        if(sharingAppList.size() > 0  ){
-
-            final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle("Share Pixtory Via");
-            builder.setItems(AppList, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    // Do something with the selection
-                    if (sharingAppList.get(item).equals("Whatsapp")) {
-                        shareOnWassapp(contentUri);
-                    } else if (sharingAppList.get(item).equals("Facebook")) {
-                        mListener.showShareDialog(mContentData);
-                    } else if (sharingAppList.get(item).equals("Instagram")) {
-                        shareOnInstagram(contentUri);
-                    } else if (sharingAppList.get(item).equals("Gmail")) {
-                        shareOnGmail(contentUri);
+                        String data = contentData.pictureDescription;
+                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                        //data = Html.fromHtml(data).toString();
+                        Intent whatsappIntent=new Intent();
+//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                        whatsappIntent.setAction(Intent.ACTION_SEND);
+                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
+                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
+                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
+                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
+                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
+                        whatsappIntent.setPackage(Whatsapp_Package_name);
+                        targetInviteIntents.add(whatsappIntent);
                     }
-                }
-            });
 
+                    if(Utils.isAppInstalled(mContext,Fb_Package_name)){
+                        String content = contentData.pictureDescription;
+                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                        Intent intent=new Intent();
+//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                        intent.setAction(Intent.ACTION_SEND);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+                        intent.setPackage(Fb_Package_name);
+                        targetInviteIntents.add(intent);
+                    }
 
-            AlertDialog alert = builder.create();
-            mShareImg.setVisibility(View.VISIBLE);
-            mLoadingPanel.setVisibility(View.GONE);
-            alert.show();
-        }
-        else {
-            Utils.showToastMessage(mContext,"No Apps To Share",0);
-        }
+                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
+                        String content = contentData.pictureDescription;
+                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                        Intent intent=new Intent();
+//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                        intent.setAction(Intent.ACTION_SEND);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+                        intent.setPackage(Instagram_Package_name);
+                        targetInviteIntents.add(intent);
+                    }
 
-        //   if(Utils.isAppInstalled(mContext,Fb_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
+                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
+                        String content = contentData.pictureDescription;
+                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                        Intent intent=new Intent();
+//                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
+                        intent.setAction(Intent.ACTION_SEND);
 //                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Fb_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Instagram_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
-//                        intent.setAction(Intent.ACTION_SEND);
-////                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setType("application/image");
-//                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Gmail_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
+                        intent.setType("application/image");
+                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
+                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
+                        intent.setPackage(Gmail_Package_name);
+                        targetInviteIntents.add(intent);
+                    }
+                    if(!targetInviteIntents.isEmpty()){
 
+                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
+                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
 
-//                    Intent shareIntent = new Intent();
-//                    shareIntent.setAction(Intent.ACTION_SEND);
-//                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                    shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//
-//                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
-//
-//                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
-//
-//                        String data = contentData.pictureDescription;
-//                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        //data = Html.fromHtml(data).toString();
-//                        Intent whatsappIntent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        whatsappIntent.setAction(Intent.ACTION_SEND);
-//                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
-//                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
-//                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
-//                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
-//                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
-//                        whatsappIntent.setPackage(Whatsapp_Package_name);
-//                        targetInviteIntents.add(whatsappIntent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Fb_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Fb_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Instagram_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
-//                        intent.setAction(Intent.ACTION_SEND);
-////                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setType("application/image");
-//                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Gmail_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//                    if(!targetInviteIntents.isEmpty()){
-//
-//                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
-//                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
-//
-//                            startActivity(chooserIntent);
-//                        }else{
-//                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
+                            startActivity(chooserIntent);
+                        }else{
+                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
             }
 
@@ -1858,7 +1788,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             // Runs on the UI thread
             // Here you can perform any post-execute tasks, for example remove the
             // progress bar (if you set one).
-            Toast.makeText(mContext,"Yayy!! Wallpaper set",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,"Hooray! Wallpaper set!",Toast.LENGTH_SHORT).show();
             Log.d(TAG, "New wallpaper set");
         }
 
@@ -1880,12 +1810,29 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                AmplitudeLog.AppEventBuilder appEventBuilder;
                 switch (item.getItemId()){
                     case R.id.wallpaper_overflow_set:showWallpaperAlert();
+                        appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_SetThisWallpaper_Click")
+                                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",mContentData.id+"");
+                        sendAmplitudeLog(appEventBuilder);
+                        popupMenu.dismiss();
+                        return true;
+
+                    case  R.id.wallpaper_overflow_set_today:showWallpaperAlert();
+                        appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_SetThisTodayWallpaper_Click")
+                                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                                .put("PIXTORY_ID",mContentData.id+"");
+                        sendAmplitudeLog(appEventBuilder);
                         popupMenu.dismiss();
                         return true;
 
                     case R.id.wallpaper_overflow_daily:mListener.showWallPaperCoachMark();
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_EverdayWallpaper_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                            .put("PIXTOY_ID",mContentData.id+"")
+                            .build());
                         popupMenu.dismiss();
                         return true;
 
@@ -1901,6 +1848,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         boolean isOpted = getActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(HomeActivity.OPT_FOR_DAILY_WALLPAPER,false);
         if(isOpted || isProfileContent || mListener.isCategoryViewOpen())
             popupMenu.getMenu().removeItem(R.id.wallpaper_overflow_daily);
+        if(isOpted)
+            popupMenu.getMenu().removeItem(R.id.wallpaper_overflow_set);
+        else
+            popupMenu.getMenu().removeItem(R.id.wallpaper_overflow_set_today);
         popupMenu.show();
     }
 
@@ -1956,4 +1907,20 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         intent.setPackage(Gmail_Package_name);
         startActivity(intent);
     }
+
+    private void sendAmplitudeLog(AmplitudeLog.AppEventBuilder appEventBuilder){
+        if(isProfileContent)
+            AmplitudeLog.logEvent(appEventBuilder.put("IS_PROFILE","TRUE")
+                    .put("IS_CATEGORY","FALSE")
+                    .build());
+        else if(mListener.isCategoryViewOpen())
+            AmplitudeLog.logEvent(appEventBuilder.put("IS_PROFILE","FALSE")
+                    .put("IS_CATEGORY","TRUE")
+                    .build());
+        else
+            AmplitudeLog.logEvent(appEventBuilder.put("IS_PROFILE","FALSE")
+                    .put("IS_CATEGORY","FALSE")
+                    .build());
+    }
+
 }

@@ -317,8 +317,11 @@ S
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:layout_margin="25dp"
-            android:src="@drawable/wallpaper_settings_icon"/>
+            android:layout_marginTop="27dp"
+            android:layout_marginRight="27dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/wallpaper_menu_icon"/>
     </LinearLayout>
 
 

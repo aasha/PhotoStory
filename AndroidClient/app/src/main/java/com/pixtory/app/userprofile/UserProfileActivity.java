@@ -120,7 +120,7 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     }
 
     @Override
-    public void showCategoryStories(int categoryId, String categoryName) {
+    public void showCategoryStories(int categoryId, String categoryName, int pixtoryId) {
 
     }
 

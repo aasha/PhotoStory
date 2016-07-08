@@ -58,7 +58,7 @@
     <string name="mail_feedback_message">Hi,
 \n\nYour Pixtory app is awesome! I would like to give you some feedback:</string>
     <string name="follow">Follow</string>
-    <string name="contribute_text">Would you like to be amongst our early contributors and share your Pixtories?</string>
+    <string name="contribute_text">Become a contributor and share your incredible Pixtories! Our team will reach out to you with more information.</string>
     <string name="login_text">To save your preferences, please log in</string>
     <string name="login_text_2">Connect through one of the following ways</string>
     <string name="fb_login">Connect with Facebook</string>
@@ -66,8 +66,9 @@
     <string name="swipe_up_coach_mark_text">Swipe up to read the full story</string>
     <string name="wallpaper_text">Stunning wallpapers.\nHandpicked.\nEveryday.\n\nWould you like to try it?</string>
     <string name="wallpaper_changed_text">Daily wallpaper set. \n\nYou\'ll now have a new wallpaper every day</string>
-    <string name="wallpaper_text_2">Everyday, We\'ll refresh your wallpaper to a gorgeous new image curated by us. You can always turn it off in your settings.</string>
+    <string name="wallpaper_text_2">Everyday, we\'ll refresh your phone\'s wallpaper to a gorgeous new image curated by us. You can always turn it off in your settings.</string>
     <string name="swipe_up_coach_mark_text_2">A story is the photographer\'s experience, emotion, inspiration or expression behind the picture.</string>
-    <string name="set_as_wallpaper">Set pic as Wallpaper</string>
-    <string name="daily_wallpaper">Set up Daily wallpapers</string>
+    <string name="set_as_wallpaper">Set image as your wallpaper</string>
+    <string name="daily_wallpaper">Set up Daily Wallpapers</string>
+    <string name="set_as_wallpaper_today">Set this as Wallpaper today</string>
 </resources>

@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -93,6 +95,7 @@ import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
+import com.pixtory.app.retrofit.GetWallPaperResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.RegisterResponse;
@@ -102,14 +105,21 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.utils.ImageDownloadManager;
 import com.pixtory.app.utils.Utils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -134,7 +144,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     private static final int LONG_TAP = 0;
     private static final int SWIPE_UP = 1;
-    private static String longTapText,swipeUpTextTop,swipeUpTextBottom;
+    private static final int SWIPE_LEFT = 2;
+    private static String longTapText,swipeUpTextTop,swipeUpTextBottom,swipeLeftText;
 
     private CallbackManager callbackManager;
 
@@ -143,6 +154,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     private int mCurrentFragmentPosition = 0;
     private int mCurrentFragmentPositionInCategory =0;
+    private int mPreviousFragmentPositionInCategory =0;
+    private int mPreviousFragmentPosition = 0;
 
     //Analytics
     public static final String SCREEN_NAME = "Main_Feed";
@@ -162,6 +175,7 @@ public class HomeActivity extends AppCompatActivity implements
     int previousPage = 0;
 
     private MainFragment mainFragment = null;
+    private MainFragment categoryFragment;
 
     Tracker mTracker;
     private ConnectionQuality mConnectionClass = ConnectionQuality.UNKNOWN;
@@ -191,6 +205,7 @@ public class HomeActivity extends AppCompatActivity implements
     private TextView mLongTapText;
     private ToggleButton mToggleButton;
     private TextView mWallpaperTopText;
+    private TextView mSwipeLeftText;
 
     @Bind(R.id.whole_frame)
     FrameLayout mOuterContainer;
@@ -213,7 +228,7 @@ public class HomeActivity extends AppCompatActivity implements
     TextView mCategoryTitle;
 
     @Bind(R.id.backButton)
-    ImageView backButton;
+    LinearLayout backButton;
 
 
     private int categoryDataSize;
@@ -232,6 +247,7 @@ public class HomeActivity extends AppCompatActivity implements
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
             .build());
+
         //TODO to be removed later
 //        checkForDeviceDensity();
         ButterKnife.bind(this);
@@ -274,7 +290,7 @@ public class HomeActivity extends AppCompatActivity implements
         mPager.setPageTransformer(true,parallaxPagerTransformer);
         mPager.setPageMargin(6);
         isFirstTimeOpen();
-        swipeCount();
+        //swipeCount();
 
         mCategoryViewPager.setPageTransformer(true,parallaxPagerTransformer);
         mCategoryViewPager.setPageMargin(6);
@@ -289,6 +305,8 @@ public class HomeActivity extends AppCompatActivity implements
 //                checkForCachedImages(position+10);
 //                checkForCachedImages(position+20);
                 preFetchImages(position);
+
+                mPreviousFragmentPosition = mCurrentFragmentPosition;
                 if (previousPage == 0)
                     previousPage = position;
                 else
@@ -301,21 +319,23 @@ public class HomeActivity extends AppCompatActivity implements
                     sharedPreferences.edit().putInt(Page_Index,currentIndex).apply();
                 mainFragment = (MainFragment)mCursorPagerAdapter.getCurrentFragment();
 
-               //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
-               if(mainFragment!=null && mainFragment.isFullScreenShown()){
+                //Toast.makeText(HomeActivity.this,"Page swipe",Toast.LENGTH_SHORT).show();
+                if(mainFragment!=null && mainFragment.isFullScreenShown()){
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
-                            .put("POSITION_ID",""+previousPage)
+                            .put("PIXTORY_ID",""+App.getContentData().get(mPreviousFragmentPosition).id)
+                            .put("POSITION_ID",""+mPreviousFragmentPosition)
+                            .put("IS_CATEGORY","FALSE")
                             .build());
-                   Log.i(TAG,"MF_Picture_PixtorySwipe_Amplitude");}
+                    Log.i(TAG,"MF_Picture_PixtorySwipe_Amplitude :: "+App.getContentData().get(mPreviousFragmentPosition).name);}
                 else{
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .put("PIXTORY_ID",""+App.getContentData().get(previousPage).id)
+                            .put("PIXTORY_ID",""+App.getContentData().get(mPreviousFragmentPosition).id)
+                            .put("IS_CATEGORY","FALSE")
                             .build());
-                   Log.i(TAG,"ST_Story_PixtorySwipe_Amplitude");
-               }
+                    Log.i(TAG,"ST_Story_PixtorySwipe_Amplitude :: "+App.getContentData().get(mPreviousFragmentPosition).name);
+                }
                 swipeCount();
                 Log.i(TAG,"Page swipe");
             }
@@ -334,9 +354,28 @@ public class HomeActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
+                mPreviousFragmentPositionInCategory = mCurrentFragmentPositionInCategory;
                 mCurrentFragmentPositionInCategory = position;
                 position = position+1;
                 mCategoryTitle.setText(categoryName+" ("+position+"/"+mCategoryFeedSize+")");
+                categoryFragment = (MainFragment)mCategoryPagerAdapter.getCurrentFragment();
+                if(categoryFragment!=null && categoryFragment.isFullScreenShown()){
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_Picture_PixtorySwipe")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .put("PIXTORY_ID",""+App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).id)
+                            .put("POSITION_ID",""+mPreviousFragmentPositionInCategory)
+                            .put("IS_CATEGORY","TRUE")
+                            .build());
+                    Log.i(TAG,"MF_Picture_PixtorySwipe_Amplitude_Category :: "+App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).name);}
+                else if(categoryFragment!=null){
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_PixtorySwipe")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .put("PIXTORY_ID",""+App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).id)
+                            .put("IS_CATEGORY","TRUE")
+                            .build());
+                    Log.i(TAG,"ST_Story_PixtorySwipe_Amplitude_Category :: "+App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).name);
+                }
+
             }
 
             @Override
@@ -367,7 +406,7 @@ public class HomeActivity extends AppCompatActivity implements
         swipeUpTextTop = "<b>Swipe up</b> for the <b>Story</b> behind the picture.";
         String swipeText2 = "A <b>Story</b> is the photographer\'s experience, emotion, inspiration or expression behind the picture.";
         swipeUpTextBottom = "A <b>Story</b> is the photographer\'s experience, emotion, inspiration or expression behind the picture.";
-
+        swipeLeftText = "<b>Swipe left</b> for the next <b>Pixtory</b>";
         mSwipeUpText1.setText(Html.fromHtml(swipeText1));
         mSwipeUpText2.setText(Html.fromHtml(swipeText2));
 
@@ -381,28 +420,47 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperConfirm_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                     setAlarmManagerToSetWallPaper();
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
-                    Toast.makeText(HomeActivity.this,"Pixtory will get personalized wallpaper for your device",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
 
+                    NetworkApiHelper.getInstance().getWallPaper(Integer.parseInt(Utils.getUserId(HomeActivity.this)),  new NetworkApiCallback<GetWallPaperResponse>() {
+                        @Override
+                        public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
+                            Log.i(TAG,"wallpaper URL is--"+getWallPaperResponse.wallPaper);
+                            setWallPaper(getWallPaperResponse.wallPaper);
+                        }
+
+                        @Override
+                        public void failure(GetWallPaperResponse getWallPaperResponse) {
+
+                        }
+
+                        @Override
+                        public void networkFailure(RetrofitError error) {
+
+                        }
+
+                    });
                 }
                 else
                 {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperCancel_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
-                    Toast.makeText(HomeActivity.this,"You can check this option again from menu options",Toast.LENGTH_SHORT).show();
-
                 }
+                mWallpaperCoachMark.setVisibility(View.INVISIBLE);
+                mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
             }
         });
         mWallpaperClose.setOnClickListener(new View.OnClickListener() {
@@ -420,7 +478,7 @@ public class HomeActivity extends AppCompatActivity implements
                 .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
                 .build());
 
-        menuIcon.setImageResource(R.drawable.menu_icon);
+        menuIcon.setImageResource(R.drawable.hamburger_icon_2);
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         shareDialog = new ShareDialog(this);
@@ -471,10 +529,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
-
-        mainFragment = getCurrentFragment();
-        if(mainFragment!=null)
-            mainFragment.setWallpaper();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -803,7 +857,9 @@ public class HomeActivity extends AppCompatActivity implements
         feedbackCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Feedback_Cancel_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                        .build());
                 dialog.dismiss();
             }
         });
@@ -941,6 +997,9 @@ public class HomeActivity extends AppCompatActivity implements
         contributeCancel.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("BecomeContributor_Cancel_Click")
+                        .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                        .build());
                 dialog.dismiss();
             }
         });
@@ -1053,7 +1112,7 @@ public class HomeActivity extends AppCompatActivity implements
         items.add(new SideMenuData(getResources().getDrawable(R.drawable.contributor_icon_3),"Become a Contributor"));
         items.add(new SideMenuData(getResources().getDrawable(R.drawable.invite_icon_3),"Invite Friends"));
         items.add(new SideMenuData(getResources().getDrawable(R.drawable.feedback_icon_3),"Feedback"));
-        items.add(new SideMenuData(getResources().getDrawable(R.drawable.wallpaper_icon_3),"Wallpaper setting"));
+        items.add(new SideMenuData(getResources().getDrawable(R.drawable.wallpaper_icon_3),"Daily wallpapers"));
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
         DisplayMetrics dm = new DisplayMetrics();
@@ -1166,7 +1225,7 @@ public class HomeActivity extends AppCompatActivity implements
                         break;
 
                     case 5:mDrawerLayout.closeDrawer(mDrawerList);
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_WallpaperSettings_Click")
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("HB_Wallpaper_Click")
                                 .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                                 .build());
                         prepareWallpaperCoachmark(true);
@@ -1215,12 +1274,21 @@ public class HomeActivity extends AppCompatActivity implements
             for(ResolveInfo resInfo : resInfos){
                 String packageName=resInfo.activityInfo.packageName;
                 Log.i("Package Name", packageName);
-                if(packageName.contains("com.whatsapp") || packageName.contains("com.facebook.katana") || packageName.contains("mms") || packageName.contains("android.gm")){
+                if( packageName.contains("com.facebook.katana") || packageName.contains("mms") || packageName.contains("android.gm")){
                     Intent intent=new Intent();
                     intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                     intent.setAction(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, you may want to try this new App Pixtory. It gives you some great photographs and the story behind each. I liked it and think you will as well.\n\nwww.pixtory.in");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called Pixtory, a platform for stunning fullscreen images and the stories behind them. I think you should check it out! Download it on the Play Store or go to \n\nwww.pixtory.in to know more.");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
+                    intent.setPackage(packageName);
+                    targetInviteIntents.add(intent);
+                }else if(packageName.contains("com.whatsapp")){
+                    Intent intent=new Intent();
+                    intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called *Pixtory*, a platform for stunning fullscreen images and the stories behind them. I think you should check it out! Download it on the Play Store or go to \n\nwww.pixtory.in to know more.");
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);
@@ -1319,9 +1387,17 @@ public class HomeActivity extends AppCompatActivity implements
                 case 1:handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        showCoachmarksDialog(SWIPE_LEFT);
+                    }
+                },2000);
+                    break;
+
+                case 2:handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
                         showCoachmarksDialog(SWIPE_UP);
                     }
-                },3000);
+                },800);
                     break;
 
                 case 10: showWallPaperCoachMark();
@@ -1536,6 +1612,10 @@ public class HomeActivity extends AppCompatActivity implements
                 ((TextView)dialog.findViewById(R.id.swipe_up_text_top)).setText(Html.fromHtml(swipeUpTextTop));
                 ((TextView)dialog.findViewById(R.id.swipe_up_text_bottom)).setText(Html.fromHtml(swipeUpTextBottom));
                 break;
+
+            case SWIPE_LEFT:dialog.setContentView(R.layout.swipe_left_coachmark_dialog);
+                ((TextView)dialog.findViewById(R.id.swipe_left_text_top)).setText(Html.fromHtml(swipeLeftText));
+                break;
         }
 
         testView = dialog.findViewById(R.id.swipe_up_coachmark_close);
@@ -1562,14 +1642,22 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void showCategoryStories(int id,String name){
+    public void showCategoryStories(int id,String name,int pixtoryId){
         categoryName = name;
         isCategoryViewOpen = true;
-
+        mCurrentFragmentPositionInCategory=0;
         if(Utils.isNotEmpty(Utils.getUserId(this))) {
 
             mProgress.setMessage("Fetching Pixtories");
             mProgress.show();
+
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Category_Click")
+                    .put("PIXTORY_ID",pixtoryId+"")
+                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                    .put("CATEGORY_ID",id+"")
+                    .put("CATEGORY_NAME",name)
+                    .build());
+
 
             Log.d(TAG,"showCategoryStories->id="+id+"::name="+name);
             NetworkApiHelper.getInstance().getContentByCategory(Integer.parseInt(Utils.getUserId(this)), id, new NetworkApiCallback<GetMainFeedResponse>() {
@@ -1648,6 +1736,37 @@ public class HomeActivity extends AppCompatActivity implements
         shareDialog.show(content);
 
 
+    }
+
+    public void setWallPaper(String imgUrl){
+        Picasso.with(HomeActivity.this).load(imgUrl).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                    Toast.makeText(HomeActivity.this,"Hurray!! Pixtory updated your wallpaper",Toast.LENGTH_SHORT).show();
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWallpaper_Set")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+                } catch (IOException e) {
+                    Toast.makeText(HomeActivity.this,"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Toast.makeText(HomeActivity.this,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
     }
 
 

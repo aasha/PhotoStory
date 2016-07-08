@@ -9,9 +9,11 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.retrofit.GetWallPaperResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -66,6 +68,9 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
                 try {
                     myWallpaperManager.setBitmap(bitmap);
                     Toast.makeText(mContext.getApplicationContext(),"Hurray!! Pixtory updated your wallpaper",Toast.LENGTH_SHORT).show();
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWallpaper_Set")
+                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                    .build());
                 } catch (IOException e) {
                     Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
                     e.printStackTrace();

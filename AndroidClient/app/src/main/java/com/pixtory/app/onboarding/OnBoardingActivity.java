@@ -170,7 +170,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                     String accessToken = AccessToken.getCurrentAccessToken().getToken();
                     final String imgUrl = "https://graph.facebook.com/" + fbId + "/picture?width=500&height=500";
 
-                    mProgressDialog.setTitle("Registering user...");
+                    mProgressDialog.setTitle("Fetching pixtories for you");
                     mProgressDialog.show();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Success)
                             .put("NAME", name)
@@ -199,6 +199,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                                     .put("MESSAGE", error.errorMessage)
                                     .build());
+                            Toast.makeText(OnBoardingActivity.this," Oops! We're facing some problems. Please try again later!",Toast.LENGTH_LONG).show();
                             closeDialog();
                         }
 
@@ -207,6 +208,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                                     .put("MESSAGE", error.getMessage())
                                     .build());
+                            Toast.makeText(OnBoardingActivity.this, "Please check your network connection", Toast.LENGTH_LONG).show();
                             closeDialog();
                         }
                     });
@@ -291,7 +293,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                         .put("MESSAGE", error.getMessage())
                         .build());
-                Toast.makeText(OnBoardingActivity.this, "Please connect to network", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OnBoardingActivity.this, "Please check your internet connection", Toast.LENGTH_LONG).show();
 
             }
         });

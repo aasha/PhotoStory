@@ -8,6 +8,11 @@
         android:title="@string/set_as_wallpaper" />
 
     <item
+        android:id="@+id/wallpaper_overflow_set_today"
+        android:icon="@null"
+        android:title="@string/set_as_wallpaper_today" />
+
+    <item
         android:id="@+id/wallpaper_overflow_daily"
         android:icon="@null"
         android:title="@string/daily_wallpaper" />
