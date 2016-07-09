@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -27,6 +28,7 @@ import com.pixtory.app.model.ContentData;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 
 import retrofit.RetrofitError;
@@ -35,11 +37,18 @@ import retrofit.client.Response;
 public class UserProfileActivity extends FragmentActivity implements UserProfileFragment.OnFragmentInteractionListener, MainFragment.OnMainFragmentInteractionListener
 , CommentsDialogFragment.OnAddCommentButtonClickListener{
 
+    private long storyStartTime;
+    private long storyEndTime;
+    private boolean isTimerStarted;
+    private int pixtoryId;
+    private long storyTimeInSecs;
+
     private MainFragment mainFragment;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_profle_2);
+        isTimerStarted = false;
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -180,5 +189,52 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
 
     }
 
+    @Override
+    public void startStoryTimer(int startPixtoryId) {
+        isTimerStarted = true;
+        storyStartTime = System.currentTimeMillis();
+        pixtoryId=startPixtoryId;
+        Log.i(UserProfileActivity.class.getName(),"Story timer started for Pixtory id - "+pixtoryId);
 
+    }
+
+    @Override
+    public void stopStoryTimer(int endPixtoryId) {
+        if(isTimerStarted && endPixtoryId == pixtoryId){
+            storyEndTime = System.currentTimeMillis();
+            isTimerStarted=false;
+            storyTimeInSecs = (storyEndTime - storyStartTime)/1000;
+            Log.i(UserProfileActivity.class.getName(),"Story timer stopped for Pixtory id - "+pixtoryId + "Read time - "+storyTimeInSecs);
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_Read_Time")
+                    .put(AppConstants.USER_ID,Utils.getUserId(UserProfileActivity.this))
+                    .put("PIXTORY_ID",pixtoryId+"")
+                    .put("READ_TIME",storyTimeInSecs+"")
+                    .build());
+        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopStoryTimer(pixtoryId);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        stopStoryTimer(pixtoryId);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AmplitudeLog.endSession();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AmplitudeLog.startSession();
+    }
 }

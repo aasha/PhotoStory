@@ -55,4 +55,12 @@ public class AmplitudeLog {
             return appEvent;
         }
     }
+
+    public static void startSession(){
+        Amplitude.startSession();
+    }
+
+    public static void endSession(){
+        Amplitude.endSession();
+    }
 }

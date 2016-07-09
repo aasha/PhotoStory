@@ -261,16 +261,6 @@ S
         android:gravity="center"
         android:layout_weight="1">
 
-        <RelativeLayout
-            style="@style/GenericProgressBackground"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:visibility="gone"
-            android:id="@+id/loadingPanel">
-            <ProgressBar
-                style="@style/GenericProgressIndicator"/>
-        </RelativeLayout>
-
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
