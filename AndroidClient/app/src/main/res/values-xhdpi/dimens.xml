@@ -12,7 +12,7 @@
     <dimen name="skip_login_font">18sp</dimen>
     <dimen name="card_name_font">15sp</dimen>
 
-    <dimen name="image_detail_width">260dp</dimen>
+    <dimen name="image_detail_width">240dp</dimen>
     <dimen name="story_layout_min_height">700dp</dimen>
     <dimen name="story_min_height">350dp</dimen>
 

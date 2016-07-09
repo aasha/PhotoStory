@@ -354,7 +354,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mSlantViewHtInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 100, displayMetrics );
         mImageExtendedHeight = mDeviceHeightInPx + ((int)(2.5f*mSlantViewHtInPx));
         mBottomScreenHt = (int)(0.60f*mDeviceHeightInPx);
-        mDeviceHeightInPx += mSoftBarHeight;
+//        mDeviceHeightInPx += mSoftBarHeight;
 
         Log.d("TAG", "w:h : sbw =" + mDeviceWidthInPx + ":" + mDeviceHeightInPx + "::" + mSoftBarHeight);
     }
@@ -555,7 +555,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.i(TAG,"callback->main fragment on view created");
-
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -954,7 +953,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private boolean modifyScreenHeight(int offset) {
 
-        imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
+        imgViewLayoutParams.height = (mImageExtendedHeight) -(offset);
         mImageMain.setLayoutParams(imgViewLayoutParams);
 
         if(offset > mBottomScreenHt ){
@@ -1090,7 +1089,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     }
                     else {
 
-                        mListener.showMenuIcon(true);
+                        if(mListener != null)
+                            mListener.showMenuIcon(true);
                         storyBackImg.setVisibility(View.VISIBLE);
                         mWallpaperSettingsIcon.setVisibility(View.VISIBLE);
                         mImageDetailsLayout.smoothScrollTo(0, 0);
@@ -1557,6 +1557,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     public void sharePixtory(final ContentData contentData) {
 
+
+
         ImageRequest imageRequest = ImageRequestBuilder
                 .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
                 .setRequestPriority(Priority.HIGH)
@@ -1617,25 +1619,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
         final List<String> sharingAppList = new ArrayList<String>();
 
-                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
 
-                        String data = contentData.pictureDescription;
-                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-                        //data = Html.fromHtml(data).toString();
-                        Intent whatsappIntent=new Intent();
-//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                        whatsappIntent.setAction(Intent.ACTION_SEND);
-                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
-                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
-                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
-                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
-                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
-                        whatsappIntent.setPackage(Whatsapp_Package_name);
-                        targetInviteIntents.add(whatsappIntent);
-                    }
         if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
             sharingAppList.add("Whatsapp");
         }
@@ -1644,13 +1628,13 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             sharingAppList.add("Facebook");
         }
 
-        if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
-            sharingAppList.add("Instagram");
-        }
-
-        if (Utils.isAppInstalled(mContext, Gmail_Package_name)) {
-            sharingAppList.add("Gmail");
-        }
+//        if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
+//            sharingAppList.add("Instagram");
+//        }
+//
+//        if (Utils.isAppInstalled(mContext, Gmail_Package_name)) {
+//            sharingAppList.add("Gmail");
+//        }
 
         if (sharingAppList.size() > 0) {
 
@@ -1665,11 +1649,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         shareOnWassapp(contentUri);
                     } else if (sharingAppList.get(item).equals("Facebook")) {
                         mListener.showShareDialog(mContentData);
-                    } else if (sharingAppList.get(item).equals("Instagram")) {
-                        shareOnInstagram(contentUri);
-                    } else if (sharingAppList.get(item).equals("Gmail")) {
-                        shareOnGmail(contentUri);
                     }
+//                    else if (sharingAppList.get(item).equals("Instagram")) {
+//                        shareOnInstagram(contentUri);
+//                    } else if (sharingAppList.get(item).equals("Gmail")) {
+//                        shareOnGmail(contentUri);
+//                    }
                 }
             });
 
@@ -1811,7 +1796,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
         //data = Html.fromHtml(data).toString();
         Intent whatsappIntent=new Intent();
-    //                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+//                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
         whatsappIntent.setAction(Intent.ACTION_SEND);
         whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
         whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
@@ -1822,6 +1807,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 +"_\n\n"+mContentData.pictureDescription + "Check out our website www.pixtory.in");
         whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name+"_\n\n"+data);
         whatsappIntent.setPackage(Whatsapp_Package_name);
+
 
         startActivity(whatsappIntent);
 //        targetInviteIntents.add(whatsappIntent);

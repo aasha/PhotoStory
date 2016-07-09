@@ -17,11 +17,13 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -63,11 +65,15 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
 import com.facebook.datasource.DataSubscriber;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.Priority;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.login.LoginManager;
@@ -256,7 +262,6 @@ public class HomeActivity extends AppCompatActivity implements
         mTracker = App.getmInstance().getDefaultTracker();
         mCtx = this;
 
-
         Log.i(TAG, "home activity oncreate");
         callbackManager = CallbackManager.Factory.create();
 
@@ -268,7 +273,6 @@ public class HomeActivity extends AppCompatActivity implements
         mOuterContainer.setVisibility(View.GONE);
 
         prepareFeed();
-        setPersonDetails();
 
         mPager = (ViewPager)findViewById(R.id.pager);
         mCategoryViewPager = (ViewPager)findViewById(R.id.category_pager);
@@ -304,8 +308,6 @@ public class HomeActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-//                checkForCachedImages(position+10);
-//                checkForCachedImages(position+20);
                 preFetchImages(position);
 
                 mPreviousFragmentPosition = mCurrentFragmentPosition;
@@ -430,26 +432,7 @@ public class HomeActivity extends AppCompatActivity implements
                     setAlarmManagerToSetWallPaper();
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
                     Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
-                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
 
-                    NetworkApiHelper.getInstance().getWallPaper(Integer.parseInt(Utils.getUserId(HomeActivity.this)),  new NetworkApiCallback<GetWallPaperResponse>() {
-                        @Override
-                        public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
-                            Log.i(TAG,"wallpaper URL is--"+getWallPaperResponse.wallPaper);
-                            setWallPaper(getWallPaperResponse.wallPaper);
-                        }
-
-                        @Override
-                        public void failure(GetWallPaperResponse getWallPaperResponse) {
-
-                        }
-
-                        @Override
-                        public void networkFailure(RetrofitError error) {
-
-                        }
-
-                    });
                 }
                 else
                 {
@@ -457,6 +440,7 @@ public class HomeActivity extends AppCompatActivity implements
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
+                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
@@ -473,12 +457,8 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
 
-        //Register for push notifs
-        registerForPushNotification();
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
-                .put("TIMESTAMP", System.currentTimeMillis() + "")
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .build());
+//        //Register for push notifs
+//        registerForPushNotification();
 
         menuIcon.setImageResource(R.drawable.hamburger_icon_2);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -524,32 +504,40 @@ public class HomeActivity extends AppCompatActivity implements
         });
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+    }
+
     public void setAlarmManagerToSetWallPaper(){
 
         mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
 
         mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
-
         mainFragment = getCurrentFragment();
 
         setWallpaperNow(AppConstants.SET_WALLPAPER);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 4);
+        calendar.set(Calendar.MINUTE, 30);
 //        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY, 17);
-        calendar.set(Calendar.MINUTE, 50);
 
 
 //        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 //                AlarmManager.INTERVAL_HALF_HOUR,
 //                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
 
-        //repeat alarm in 40 sec 1000*60*60*24
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000*60*60*24, mPendingIntent);
+        //repeat alarm in 1 day 1000*60*60*24
+//        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                1000*60*2, mPendingIntent);
 
+        //Alarm set for 6 hours
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000*60*60*6, mPendingIntent);
 
         Log.i("Alarm","setAlarmManagerToSetWallPaper called");
 
@@ -558,80 +546,88 @@ public class HomeActivity extends AppCompatActivity implements
     public void cancelAlarm(){
         if(mAlarmManager != null && mPendingIntent != null){
             mAlarmManager.cancel(mPendingIntent);
-            Log.i("Alarm", "Alarm Manager Canceled");
+            Log.i("Alarm", "Alarm Manager Cancelled");
         }
     }
 
 
     private void prepareFeed() {
+        if(Utils.isNotEmpty(Utils.getUserId(HomeActivity.this))){
 
-        setWallpaperNow(AppConstants.CACHE_WALLPAPER_IMAGE);
+            Log.i(TAG, "prepareFeed--user id::"+Utils.getUserId(HomeActivity.this));
 
-        NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, Utils.getUserId(HomeActivity.this) ,new NetworkApiCallback<GetMainFeedResponse>() {
-            @Override
-            public void success(GetMainFeedResponse o, Response response) {
-                mProgress.dismiss();
+            NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, Utils.getUserId(HomeActivity.this) ,new NetworkApiCallback<GetMainFeedResponse>() {
+                @Override
+                public void success(GetMainFeedResponse o, Response response) {
+                    mProgress.dismiss();
+                    setPersonDetails();
+                    Log.i(TAG, "prepare feed successful!!");
 
-                Log.i(TAG, "prepare feed successful!!");
+                    if (o.contentList != null) {
+                        mFeedSize = o.contentList.size();
+                        App.setContentData(o.contentList);
+                        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                        int startPos = sharedPreferences.getInt(Page_Index,0);
 
-                if (o.contentList != null) {
-                    mFeedSize = o.contentList.size();
-                    App.setContentData(o.contentList);
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                    int startPos = sharedPreferences.getInt(Page_Index,0);
+                        App.shuffleContentData(startPos);
+                        Utils.deleteOldVideos(o.contentList);
 
-                    App.shuffleContentData(startPos);
-                    Utils.deleteOldVideos(o.contentList);
+                        ImageDownloadManager imageDownloadManager =
+                                new ImageDownloadManager(HomeActivity.this,o.contentList , 0 , 20);
+                        AsyncTaskCompat.executeParallel( imageDownloadManager);
 
-                    ImageDownloadManager imageDownloadManager =
-                            new ImageDownloadManager(HomeActivity.this,o.contentList , 0 , 20);
-                    AsyncTaskCompat.executeParallel( imageDownloadManager);
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Done)
+                                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                                .build());
+                        mCursorPagerAdapter.setData(App.getContentData());
 
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Done)
-                            .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                            .build());
-                    mCursorPagerAdapter.setData(App.getContentData());
+                        mPager.setAdapter(mCursorPagerAdapter);
 
-                    mPager.setAdapter(mCursorPagerAdapter);
+                        mLoadingText.setVisibility(View.GONE);
+                        mOuterContainer.setVisibility(View.VISIBLE);
+                        swipeCount();
 
-                    mLoadingText.setVisibility(View.GONE);
-                    mOuterContainer.setVisibility(View.VISIBLE);
-                    swipeCount();
+                    } else {
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
+                                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                                .put("MESSAGE", "No Data")
+                                .build());
+                        Toast.makeText(HomeActivity.this, "No data!", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-                } else {
+                @Override
+                public void failure(GetMainFeedResponse error) {
+                    mProgress.dismiss();
+                    mLoadingText.setVisibility(View.VISIBLE);
+                    mOuterContainer.setVisibility(View.GONE);
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
                             .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                            .put("MESSAGE", "No Data")
+                            .put("MESSAGE", error.errorMessage)
                             .build());
-                    Toast.makeText(HomeActivity.this, "No data!", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG,"GetMainFeedResponse error"+error.errorMessage);
+                    Toast.makeText(HomeActivity.this, "GetMainFeedResponse error--"+error.errorMessage, Toast.LENGTH_SHORT).show();
                 }
-            }
 
-            @Override
-            public void failure(GetMainFeedResponse error) {
-                mProgress.dismiss();
-                mLoadingText.setVisibility(View.VISIBLE);
-                mOuterContainer.setVisibility(View.GONE);
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
-                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                        .put("MESSAGE", error.errorMessage)
-                        .build());
-                Log.i(TAG,"GetMainFeedResponse error"+error.errorMessage);
-                Toast.makeText(HomeActivity.this, "GetMainFeedResponse error--"+error.errorMessage, Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void networkFailure(RetrofitError error) {
+                    mProgress.dismiss();
+                    mLoadingText.setVisibility(View.VISIBLE);
+                    mOuterContainer.setVisibility(View.GONE);
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
+                            .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                            .put("MESSAGE", error.getMessage())
+                            .build());
+                    Toast.makeText(HomeActivity.this, "Please check your network connection, cannot proceed further", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else {
+            if(BuildConfig.BUILD_TYPE.equals(BuildConfig.DEBUG))
+                Utils.showToastMessage(this,"Yes this was the issue , user id was null in getMainFeed",1);
+            else
+                Utils.showToastMessage(this,"Oops internal server occured, close and then open app again",1);
 
-            @Override
-            public void networkFailure(RetrofitError error) {
-                mProgress.dismiss();
-                mLoadingText.setVisibility(View.VISIBLE);
-                mOuterContainer.setVisibility(View.GONE);
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Get_Feed_Failed)
-                        .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                        .put("MESSAGE", error.getMessage())
-                        .build());
-                Toast.makeText(HomeActivity.this, "Please check your network connection, cannot proceed further", Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
     }
 
     private void registerForPushNotification() {
@@ -661,14 +657,29 @@ public class HomeActivity extends AppCompatActivity implements
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//            getWindow().getDecorView().setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+////            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//            mTracker.setScreenName(SCREEN_NAME);
+//            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+//            mConnectionClassManager.register(mListener);
+//            mDeviceBandwidthSampler.startSampling();
+//            ConnectionQuality cq = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
+//        /*AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
+//                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+//                .put(AppConstants.CONNECTION_QUALITY, cq.toString())
+//                .build());*/
+//            Log.e("AASHA", "Connection q " + cq.toString());
+
+
+//            if(mProgress.isShowing()){
+//                mProgress.dismiss();
+//            }
         }
     }
 
@@ -705,33 +716,20 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        mConnectionClassManager.remove(mListener);
-        mDeviceBandwidthSampler.stopSampling();
+//        mConnectionClassManager.remove(mListener);
+//        mDeviceBandwidthSampler.stopSampling();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mTracker.setScreenName(SCREEN_NAME);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-        mConnectionClassManager.register(mListener);
-        mDeviceBandwidthSampler.startSampling();
-        ConnectionQuality cq = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
-        /*AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( MF_Bandwidth_Changed)
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .put(AppConstants.CONNECTION_QUALITY, cq.toString())
-                .build());*/
 
-        if(mProgress.isShowing()){
-            mProgress.dismiss();
-        }
-        Log.e("AASHA", "Connection q " + cq.toString());
-    }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "home activity on Start");
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
+                .put("TIMESTAMP", System.currentTimeMillis() + "")
+                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                .build());
     }
 
     @Override
@@ -771,9 +769,13 @@ public class HomeActivity extends AppCompatActivity implements
 
     private void setPersonDetails(){
 
+        Log.i(TAG,"get person details->"+Integer.parseInt(Utils.getUserId(HomeActivity.this)));
+
         NetworkApiHelper.getInstance().getPersonDetails(Integer.parseInt(Utils.getUserId(HomeActivity.this)), Integer.parseInt(Utils.getUserId(HomeActivity.this)),new NetworkApiCallback<GetPersonDetailsResponse>() {
             @Override
             public void success(GetPersonDetailsResponse o, Response response) {
+                //Register for push notifs
+                registerForPushNotification();
 
                 if (o.contentList != null) {
                     App.setPersonConentData(o.contentList);
@@ -1297,7 +1299,10 @@ public class HomeActivity extends AppCompatActivity implements
                     intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                     intent.setAction(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called *Pixtory*, a platform for stunning fullscreen images and the stories behind them. I think you should check it out! Download it on the Play Store or go to \n\nwww.pixtory.in to know more.");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called *Pixtory*, a platform for stunning fullscreen images and the stories behind them. I think you should check it" +
+                            " out! Download it on the Play Store \n\n"
+                            +AppConstants.PLAY_STORE_LINK+AppConstants.SOCIAL_MEDIA_WHATSAPP_SHARE+
+                            " to know more.");
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);
@@ -1401,7 +1406,7 @@ public class HomeActivity extends AppCompatActivity implements
                 },2000);
                     break;
 
-                case 2:handler.postDelayed(new Runnable() {
+                case 4:handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         showCoachmarksDialog(SWIPE_UP);
@@ -1588,11 +1593,11 @@ public class HomeActivity extends AppCompatActivity implements
 
         mainFragment = getCurrentFragment();
 
-        if (mainFragment.isCommentsVisible()) {
+        if (mainFragment!=null && mainFragment.isCommentsVisible()) {
             Log.i(TAG, "onBackPressed - User is navigated to story view");
             mainFragment.attachPixtoryContent(AppConstants.SHOW_PIC_STORY);
 
-        } else if (!mainFragment.isFullScreenShown()) {
+        } else if (mainFragment!=null && !mainFragment.isFullScreenShown()) {
             Log.i(TAG, "onBackPressed - User is navigated to full image view");
             mainFragment.setUpFullScreen();
         }
@@ -1786,21 +1791,7 @@ public class HomeActivity extends AppCompatActivity implements
                 Log.i(TAG,"wallpaper URL is--"+getWallPaperResponse.wallPaper);
                 if(wallpaper_action == AppConstants.SET_WALLPAPER)
                     setWallPaper(HomeActivity.this , getWallPaperResponse.wallPaper);
-                else if(wallpaper_action == AppConstants.CACHE_WALLPAPER_IMAGE){
 
-//                        if (Utils.isNotEmpty(getWallPaperResponse.wallPaper)) {
-//
-//                            ImageRequest request = ImageRequestBuilder
-//                                    .newBuilderWithSource(Uri.parse(getWallPaperResponse.wallPaper))
-//                                    .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-//                                    .setProgressiveRenderingEnabled(true)
-//                                    .build();
-//
-//                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
-//                            imagePipeline.prefetchToDiskCache(request, null);
-//                            Log.i(TAG,"wallpaper image is cached");
-//                        }
-                }
             }
 
             @Override
@@ -1816,25 +1807,27 @@ public class HomeActivity extends AppCompatActivity implements
         });
     }
 
-    public void setWallPaper(final Context mContext , String imgUrl){
-        Picasso.with(mContext).load(imgUrl).into(new Target() {
+    public void setWallPaper(final Context mContext , String imgUrl) {
+
+        Target target;
+
+        Picasso.with(mContext).load(imgUrl).into( target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 WallpaperManager myWallpaperManager
                         = WallpaperManager.getInstance(mContext.getApplicationContext());
                 try {
                     myWallpaperManager.setBitmap(bitmap);
-                    Toast.makeText(mContext.getApplicationContext(),"Hurray!! Pixtory updated your wallpaper",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext.getApplicationContext(), "Hurray!! Pixtory updated your wallpaper", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
-                    Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext.getApplicationContext(), "Oops we couldn't set your wallpaper", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(mContext, "Bitmap Loadig Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
             }
 
             @Override

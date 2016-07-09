@@ -139,7 +139,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        userProfleView = inflater.inflate(R.layout.user_profile_test,container,false);
+        userProfleView = inflater.inflate(R.layout.user_profile_fragment,container,false);
 
         mPersonInfo = new PersonInfo();
         mContentDataList = new ArrayList<ContentData>();
@@ -343,7 +343,8 @@ public class UserProfileFragment extends Fragment {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
                  .put("USER_ID",mUserId+"")
                 .build());
-                mActivity.onBackPressed();
+//                mActivity.onBackPressed();
+                mActivity.finish();
             }});
 
         mBackClick.setOnClickListener(new View.OnClickListener() {
@@ -353,6 +354,8 @@ public class UserProfileFragment extends Fragment {
                         .put("USER_ID",mUserId+"")
                         .build());
                 mActivity.onBackPressed();
+                mActivity.finish();
+
             }});
 
         personFollow.setOnClickListener(new View.OnClickListener() {

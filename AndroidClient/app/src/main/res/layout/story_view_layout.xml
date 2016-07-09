@@ -24,7 +24,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginLeft="7dp"
             android:text="Steve Johnson"
-            android:textColor="#31aef5"
+            android:textColor="@color/grey_2"
             android:textSize="13dp"
             android:id="@+id/txtName"
         android:textStyle="bold"/>

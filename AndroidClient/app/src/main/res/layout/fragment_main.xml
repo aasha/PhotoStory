@@ -182,7 +182,7 @@
                     android:layout_height="200dp"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:layout_marginTop="-30dp"
+                    android:layout_marginTop="-15dp"
                     android:visibility="visible"
                     android:layout_below="@+id/like_layout"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"

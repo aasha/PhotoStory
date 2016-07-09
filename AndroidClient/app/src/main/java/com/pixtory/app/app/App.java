@@ -141,6 +141,8 @@ public class App extends Application implements AppConstants {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
             mTracker = analytics.newTracker("UA-73056382-1");
+
+           mTracker.setReferrer("referrer");
         }
         return mTracker;
     }
