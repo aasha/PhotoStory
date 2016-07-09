@@ -55,6 +55,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.amplitude.api.Amplitude;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -238,17 +239,32 @@ public class HomeActivity extends AppCompatActivity implements
     private String categoryName;
     public boolean isCategoryViewOpen = false;
 
+    private long storyStartTime;
+    private long storyEndTime;
+    private boolean isTimerStarted;
+    private int pixtoryId;
+    private long storyTimeInSecs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        isFirstTimeOpen();
+
+        if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
+                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                    .build());
+
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
+                .put("TIMESTAMP", System.currentTimeMillis() + "")
+                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                .build());
+
         setContentView(R.layout.activity_home);
 
         userId = getIntent().getStringExtra("USER_ID");
 
-        if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
-            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-            .build());
 
         //TODO to be removed later
 //        checkForDeviceDensity();
@@ -291,7 +307,6 @@ public class HomeActivity extends AppCompatActivity implements
         ParallaxPagerTransformer parallaxPagerTransformer = new ParallaxPagerTransformer(HomeActivity.this,R.id.image_main,0.5f);
         mPager.setPageTransformer(true,parallaxPagerTransformer);
         mPager.setPageMargin(6);
-        isFirstTimeOpen();
         //swipeCount();
 
         mCategoryViewPager.setPageTransformer(true,parallaxPagerTransformer);
@@ -337,6 +352,7 @@ public class HomeActivity extends AppCompatActivity implements
                             .put("IS_CATEGORY","FALSE")
                             .build());
                     Log.i(TAG,"ST_Story_PixtorySwipe_Amplitude :: "+App.getContentData().get(mPreviousFragmentPosition).name);
+                    stopStoryTimer(App.getContentData().get(mPreviousFragmentPosition).id);
                 }
                 swipeCount();
                 Log.i(TAG,"Page swipe");
@@ -375,6 +391,7 @@ public class HomeActivity extends AppCompatActivity implements
                             .put("PIXTORY_ID",""+App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).id)
                             .put("IS_CATEGORY","TRUE")
                             .build());
+                    stopStoryTimer(App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).id);
                     Log.i(TAG,"ST_Story_PixtorySwipe_Amplitude_Category :: "+App.getCategoryContentData().get(mPreviousFragmentPositionInCategory).name);
                 }
 
@@ -421,6 +438,7 @@ public class HomeActivity extends AppCompatActivity implements
         mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.i(TAG,"Toggle button state changed");
                 if(isChecked){
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
@@ -475,10 +493,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         //Register for push notifs
         registerForPushNotification();
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
-                .put("TIMESTAMP", System.currentTimeMillis() + "")
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .build());
+
 
         menuIcon.setImageResource(R.drawable.hamburger_icon_2);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -520,6 +535,9 @@ public class HomeActivity extends AppCompatActivity implements
                 isCategoryViewOpen = false;
                 mOuterContainer.setVisibility(View.VISIBLE);
                 mOtherFrame.setVisibility(View.GONE);
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("CAT_Back_Click")
+                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                .build());
             }
         });
     }
@@ -707,6 +725,7 @@ public class HomeActivity extends AppCompatActivity implements
         super.onPause();
         mConnectionClassManager.remove(mListener);
         mDeviceBandwidthSampler.stopSampling();
+        AmplitudeLog.endSession();
     }
 
     @Override
@@ -726,6 +745,7 @@ public class HomeActivity extends AppCompatActivity implements
             mProgress.dismiss();
         }
         Log.e("AASHA", "Connection q " + cq.toString());
+        AmplitudeLog.startSession();
     }
 
     @Override
@@ -1604,6 +1624,7 @@ public class HomeActivity extends AppCompatActivity implements
         else{
             super.onBackPressed();
         }
+        stopStoryTimer(pixtoryId);
 
     }
 
@@ -1844,6 +1865,39 @@ public class HomeActivity extends AppCompatActivity implements
         });
     }
 
+
+    @Override
+    public void startStoryTimer(int startPixtoryId) {
+        isTimerStarted = true;
+        storyStartTime = System.currentTimeMillis();
+        pixtoryId = startPixtoryId;
+        Log.i(TAG,"Story timer started for Pixtory id - "+pixtoryId);
+
+    }
+
+    @Override
+    public void stopStoryTimer(int endPixtoryId) {
+        if(isTimerStarted && endPixtoryId == pixtoryId){
+            storyEndTime = System.currentTimeMillis();
+            isTimerStarted=false;
+            storyTimeInSecs = (storyEndTime - storyStartTime)/1000;
+            Log.i(TAG,"Story timer stopped for Pixtory id - "+pixtoryId + "Read time - "+storyTimeInSecs);
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("ST_Story_Read_Time")
+                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                .put("PIXTORY_ID",pixtoryId+"")
+                .put("READ_TIME",storyTimeInSecs+"")
+                .build());
+        }
+
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopStoryTimer(pixtoryId);
+    }
 }
 
 

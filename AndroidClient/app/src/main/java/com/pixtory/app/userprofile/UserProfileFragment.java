@@ -139,7 +139,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        userProfleView = inflater.inflate(R.layout.user_profile_test,container,false);
+        userProfleView = inflater.inflate(R.layout.user_profile_fragment,container,false);
 
         mPersonInfo = new PersonInfo();
         mContentDataList = new ArrayList<ContentData>();

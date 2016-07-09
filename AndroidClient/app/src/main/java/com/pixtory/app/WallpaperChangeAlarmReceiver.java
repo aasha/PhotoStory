@@ -56,6 +56,7 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
         });
     }
+    }
 
 
 

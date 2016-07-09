@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -141,6 +142,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private static Animation mAnimation;
 
+    Dialog dialog;
+
     private Context mContext;
     private Activity mActivity;
 
@@ -221,8 +224,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     @Bind(R.id.editor_pick_text)
     TextView mEditorPickText;
 
-    @Bind(R.id.loadingPanel)
-    RelativeLayout mLoadingPanel;
+//    @Bind(R.id.loadingPanel)
+//    RelativeLayout mLoadingPanel;
 
     ImageView swipeUpArrow;
 
@@ -317,6 +320,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mProgressDialog = new ProgressDialog(getActivity());
         mProgressDialog.setTitle("Loading Pixstory For You...!!");
         mProgressDialog.setCanceledOnTouchOutside(false);
+
+        dialog = new Dialog(mActivity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.please_wait_alert);
 
 //        mProgressDialog.show();
         if (getArguments() != null) {
@@ -650,12 +657,15 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 mCategory1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(!mListener.isCategoryViewOpen()) {
+                        if(!mListener.isCategoryViewOpen() && !isProfileContent) {
 
                             Category category = cd.categoryNameList.get(0);
                             Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
+                            mListener.stopStoryTimer(cd.id);
                             mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                         }
+                        else
+                            Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG);
                     }
                 });
 
@@ -666,11 +676,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     mCategory2.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if(!mListener.isCategoryViewOpen()) {
+                            if(!mListener.isCategoryViewOpen() && !isProfileContent) {
                                 Category category = cd.categoryNameList.get(1);
                                 Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
+                                mListener.stopStoryTimer(cd.id);
                                 mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                             }
+                            else
+                                Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG);
 
                         }
                     });
@@ -684,11 +697,14 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         mCategory3.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if(!mListener.isCategoryViewOpen()) {
+                                if(!mListener.isCategoryViewOpen() && !isProfileContent) {
                                     Category category = cd.categoryNameList.get(2);
                                     Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
+                                    mListener.stopStoryTimer(cd.id);
                                     mListener.showCategoryStories(category.categoryId ,category.categoryName, cd.id );
                                 }
+                                else
+                                    Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG);
                             }
                         });
 
@@ -700,8 +716,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     @Override
                     public void onClick(View v) {
                         //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
-                        if(!mListener.isCategoryViewOpen())
+
+                        if(!mListener.isCategoryViewOpen()){
+                            mListener.stopStoryTimer(cd.id);
                             navigateToUserProfile(cd);
+                        }
                     }
                 });
               /*  mTextName.setOnClickListener(new View.OnClickListener() {
@@ -729,10 +748,27 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             public void onClick(View v) {
 
                 if(Utils.isNotEmpty(Utils.getFbID(mContext))) {
+                   /* final Handler handler = new Handler();
+                    final Handler handler1 = new Handler();
+                    final Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            mShareImg.setVisibility(View.GONE);
+                            mLoadingPanel.setVisibility(View.VISIBLE);
+                        }
+                    };
+                    handler.post(runnable);*/
+                    //mShareImg.startAnimation(AnimationUtils.loadAnimation(mContext,R.anim.rotate));
+                    //mShareImg.setVisibility(View.GONE);
+                    //mLoadingPanel.setVisibility(View.VISIBLE);
 
-                    mShareImg.setVisibility(View.GONE);
-                    mLoadingPanel.setVisibility(View.VISIBLE);
+                    mListener.stopStoryTimer(cd.id);
 
+                   // mProgressDialog.setTitle("Please wait...!!");
+                    //mProgressDialog.setCanceledOnTouchOutside(false);
+                    //mProgressDialog.show();
+
+                    dialog.show();
                     sharePixtory(cd);
                     AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("ST_Share_Click")
                             .put(AppConstants.USER_ID, Utils.getUserId(mContext))
@@ -751,7 +787,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                         .put("PIXTORY_ID",cd.id+"");
                 sendAmplitudeLog(appEventBuilder);
-
+                mListener.stopStoryTimer(cd.id);
                 buildCommentsLayout(cd);
                 attachPixtoryContent(AppConstants.SHOW_PIC_COMMENTS);
             }
@@ -876,6 +912,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         void showShareDialog(ContentData contentData);
         boolean isCategoryViewOpen();
         void showWallPaperCoachMark();
+        void startStoryTimer(int pixtoryId);
+        void stopStoryTimer(int pixtoryId);
     }
 
     public void resetFragmentState() {
@@ -1084,6 +1122,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         sendAmplitudeLog(appEventBuilder);
                         Log.i(TAG,"MF_Picture_StoryView_Amplitude");
                         PreviousEvent = MF_Picture_StoryView;
+                        mListener.startStoryTimer(mContentData.id);
                         }
                         isPixtorySwipeUp=false;
 
@@ -1105,6 +1144,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             sendAmplitudeLog(appEventBuilder);
                             PreviousEvent = ST_Story_PictureView;
                             Log.i(TAG,"ST_Story_PictureView_Amplitude");
+                            mListener.stopStoryTimer(mContentData.id);
                         }
                         if(!isSwipeUpArrowShown){
                             swipeUpArrow.setVisibility(View.VISIBLE);
@@ -1556,131 +1596,137 @@ public class MainFragment extends Fragment implements ScrollViewListener{
     }
 
     public void sharePixtory(final ContentData contentData) {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-        ImageRequest imageRequest = ImageRequestBuilder
-                .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
-                .setRequestPriority(Priority.HIGH)
-                .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-                .build();
+                ImageRequest imageRequest = ImageRequestBuilder
+                        .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
+                        .setRequestPriority(Priority.HIGH)
+                        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+                        .build();
 
-        DataSource<CloseableReference<CloseableImage>> dataSource =
-                frescoImagePipeline.fetchDecodedImage(imageRequest, mContext);
+                DataSource<CloseableReference<CloseableImage>> dataSource =
+                        frescoImagePipeline.fetchDecodedImage(imageRequest, mContext);
 
-        try {
-            dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                @Override
-                public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                    if (bitmap == null) {
-                        Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
-                        return;
+                try {
+                    dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                        @Override
+                        public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                            if (bitmap == null) {
+                                Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+                                return;
+                            }
+                            Log.i(TAG, "Bitmap is not null-" + bitmap.toString());
+                            mImageBitmap = bitmap;
+                            // The bitmap provided to this method is only guaranteed to be around
+                            // for the lifespan of this method. The image pipeline frees the
+                            // bitmap's memory after this method has completed.
+                            //
+                            // This is fine when passing the bitmap to a system process as
+                            // Android automatically creates a copy.
+                            //
+                            // If you need to keep the bitmap around, look into using a
+                            // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
+                        }
+
+                        @Override
+                        public void onFailureImpl(DataSource dataSource) {
+                            // No cleanup required here
+                        }
+                    }, CallerThreadExecutor.getInstance());
+                } finally {
+                    if (dataSource != null) {
+                        dataSource.close();
                     }
-                    Log.i(TAG, "Bitmap is not null-" + bitmap.toString());
-                    mImageBitmap = bitmap;
-                    // The bitmap provided to this method is only guaranteed to be around
-                    // for the lifespan of this method. The image pipeline frees the
-                    // bitmap's memory after this method has completed.
-                    //
-                    // This is fine when passing the bitmap to a system process as
-                    // Android automatically creates a copy.
-                    //
-                    // If you need to keep the bitmap around, look into using a
-                    // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
+                }
+                try {
+                    File cachePath = new File(mContext.getCacheDir(), "images");
+                    cachePath.mkdirs(); // don't forget to make the directory
+                    FileOutputStream stream = new FileOutputStream(cachePath + "/" + contentData.name + ".png"); // overwrites this image every time
+                    mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    stream.close();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void onFailureImpl(DataSource dataSource) {
-                    // No cleanup required here
-                }
-            }, CallerThreadExecutor.getInstance());
-        } finally {
-            if (dataSource != null) {
-                dataSource.close();
-            }
-        }
-        try {
-            File cachePath = new File(mContext.getCacheDir(), "images");
-            cachePath.mkdirs(); // don't forget to make the directory
-            FileOutputStream stream = new FileOutputStream(cachePath + "/" + contentData.name + ".png"); // overwrites this image every time
-            mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            stream.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        File imagePath = new File(mContext.getCacheDir(), "images");
-        File newFile = new File(imagePath, contentData.name + ".png");
-        final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
+                File imagePath = new File(mContext.getCacheDir(), "images");
+                File newFile = new File(imagePath, contentData.name + ".png");
+                final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
 
 
-        final List<String> sharingAppList = new ArrayList<String>();
+                final List<String> sharingAppList = new ArrayList<String>();
 
-                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
+                if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
 
-                        String data = contentData.pictureDescription;
-                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-                        //data = Html.fromHtml(data).toString();
-                        Intent whatsappIntent=new Intent();
+                    String data = contentData.pictureDescription;
+                    data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+                    //data = Html.fromHtml(data).toString();
+                    Intent whatsappIntent=new Intent();
 //                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                        whatsappIntent.setAction(Intent.ACTION_SEND);
-                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
-                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
-                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
-                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
-                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
-                        whatsappIntent.setPackage(Whatsapp_Package_name);
-                        targetInviteIntents.add(whatsappIntent);
-                    }
-        if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
-            sharingAppList.add("Whatsapp");
-        }
-
-        if (Utils.isAppInstalled(mContext, Fb_Package_name)) {
-            sharingAppList.add("Facebook");
-        }
-
-        if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
-            sharingAppList.add("Instagram");
-        }
-
-        if (Utils.isAppInstalled(mContext, Gmail_Package_name)) {
-            sharingAppList.add("Gmail");
-        }
-
-        if (sharingAppList.size() > 0) {
-
-            final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle("Share Pixtory Via");
-            builder.setItems(AppList, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    // Do something with the selection
-                    if (sharingAppList.get(item).equals("Whatsapp")) {
-                        shareOnWassapp(contentUri);
-                    } else if (sharingAppList.get(item).equals("Facebook")) {
-                        mListener.showShareDialog(mContentData);
-                    } else if (sharingAppList.get(item).equals("Instagram")) {
-                        shareOnInstagram(contentUri);
-                    } else if (sharingAppList.get(item).equals("Gmail")) {
-                        shareOnGmail(contentUri);
-                    }
+                    whatsappIntent.setAction(Intent.ACTION_SEND);
+                    whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
+                    whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
+                    whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
+                    SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
+                    whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
+                            +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
+                    whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
+                    whatsappIntent.setPackage(Whatsapp_Package_name);
+                    //targetInviteIntents.add(whatsappIntent);
                 }
-            });
+                if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
+                    sharingAppList.add("Whatsapp");
+                }
+
+                if (Utils.isAppInstalled(mContext, Fb_Package_name)) {
+                    sharingAppList.add("Facebook");
+                }
+
+                if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
+                    sharingAppList.add("Instagram");
+                }
+
+                if (Utils.isAppInstalled(mContext, Gmail_Package_name)) {
+                    sharingAppList.add("Gmail");
+                }
+
+                if (sharingAppList.size() > 0) {
+
+                    final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setTitle("Share Pixtory Via");
+                    builder.setItems(AppList, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            // Do something with the selection
+                            if (sharingAppList.get(item).equals("Whatsapp")) {
+                                shareOnWassapp(contentUri);
+                            } else if (sharingAppList.get(item).equals("Facebook")) {
+                                mListener.showShareDialog(mContentData);
+                            } else if (sharingAppList.get(item).equals("Instagram")) {
+                                shareOnInstagram(contentUri);
+                            } else if (sharingAppList.get(item).equals("Gmail")) {
+                                shareOnGmail(contentUri);
+                            }
+                        }
+                    });
 
 
-            AlertDialog alert = builder.create();
-            mShareImg.setVisibility(View.VISIBLE);
-            mLoadingPanel.setVisibility(View.GONE);
-            alert.show();
-        } else {
-            Utils.showToastMessage(mContext, "No Apps To Share", 0);
-        }
+                    AlertDialog alert = builder.create();
+                    //mProgressDialog.dismiss();
+                    dialog.dismiss();
+                    alert.show();
+                } else {
+                    Utils.showToastMessage(mContext, "No Apps To Share", 0);
+                }
+            }
+        },20);
     }
 
     private boolean isTouchEnabled = true;
