@@ -475,53 +475,54 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         relativeParams.setMargins(0, (int)mLikeLayoutPaddingTop, 0, 0);
         mTopLikeLayout.setLayoutParams(relativeParams);
         mTopLikeLayout.requestLayout();
+        mTopLikeLayout.bringToFront();
 
-        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
+//        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
 
-        mStoryParentLayout.setOnTouchListener(new NestedScrollView.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = event.getAction();
-
-                if(isCommentsVisible()){
-                    return false;
-                }
-
-//                // Disallow the touch request for parent scroll on touch of child view
-//                if (me.getAction() == MotionEvent.ACTION_UP) {
-//                    Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
+//        mStoryParentLayout.setOnTouchListener(new NestedScrollView.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                int action = event.getAction();
 //
-//                    if((scrollY-oldScrollY) != 0){
-//                        setUpHalfScreen();
-//                    }
+//                if(isCommentsVisible()){
 //                    return false;
 //                }
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Disallow ScrollView to intercept touch events.
-                        v.getParent().requestDisallowInterceptTouchEvent(true);
-
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        // Allow ScrollView to intercept touch events.
-                        v.getParent().requestDisallowInterceptTouchEvent(false);
-                        Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
-
-                        if((scrollY-oldScrollY) != 0){
-                            setUpHalfScreen();
-                        }
-                    break;
-
-
-                }
-                v.onTouchEvent(event);
-                return false;
-
-                // Handle ListView touch events.
+//
+////                // Disallow the touch request for parent scroll on touch of child view
+////                if (me.getAction() == MotionEvent.ACTION_UP) {
+////                    Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
+////
+////                    if((scrollY-oldScrollY) != 0){
+////                        setUpHalfScreen();
+////                    }
+////                    return false;
+////                }
+//                switch (action) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        // Disallow ScrollView to intercept touch events.
+//                        v.getParent().requestDisallowInterceptTouchEvent(true);
+//
+//                        break;
+//
+//                    case MotionEvent.ACTION_UP:
+//                        // Allow ScrollView to intercept touch events.
+//                        v.getParent().requestDisallowInterceptTouchEvent(false);
+//                        Log.i(TAG,"min dist-"+(scrollY-oldScrollY));
+//
+//                        if((scrollY-oldScrollY) != 0){
+//                            setUpHalfScreen();
+//                        }
+//                    break;
+//
+//
+//                }
+//                v.onTouchEvent(event);
 //                return false;
-            }
-        });
+//
+//                // Handle ListView touch events.
+////                return false;
+//            }
+//        });
 
         setUpFullScreen();
 
@@ -755,6 +756,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             setCommentsVisible(false);
             mStoryParentLayout.setNestedScrollingEnabled(true);
             mImageDetailsLayout.setScrollingEnabled(true);
+
             mCommentPostBtnLayout.setVisibility(View.GONE);
 
         }else{
@@ -906,16 +908,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     try {
                         if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                            mIsFling = true;
-//                            Log.i(TAG, "onFlingUp::::"+mImageDetailsLayout.getScrollY());
 
-//                            modifyScreenHeight(mImageDetailsLayout.getScrollY());
 
                         } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 
                         } else {
-//                            mIsFling = false;
                         return false;
                         }
                     } catch (Exception e) {
@@ -973,10 +971,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             return false;
         }
 
-//        if (gesture1.onTouchEvent(me)) {
-//            return true;
-//        }
-
         if (me.getAction() == MotionEvent.ACTION_SCROLL){
             Log.i(TAG,"scrolling++"+me.getYPrecision());
 
@@ -995,22 +989,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     }
 
-//    final GestureDetector gesture1 = new GestureDetector(getActivity(),
-//            new GestureDetector.SimpleOnGestureListener() {
-//
-//                @Override
-//            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-//
-//                    return true;
-//                }
-//
-//
-//            });
-
-
     int mHalfScreenSize;
     @OnTouch(R.id.image_details_layout)
-    public boolean onTouchStory(ScrollView view, MotionEvent me) {
+    public boolean onTouchStory(NestedScrollView view, MotionEvent me) {
 
         //if comment section is visible , swipe up and down gesture for story and content is disabled
         if(isCommentsVisible()){
@@ -1529,15 +1510,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     SetWallpaperTask setWallpaperTask = new SetWallpaperTask(mContext,bitmap);
                     setWallpaperTask.execute();
 
-                    // The bitmap provided to this method is only guaranteed to be around
-                    // for the lifespan of this method. The image pipeline frees the
-                    // bitmap's memory after this method has completed.
-                    //
-                    // This is fine when passing the bitmap to a system process as
-                    // Android automatically creates a copy.
-                    //
-                    // If you need to keep the bitmap around, look into using a
-                    // BaseDataSubscriber instead of a BaseBitmapDataSubscriber.
                 }
 
                 @Override
@@ -1554,8 +1526,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     }
 
-    public void sharePixtory(final ContentData contentData)
-    {
+    public void sharePixtory(final ContentData contentData) {
 
         ImageRequest imageRequest = ImageRequestBuilder
                 .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
@@ -1574,7 +1545,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
                         return;
                     }
-                    Log.i(TAG,"Bitmap is not null-"+bitmap.toString());
+                    Log.i(TAG, "Bitmap is not null-" + bitmap.toString());
                     mImageBitmap = bitmap;
                     // The bitmap provided to this method is only guaranteed to be around
                     // for the lifespan of this method. The image pipeline frees the
@@ -1597,47 +1568,43 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 dataSource.close();
             }
         }
-                try{
-                    File cachePath = new File(mContext.getCacheDir(), "images");
-                    cachePath.mkdirs(); // don't forget to make the directory
-                    FileOutputStream stream = new FileOutputStream(cachePath + "/"+contentData.name+".png"); // overwrites this image every time
-                    mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    stream.close();
+        try {
+            File cachePath = new File(mContext.getCacheDir(), "images");
+            cachePath.mkdirs(); // don't forget to make the directory
+            FileOutputStream stream = new FileOutputStream(cachePath + "/" + contentData.name + ".png"); // overwrites this image every time
+            mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.close();
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                File imagePath = new File(mContext.getCacheDir(), "images");
-                File newFile = new File(imagePath, contentData.name+".png");
-                final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
+        File imagePath = new File(mContext.getCacheDir(), "images");
+        File newFile = new File(imagePath, contentData.name + ".png");
+        final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
 
-//                if (contentUri != null) {
-//
-//                    mListener.showShareDialog(mContentData , mImageBitmap);
-//                }
 
         final List<String> sharingAppList = new ArrayList<String>();
 
-        if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
+        if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
             sharingAppList.add("Whatsapp");
         }
 
-        if(Utils.isAppInstalled(mContext,Fb_Package_name)){
+        if (Utils.isAppInstalled(mContext, Fb_Package_name)) {
             sharingAppList.add("Facebook");
         }
 
-        if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
+        if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
             sharingAppList.add("Instagram");
         }
 
-        if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
+        if (Utils.isAppInstalled(mContext, Gmail_Package_name)) {
             sharingAppList.add("Gmail");
         }
 
-        if(sharingAppList.size() > 0  ){
+        if (sharingAppList.size() > 0) {
 
             final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
 
@@ -1663,144 +1630,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             mShareImg.setVisibility(View.VISIBLE);
             mLoadingPanel.setVisibility(View.GONE);
             alert.show();
+        } else {
+            Utils.showToastMessage(mContext, "No Apps To Share", 0);
         }
-        else {
-            Utils.showToastMessage(mContext,"No Apps To Share",0);
-        }
-
-        //   if(Utils.isAppInstalled(mContext,Fb_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Fb_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Instagram_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
-//                        intent.setAction(Intent.ACTION_SEND);
-////                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setType("application/image");
-//                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Gmail_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-
-
-
-//                    Intent shareIntent = new Intent();
-//                    shareIntent.setAction(Intent.ACTION_SEND);
-//                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                    shareIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//
-//                    List<Intent> targetInviteIntents=new ArrayList<Intent>();
-//
-//                    if(Utils.isAppInstalled(mContext , Whatsapp_Package_name)){
-//
-//                        String data = contentData.pictureDescription;
-//                        data = data.replace("<b>","*").replace("</b>","*").replace("<i>","_").replace("</i>","_").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        //data = Html.fromHtml(data).toString();
-//                        Intent whatsappIntent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        whatsappIntent.setAction(Intent.ACTION_SEND);
-//                        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
-//                        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
-//                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name
-//                                +"_\n\n"+contentData.pictureDescription + "Check out our website www.pixtory.in");
-//                        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+contentData.name+"*\nBy _"+contentData.personDetails.name+"_\n\n"+data);
-//                        whatsappIntent.setPackage(Whatsapp_Package_name);
-//                        targetInviteIntents.add(whatsappIntent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Fb_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Fb_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Instagram_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-//                        intent.setAction(Intent.ACTION_SEND);
-//                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Instagram_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//
-//                    if(Utils.isAppInstalled(mContext,Gmail_Package_name)){
-//                        String content = contentData.pictureDescription;
-//                        content = content.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
-//                        Intent intent=new Intent();
-////                        intent.setComponent(new ComponentName(Gmail_Package_name , getActivity().getPackageCodePath()));
-//                        intent.setAction(Intent.ACTION_SEND);
-////                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-//                        intent.setType("application/image");
-//                        mContext.grantUriPermission(Gmail_Package_name, contentUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Pixtory!");
-//                        intent.putExtra(Intent.EXTRA_STREAM, contentUri);
-//                        intent.putExtra(Intent.EXTRA_TEXT,contentData.name+"\nBy "+contentData.personDetails.name+"\n\n"+content);
-//                        intent.setPackage(Gmail_Package_name);
-//                        targetInviteIntents.add(intent);
-//                    }
-//                    if(!targetInviteIntents.isEmpty()){
-//
-//                            Intent chooserIntent=Intent.createChooser(targetInviteIntents.remove(0), "Share Pixtory via");
-//                            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetInviteIntents.toArray(new Parcelable[]{}));
-//
-//                            startActivity(chooserIntent);
-//                        }else{
-//                            Toast.makeText(mContext,"No Apps to share",Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-
-            }
-
-
+    }
 
     private boolean isTouchEnabled = true;
     public  void setActioUpEnabled(boolean isEnable){
@@ -1956,4 +1789,5 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         intent.setPackage(Gmail_Package_name);
         startActivity(intent);
     }
+
 }

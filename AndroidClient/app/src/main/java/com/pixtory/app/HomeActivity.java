@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -66,6 +68,8 @@ import com.facebook.datasource.DataSource;
 import com.facebook.datasource.DataSubscriber;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
@@ -93,6 +97,7 @@ import com.pixtory.app.pushnotification.RegistrationIntentService;
 import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetMainFeedResponse;
 import com.pixtory.app.retrofit.GetPersonDetailsResponse;
+import com.pixtory.app.retrofit.GetWallPaperResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.RegisterResponse;
@@ -102,9 +107,12 @@ import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.BlurBuilder;
 import com.pixtory.app.utils.ImageDownloadManager;
 import com.pixtory.app.utils.Utils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -462,7 +470,6 @@ public class HomeActivity extends AppCompatActivity implements
                 mOtherFrame.setVisibility(View.GONE);
             }
         });
-
     }
 
     public void setAlarmManagerToSetWallPaper(){
@@ -473,14 +480,14 @@ public class HomeActivity extends AppCompatActivity implements
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
 
         mainFragment = getCurrentFragment();
-        if(mainFragment!=null)
-            mainFragment.setWallpaper();
+
+        setWallpaperNow(AppConstants.SET_WALLPAPER);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-//        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY, 5);
-        calendar.set(Calendar.MINUTE, 30);
+        calendar.setTime(new Date());
+//        calendar.set(Calendar.HOUR_OF_DAY, 17);
+//        calendar.set(Calendar.MINUTE, 50);
 
 
 //        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -488,8 +495,10 @@ public class HomeActivity extends AppCompatActivity implements
 //                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
 
         //repeat alarm in 40 sec 1000*60*60*24
-        mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000*60*60*24, mPendingIntent);
+
+
         Log.i("Alarm","setAlarmManagerToSetWallPaper called");
 
     }
@@ -503,6 +512,8 @@ public class HomeActivity extends AppCompatActivity implements
 
 
     private void prepareFeed() {
+
+        setWallpaperNow(AppConstants.CACHE_WALLPAPER_IMAGE);
 
         NetworkApiHelper.getInstance().getMainFeed(HomeActivity.this, Utils.getUserId(HomeActivity.this) ,new NetworkApiCallback<GetMainFeedResponse>() {
             @Override
@@ -1650,6 +1661,71 @@ public class HomeActivity extends AppCompatActivity implements
 
     }
 
+    public void setWallpaperNow(final int wallpaper_action){
+
+        NetworkApiHelper.getInstance().getWallPaper(Integer.parseInt(Utils.getUserId(this)),  new NetworkApiCallback<GetWallPaperResponse>() {
+            @Override
+            public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
+                Log.i(TAG,"wallpaper URL is--"+getWallPaperResponse.wallPaper);
+                if(wallpaper_action == AppConstants.SET_WALLPAPER)
+                    setWallPaper(HomeActivity.this , getWallPaperResponse.wallPaper);
+                else if(wallpaper_action == AppConstants.CACHE_WALLPAPER_IMAGE){
+
+//                        if (Utils.isNotEmpty(getWallPaperResponse.wallPaper)) {
+//
+//                            ImageRequest request = ImageRequestBuilder
+//                                    .newBuilderWithSource(Uri.parse(getWallPaperResponse.wallPaper))
+//                                    .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+//                                    .setProgressiveRenderingEnabled(true)
+//                                    .build();
+//
+//                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+//                            imagePipeline.prefetchToDiskCache(request, null);
+//                            Log.i(TAG,"wallpaper image is cached");
+//                        }
+                }
+            }
+
+            @Override
+            public void failure(GetWallPaperResponse getWallPaperResponse) {
+
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+
+            }
+
+        });
+    }
+
+    public void setWallPaper(final Context mContext , String imgUrl){
+        Picasso.with(mContext).load(imgUrl).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(mContext.getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                    Toast.makeText(mContext.getApplicationContext(),"Hurray!! Pixtory updated your wallpaper",Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
+    }
 
 }
 

@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.pixtory.app.app.App;
 import com.pixtory.app.retrofit.GetWallPaperResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
@@ -30,9 +31,7 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(final Context mContext, Intent intent) {
-        Log.i("Alarm","WallpaperChangeAlarmReceiver onRecieve Called");
-
-        if(Utils.isNotEmpty(Utils.getUserId(mContext))){
+        Log.i("Alarm","WallpaperChangeAlarmReceiver onReceive Called");
 
         int user_id = Integer.parseInt(Utils.getUserId(mContext));
 
@@ -50,12 +49,12 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
             @Override
             public void networkFailure(RetrofitError error) {
-
             }
 
         });
-        }
     }
+
+
 
         public void setWallPaper(final Context mContext , String imgUrl){
             Picasso.with(mContext).load(imgUrl).into(new Target() {
@@ -74,7 +73,7 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(mContext,"Bitmap Loadig Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"Bitmap Loading Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
 
             }
 
@@ -84,5 +83,10 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
             }
         });
         }
+
+
+    public void setCachedWallpaper(){
+
+    }
 
 }

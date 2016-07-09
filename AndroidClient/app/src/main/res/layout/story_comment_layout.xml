@@ -9,6 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="30dp"
         android:id="@+id/story_detail">
 
     <TextView android:layout_width="wrap_content"
@@ -17,11 +18,11 @@
         android:text="Steve Johnson"
         android:fontFamily="sans-serif-light"
         android:textColor="@color/grey_3"
-        android:textSize="10sp"
+        android:textSize="10dp"
         android:id="@+id/txtPlace"/>
     <TextView android:layout_width="wrap_content"
         android:layout_marginLeft="20dp"
-        android:textSize="12sp"
+        android:textSize="12dp"
         android:fontFamily="sans-serif"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtPlace"
@@ -89,7 +90,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:textSize="15sp"
+            android:textSize="15dp"
             android:text="comments"
             android:id="@+id/comment_text"
             android:textStyle="bold"

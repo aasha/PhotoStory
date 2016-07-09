@@ -100,7 +100,7 @@
                     android:gravity="center"
                     android:textColor="@color/white"
                     android:layout_marginLeft="70dp"
-                    android:textSize="22sp"/>
+                    android:textSize="22dp"/>
 
 
 
@@ -134,7 +134,7 @@
                 android:paddingBottom="30dp"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textSize="22sp"
+                android:textSize="22dp"
                 android:fontFamily="sans-serif-light"
                 android:id="@+id/long_tap_text"
                 android:lineSpacingExtra="5dp"/>
@@ -164,7 +164,7 @@
                 android:paddingBottom="30dp"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textSize="22sp"
+                android:textSize="22dp"
                 android:fontFamily="sans-serif-light"
                 android:id="@+id/swipe_up_text_1"
                 android:lineSpacingExtra="5dp"/>
@@ -180,7 +180,7 @@
                 android:layout_gravity="bottom"
                 android:textColor="@color/black"
                 android:paddingBottom="30dp"
-                android:textSize="17sp"
+                android:textSize="17dp"
                 android:fontFamily="sans-serif-regular"
                 android:paddingTop="20dp"
                 android:text="@string/swipe_up_coach_mark_text_2"
@@ -216,7 +216,7 @@
                 android:textAlignment="center"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textSize="23sp"
+                android:textSize="23dp"
                 android:fontFamily="sans-serif-regular"
                 android:textStyle="italic|bold"
                 android:id="@+id/wallpaper_top_text"
@@ -231,7 +231,7 @@
                 android:textAlignment="center"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textSize="27sp"
+                android:textSize="27dp"
                 android:id="@+id/wallpaper_coachmark_text"
                 android:fontFamily="sans-serif-regular"/>
             <FrameLayout
@@ -243,7 +243,7 @@
                 android:visibility="gone">
                 <TextView
                     android:layout_width="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="20dp"
                     android:layout_height="wrap_content"
                     android:text="Yes please!"
                     android:textColor="@color/white"
@@ -259,7 +259,7 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:textSize="20sp"
+                android:textSize="20dp"
                 android:layout_height="wrap_content"
                 android:text="Not now"
                 android:textColor="@color/black"
@@ -290,7 +290,7 @@
                 android:textColor="@color/black"
                 android:paddingBottom="30dp"
                 android:layout_marginBottom="80dp"
-                android:textSize="16sp"
+                android:textSize="16dp"
                 android:fontFamily="sans-serif-regular"
                 android:paddingTop="20dp"
                 android:text="@string/wallpaper_text_2"
@@ -307,7 +307,7 @@
                 android:padding="15dp"
                 android:text="Okay, Got it!"
                 android:background="#30ffffff"
-                android:textSize="18sp"
+                android:textSize="18dp"
                 android:fontFamily="sans-serif-light"
                 android:id="@+id/wallpaper_close"/>
 

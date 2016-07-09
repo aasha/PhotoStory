@@ -1,6 +1,8 @@
 package com.pixtory.app.views;
 
 import android.content.Context;
+import android.support.v4.view.NestedScrollingParent;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,7 +11,7 @@ import android.widget.ScrollView;
 /**
  * Created by training3 on 14/06/2016 AD.
  */
-public class ObservableScrollView  extends ScrollView{
+public class ObservableScrollView  extends NestedScrollView{
 
     private ScrollViewListener scrollViewListener = null;
     private boolean mScrollable = true;
@@ -28,6 +30,21 @@ public class ObservableScrollView  extends ScrollView{
 
     public void setScrollViewListener(ScrollViewListener scrollViewListener) {
         this.scrollViewListener = scrollViewListener;
+    }
+
+    @Override
+    public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+        return super.onStartNestedScroll(child, target, nestedScrollAxes);
+    }
+
+    @Override
+    public void onStopNestedScroll(View target) {
+        super.onStopNestedScroll(target);
+    }
+
+    @Override
+    public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+        super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
     }
 
     @Override

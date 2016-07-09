@@ -60,6 +60,16 @@ public class App extends Application implements AppConstants {
 
     private static int MAX_CAPACITY = 10;
 
+    public static String getDailyWallpaperUrl() {
+        return dailyWallpaperUrl;
+    }
+
+    public static void setDailyWallpaperUrl(String dailyWallpaperUrl) {
+        App.dailyWallpaperUrl = dailyWallpaperUrl;
+    }
+
+    private static String dailyWallpaperUrl;
+
     private static Map<String,PersonInfo> mProfileCache = new LinkedHashMap<String, PersonInfo>(MAX_CAPACITY+1,0.75F,true){
         @Override
         protected boolean removeEldestEntry(Entry<String, PersonInfo> eldest) {
