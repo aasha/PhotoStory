@@ -16,7 +16,8 @@
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:id="@+id/imgProfile"
-            android:layout_marginLeft="25dp"/>
+            android:layout_marginLeft="25dp"
+        android:layout_marginBottom="12dp"/>
     <TextView android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/imgProfile"
@@ -25,7 +26,8 @@
             android:text="Steve Johnson"
             android:textColor="#31aef5"
             android:textSize="13dp"
-            android:id="@+id/txtName"/>
+            android:id="@+id/txtName"
+        android:textStyle="bold"/>
     <com.pixtory.app.views.RobotoLightTextView
             android:layout_width="wrap_content"
             android:layout_marginLeft="7dp"
@@ -45,7 +47,7 @@
         <com.pixtory.app.views.RobotoLightTextView
             android:layout_width="wrap_content"
             android:layout_marginLeft="7dp"
-            android:layout_marginTop="3dp"
+            android:paddingTop="3dp"
             android:layout_marginRight="0dp"
             android:textSize="11dp"
             android:layout_gravity="left"
@@ -55,15 +57,16 @@
             android:layout_toRightOf="@+id/txtDesc"
             android:layout_below="@+id/txtName"
             android:text="Travel,"
-            android:textColor="@color/grey_3"
-            android:textAllCaps="true"
+            android:textColor="@color/app_blue"
+            android:textAllCaps="false"
             android:id="@+id/category_1"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:paddingBottom="12dp"/>
 
         <com.pixtory.app.views.RobotoLightTextView
             android:layout_width="wrap_content"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="3dp"
+            android:paddingTop="3dp"
             android:layout_marginRight="0dp"
             android:textSize="11dp"
             android:layout_gravity="left"
@@ -74,14 +77,14 @@
             android:layout_below="@+id/txtName"
             android:text="&#038;"
             android:textColor="@color/grey_3"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:id="@+id/separator_1"
             android:visibility="gone"/>
 
         <com.pixtory.app.views.RobotoLightTextView
             android:layout_width="wrap_content"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="3dp"
+            android:paddingTop="3dp"
             android:layout_marginRight="0dp"
             android:textSize="11dp"
             android:layout_gravity="left"
@@ -91,10 +94,11 @@
             android:layout_toRightOf="@+id/separator_1"
             android:layout_below="@+id/txtName"
             android:text="Travel"
-            android:textColor="@color/grey_3"
-            android:textAllCaps="true"
+            android:textColor="@color/app_blue"
+            android:textAllCaps="false"
             android:id="@+id/category_2"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:paddingBottom="12dp"/>
 
         <com.pixtory.app.views.RobotoLightTextView
             android:layout_width="wrap_content"
@@ -117,7 +121,7 @@
         <com.pixtory.app.views.RobotoLightTextView
             android:layout_width="wrap_content"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="3dp"
+            android:paddingTop="3dp"
             android:layout_marginRight="10dp"
             android:textSize="11dp"
             android:layout_gravity="left"
@@ -127,10 +131,11 @@
             android:layout_toRightOf="@+id/separator_2"
             android:layout_below="@+id/txtName"
             android:text="Travel"
-            android:textColor="@color/grey_3"
-            android:textAllCaps="true"
+            android:textColor="@color/app_blue"
+            android:textAllCaps="false"
             android:id="@+id/category_3"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:paddingBottom="12dp"/>
 
 
         <View android:layout_width="match_parent"
@@ -139,7 +144,7 @@
             android:id="@+id/separator"
             android:layout_below="@+id/imgProfile"
           android:layout_marginLeft="25dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="0dp"
           android:layout_marginRight="25dp"/>
 
             <com.pixtory.app.views.DroidSerifTextView

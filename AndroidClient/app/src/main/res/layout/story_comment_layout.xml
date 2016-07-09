@@ -93,7 +93,6 @@
             android:textSize="15dp"
             android:text="comments"
             android:id="@+id/comment_text"
-            android:textStyle="bold"
             android:textAllCaps="true"
             android:layout_alignBottom="@+id/comment_img"
             android:layout_toRightOf="@+id/tvCount"

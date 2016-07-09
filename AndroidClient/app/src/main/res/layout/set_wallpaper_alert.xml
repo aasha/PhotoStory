@@ -5,7 +5,7 @@
     android:background="@color/white">
 
     <TextView
-        android:text="Set this pixtory as your wallpaper?"
+        android:text="Set this Pixtory as your phone's wallpaper?"
         android:textSize="20sp"
         android:textAlignment="center"
         android:paddingTop="15dp"

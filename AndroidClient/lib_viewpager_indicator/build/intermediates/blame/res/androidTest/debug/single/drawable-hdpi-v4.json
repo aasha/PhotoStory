@@ -1,17 +1,5 @@
 [
     {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\vpi__tab_selected_pressed_holo.9.png",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\vpi__tab_selected_pressed_holo.9.png"
-    },
-    {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\vpi__tab_selected_focused_holo.9.png",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\vpi__tab_selected_focused_holo.9.png"
-    },
-    {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\vpi__tab_selected_holo.9.png",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\vpi__tab_selected_holo.9.png"
-    },
-    {
         "merged": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/vpi__tab_unselected_holo.9.png",
         "source": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/bundles/debug/res/drawable-hdpi-v4/vpi__tab_unselected_holo.9.png"
     },
@@ -26,18 +14,6 @@
     {
         "merged": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/vpi__tab_selected_pressed_holo.9.png",
         "source": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/bundles/debug/res/drawable-hdpi-v4/vpi__tab_selected_pressed_holo.9.png"
-    },
-    {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\vpi__tab_unselected_focused_holo.9.png",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\vpi__tab_unselected_focused_holo.9.png"
-    },
-    {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\vpi__tab_unselected_pressed_holo.9.png",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\vpi__tab_unselected_pressed_holo.9.png"
-    },
-    {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\vpi__tab_unselected_holo.9.png",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\vpi__tab_unselected_holo.9.png"
     },
     {
         "merged": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/res/merged/androidTest/debug/drawable-hdpi-v4/vpi__tab_selected_focused_holo.9.png",

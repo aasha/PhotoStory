@@ -4,15 +4,7 @@
         "source": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/bundles/debug/res/color/vpi__light_theme.xml"
     },
     {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\color\\vpi__dark_theme.xml",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\color\\vpi__dark_theme.xml"
-    },
-    {
         "merged": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/res/merged/androidTest/debug/color/vpi__dark_theme.xml",
         "source": "/Users/training3/PhotoStory/AndroidClient/lib_viewpager_indicator/build/intermediates/bundles/debug/res/color/vpi__dark_theme.xml"
-    },
-    {
-        "merged": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\color\\vpi__light_theme.xml",
-        "source": "/Users/training3/PhotoStory/AndroidClient/C:\\Users\\krish\\Documents\\GitHub\\PhotoStory\\AndroidClient\\lib_viewpager_indicator\\build\\intermediates\\bundles\\debug\\res\\color\\vpi__light_theme.xml"
     }
 ]
