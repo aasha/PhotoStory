@@ -185,6 +185,7 @@
                     android:layout_marginTop="-15dp"
                     android:visibility="visible"
                     android:layout_below="@+id/like_layout"
+                    android:overScrollMode="never"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     android:background="@color/transparent">
 S
