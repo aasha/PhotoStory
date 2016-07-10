@@ -1145,7 +1145,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             sendAmplitudeLog(appEventBuilder);
                             PreviousEvent = ST_Story_PictureView;
                             Log.i(TAG,"ST_Story_PictureView_Amplitude");
-//                            mListener.stopStoryTimer(mContentData.id);
+                            mListener.stopStoryTimer(mContentData.id);
                         }
                         if(!isSwipeUpArrowShown){
                             swipeUpArrow.setVisibility(View.VISIBLE);
