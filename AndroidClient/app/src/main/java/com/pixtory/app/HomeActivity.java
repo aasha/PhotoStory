@@ -440,26 +440,28 @@ public class HomeActivity extends AppCompatActivity implements
         mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+
                 Log.i(TAG,"Toggle button state changed");
-                if(isChecked){
+                if(isChecked && !sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                     setAlarmManagerToSetWallPaper();
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
                     Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
 
                 }
-                else
+                else if(!isChecked && sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false))
                 {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
                     Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
                 }
@@ -1148,9 +1150,9 @@ public class HomeActivity extends AppCompatActivity implements
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
         DisplayMetrics dm = new DisplayMetrics();
-        if(Build.VERSION.SDK_INT>=17)
-            this.getWindowManager().getDefaultDisplay().getRealMetrics(dm);
-        else
+//        if(Build.VERSION.SDK_INT>=17)
+//            this.getWindowManager().getDefaultDisplay().getRealMetrics(dm);
+//        else
             this.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
         final ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(HomeActivity.this,0,items,dm.heightPixels);
@@ -1427,7 +1429,7 @@ public class HomeActivity extends AppCompatActivity implements
                 },2000);
                     break;
 
-                case 4:handler.postDelayed(new Runnable() {
+                case 3:handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         showCoachmarksDialog(SWIPE_UP);
@@ -1658,13 +1660,13 @@ public class HomeActivity extends AppCompatActivity implements
 
         dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//        dialog.getWindow().getDecorView().setSystemUiVisibility(
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
 
         testView.setOnClickListener(new View.OnClickListener() {

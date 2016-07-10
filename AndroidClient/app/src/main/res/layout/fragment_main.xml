@@ -102,11 +102,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:layout_marginLeft="30dp"
+                        android:layout_marginRight="15dp"
                         android:text="An attempt to bore well accidentally turned into an eternal natural geyser"
                         android:maxLines="2"
                         android:textSize="12dp"
                         android:id="@+id/picture_summary"
                         android:layout_below="@+id/text_title"
+                        android:layout_toLeftOf="@+id/image_like"
                         android:textColor="#ffffff"
                         />
                         <TextView android:layout_width="wrap_content"
