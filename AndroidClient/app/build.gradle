@@ -21,8 +21,8 @@ android {
         applicationId "com.pixtory.app"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 7 //increment with every release
-        versionName "1.6" //increment with every release
+        versionCode 10 //increment with every release
+        versionName "2.1" //increment with every release
     }
 
     dexOptions {
@@ -32,7 +32,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
