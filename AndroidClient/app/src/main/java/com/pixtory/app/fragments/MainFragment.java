@@ -1668,10 +1668,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
             sharingAppList.add("Whatsapp");
         }
-
-        if (Utils.isAppInstalled(mContext, Fb_Package_name)) {
             sharingAppList.add("Facebook");
-        }
+
+//        if (Utils.isAppInstalled(mContext, Fb_Package_name)) {
+
+//        }
 
 //        if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
 //            sharingAppList.add("Instagram");
