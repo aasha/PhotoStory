@@ -1476,12 +1476,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
             @Override
             public void failure(BaseResponse baseResponse) {
-
+                Utils.showToastMessage(mContext,"Oops something went wrong",0);
             }
 
             @Override
             public void networkFailure(RetrofitError error) {
-
+                Utils.showToastMessage(mContext,"Please check your network connection",0);
             }
         });
     }
@@ -1618,10 +1618,12 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 public void onNewResultImpl(@Nullable Bitmap bitmap) {
                     if (bitmap == null) {
                         Log.d(TAG, "Bitmap data source returned success, but bitmap null.");
+                        Toast.makeText(mContext,"Oops! something went wrong. Please try again later",Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Log.i(TAG, "Bitmap is not null-" + bitmap.toString());
                     mImageBitmap = bitmap;
+                    shareBitMap(bitmap);
                     // The bitmap provided to this method is only guaranteed to be around
                     // for the lifespan of this method. The image pipeline frees the
                     // bitmap's memory after this method has completed.
@@ -1643,100 +1645,94 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 dataSource.close();
             }
         }
-        try {
-            File cachePath = new File(mContext.getCacheDir(), "images");
-            cachePath.mkdirs(); // don't forget to make the directory
-            FileOutputStream stream = new FileOutputStream(cachePath + "/" + contentData.name + ".png"); // overwrites this image every time
-            mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            stream.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(mImageBitmap !=null){
-        File imagePath = new File(mContext.getCacheDir(), "images");
-        File newFile = new File(imagePath, contentData.name + ".png");
-        final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
 
 
-        final List<String> sharingAppList = new ArrayList<String>();
 
+    }
 
-        if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
-            sharingAppList.add("Whatsapp");
-        }
+    public void shareBitMap(Bitmap bitmap){
+
+        if(bitmap !=null){
+
+            try {
+                File cachePath = new File(mContext.getCacheDir(), "images");
+                cachePath.mkdirs(); // don't forget to make the directory
+                FileOutputStream stream = new FileOutputStream(cachePath + "/" + contentData.name + ".png"); // overwrites this image every time
+                mImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                stream.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            File imagePath = new File(mContext.getCacheDir(), "images");
+            File newFile = new File(imagePath, contentData.name + ".png");
+            final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
+
+            final List<String> sharingAppList = new ArrayList<String>();
+
+            if (Utils.isAppInstalled(mContext, Whatsapp_Package_name)) {
+                sharingAppList.add("Whatsapp");
+            }
             sharingAppList.add("Facebook");
 
-//        if (Utils.isAppInstalled(mContext, Fb_Package_name)) {
+            if (sharingAppList.size() > 0) {
 
-//        }
+                final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
 
-//        if (Utils.isAppInstalled(mContext, Instagram_Package_name)) {
-//            sharingAppList.add("Instagram");
-//        }
-//
-//        if (Utils.isAppInstalled(mContext, Gmail_Package_name)) {
-//            sharingAppList.add("Gmail");
-//        }
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle("Share Pixtory Via");
+                builder.setItems(AppList, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        // Do something with the selection
+                        if (sharingAppList.get(item).equals("Whatsapp")) {
+                            shareOnWassapp(contentUri);
+                        } else if (sharingAppList.get(item).equals("Facebook")) {
 
-        if (sharingAppList.size() > 0) {
-
-            final CharSequence[] AppList = sharingAppList.toArray(new String[sharingAppList.size()]);
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                    builder.setTitle("Share Pixtory Via");
-                    builder.setItems(AppList, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int item) {
-                            // Do something with the selection
-                            if (sharingAppList.get(item).equals("Whatsapp")) {
-                                shareOnWassapp(contentUri);
-                            } else if (sharingAppList.get(item).equals("Facebook")) {
-
-                                NetworkApiHelper.getInstance().shareContent(Integer.parseInt(Utils.getUserId(mContext)),
-                                        mContentData.id, new NetworkApiCallback<ShareContentIdResponse>() {
+                            NetworkApiHelper.getInstance().shareContent(Integer.parseInt(Utils.getUserId(mContext)),
+                                    mContentData.id, new NetworkApiCallback<ShareContentIdResponse>() {
 
 
-                                            @Override
-                                            public void success(ShareContentIdResponse shareContentIdResponse, Response response) {
-                                                mContentData.id = shareContentIdResponse.sharedContentId;
-                                                if(mListener!=null)
-                                                    mListener.showShareDialog(mContentData);
+                                        @Override
+                                        public void success(ShareContentIdResponse shareContentIdResponse, Response response) {
+                                            mContentData.id = shareContentIdResponse.sharedContentId;
+                                            if(mListener!=null)
+                                                mListener.showShareDialog(mContentData);
 
-                                            }
+                                        }
 
-                                            @Override
-                                            public void failure(ShareContentIdResponse shareContentIdResponse) {
+                                        @Override
+                                        public void failure(ShareContentIdResponse shareContentIdResponse) {
 
-                                            }
+                                        }
 
-                                            @Override
-                                            public void networkFailure(RetrofitError error) {
+                                        @Override
+                                        public void networkFailure(RetrofitError error) {
 
-                                            }
-                                        });
-                            }
-//                            else if (sharingAppList.get(item).equals("Instagram")) {
-//                                shareOnInstagram(contentUri);
-//                            } else if (sharingAppList.get(item).equals("Gmail")) {
-//                                shareOnGmail(contentUri);
-//                            }
+                                        }
+                                    });
                         }
-                    });
+    //                            else if (sharingAppList.get(item).equals("Instagram")) {
+    //                                shareOnInstagram(contentUri);
+    //                            } else if (sharingAppList.get(item).equals("Gmail")) {
+    //                                shareOnGmail(contentUri);
+    //                            }
+                    }
+                });
 
 
-                    AlertDialog alert = builder.create();
-                    //mProgressDialog.dismiss();
-                    dialog.dismiss();
-                    alert.show();
-                } else {
-                    Utils.showToastMessage(mContext, "No Apps To Share", 0);
-                }
-            }else
-                Toast.makeText(mContext,"Oops! something went wrong. Please try again later",Toast.LENGTH_SHORT).show();
+                AlertDialog alert = builder.create();
+                //mProgressDialog.dismiss();
+                dialog.dismiss();
+                alert.show();
+            } else {
+                Utils.showToastMessage(mContext, "No Apps To Share", 0);
+            }
+        }else
+            Toast.makeText(mContext,"Oops! something went wrong. Please try again later",Toast.LENGTH_SHORT).show();
         }
-        },20);
+    },20);
 
     }
 

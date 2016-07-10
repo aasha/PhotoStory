@@ -1799,9 +1799,14 @@ public class HomeActivity extends AppCompatActivity implements
         String description = contentData.pictureDescription;
         description = description.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
 
+        String title = contentData.name;
+        if(contentData.personDetails!= null && !(contentData.personDetails.name.equals(""))){
+            title = title+ "\nBy "+contentData.personDetails.name;
+        }
+
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse("http://pixtory.in/share/mail.html?id="+contentData.id))
-                .setContentTitle(contentData.pictureSummary)
+                .setContentTitle(title)
                 .setContentDescription(description)
                 .setImageUrl(Uri.parse(contentData.pictureUrl))
                 .build();

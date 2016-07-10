@@ -100,7 +100,7 @@ public class App extends Application implements AppConstants {
 
         isLoginRequired = true;
 
-        Crittercism.initialize(getApplicationContext(), "39c3ed69599d7c0cd175f7e8a7b38a01");
+        Crittercism.initialize(getApplicationContext(), "67496ab9c7094339adf79c54d369ccc900555300");
 
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(getApplicationContext())
                 .setDownsampleEnabled(true)
@@ -123,7 +123,7 @@ public class App extends Application implements AppConstants {
 //        GoogleAnalytics.getInstance(this).getLogger()
 //                .setLogLevel(Logger.LogLevel.VERBOSE);
         Log.d("Amplitude", "Amplitude init");
-        Amplitude.getInstance().initialize(this, "18371febf30de6afec0773fd4b013d32").enableForegroundTracking(this);
+        Amplitude.getInstance().initialize(this, "39c3ed69599d7c0cd175f7e8a7b38a01s").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
 
         /**Enabling disk caching for Picasso**/
