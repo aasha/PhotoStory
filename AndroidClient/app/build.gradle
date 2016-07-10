@@ -21,8 +21,8 @@ android {
         applicationId "com.pixtory.app"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 6 //increment with every release
-        versionName "1.5" //increment with every release
+        versionCode 7 //increment with every release
+        versionName "1.6" //increment with every release
     }
 
     dexOptions {

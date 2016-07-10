@@ -1538,7 +1538,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")
                         .build());
-                setWallpaper();
+//                setWallpaper();
+                Picasso.with(mContext).load(mContentData.pictureUrl).into(App.mWallpaperTarget);
                 dialog.dismiss();
             }
         });
