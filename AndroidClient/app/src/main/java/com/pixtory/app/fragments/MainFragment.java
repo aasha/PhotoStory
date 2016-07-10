@@ -703,7 +703,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                     mListener.stopStoryTimer(cd.id);
                                     mListener.showCategoryStories(category.categoryId ,category.categoryName, cd.id );
                                 }
-                                else if(!mListener.isCategoryViewOpen() || isProfileContent)
+                                else
                                     Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG).show();
                             }
                         });
@@ -1656,7 +1656,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        if(mImageBitmap !=null){
         File imagePath = new File(mContext.getCacheDir(), "images");
         File newFile = new File(imagePath, contentData.name + ".png");
         final Uri contentUri = FileProvider.getUriForFile(mContext, "com.pixtory.app.fileprovider", newFile);
@@ -1732,8 +1732,11 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 } else {
                     Utils.showToastMessage(mContext, "No Apps To Share", 0);
                 }
-            }
+            }else
+                Toast.makeText(mContext,"Oops! something went wrong. Please try again later",Toast.LENGTH_SHORT).show();
+        }
         },20);
+
     }
 
     private boolean isTouchEnabled = true;

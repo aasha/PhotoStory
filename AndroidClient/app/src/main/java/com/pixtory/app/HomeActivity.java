@@ -437,38 +437,6 @@ public class HomeActivity extends AppCompatActivity implements
         mWallpaperYes = (TextView)findViewById(R.id.wallpaper_yes);
         mWallpaperNo = (TextView)findViewById(R.id.wallpaper_no);
 
-        mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-
-                Log.i(TAG,"Toggle button state changed");
-                if(isChecked && !sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
-                    .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                    .build());
-
-                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                    setAlarmManagerToSetWallPaper();
-                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
-                    Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
-
-                }
-                else if(!isChecked && sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false))
-                {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
-                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .build());
-                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
-                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
-
-                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
-                    cancelAlarm();
-                }
-                mWallpaperCoachMark.setVisibility(View.INVISIBLE);
-                mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
-            }
-        });
         mWallpaperClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1537,6 +1505,39 @@ public class HomeActivity extends AppCompatActivity implements
             mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
             mToggleButton.setChecked(false);
         }
+
+        mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+
+                Log.i(TAG,"Toggle button state changed");
+                if(isChecked && !sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+
+                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
+                    setAlarmManagerToSetWallPaper();
+                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
+                    Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
+
+                }
+                else if(!isChecked && sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false))
+                {
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
+                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
+
+                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
+                    cancelAlarm();
+                }
+                mWallpaperCoachMark.setVisibility(View.INVISIBLE);
+                mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
+            }
+        });
     }
 
     private boolean isFirstTimeOpen(){
