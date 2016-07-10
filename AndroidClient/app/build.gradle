@@ -22,7 +22,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 11 //increment with every release
-        versionName "beta-1.0" //increment with every release
+        versionName "beta_1.0" //increment with every release
     }
 
     dexOptions {
