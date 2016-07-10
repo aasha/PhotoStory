@@ -702,7 +702,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                     mListener.stopStoryTimer(cd.id);
                                     mListener.showCategoryStories(category.categoryId ,category.categoryName, cd.id );
                                 }
-                                else if(!mListener.isCategoryViewOpen() || isProfileContent)
+                                else
                                     Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG).show();
                             }
                         });
