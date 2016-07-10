@@ -80,7 +80,7 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
 
      public void setWallPaper(final Context mContext , String imgUrl) {
-         Picasso.with(mContext).load(imgUrl).into(App.mWallpaperTarget);
+         Picasso.with(mContext).load(imgUrl).into(App.mDailyWallpaperTarget);
      }
 
     public void setCachedWallpaper(){
