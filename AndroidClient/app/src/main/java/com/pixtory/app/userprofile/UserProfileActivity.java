@@ -3,6 +3,7 @@ import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -17,8 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
@@ -42,6 +45,7 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     private boolean isTimerStarted;
     private int pixtoryId;
     private long storyTimeInSecs;
+    private ShareDialog shareDialog = null;
 
     private MainFragment mainFragment;
     @Override
@@ -49,6 +53,8 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_profle_2);
         isTimerStarted = false;
+        shareDialog = new ShareDialog(this);
+
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -181,6 +187,19 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     }
 
     public void showShareDialog(ContentData contentData){
+
+        String description = contentData.pictureDescription;
+        description = description.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
+
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse("www.pixtory.in"))
+                .setContentTitle(contentData.pictureSummary)
+                .setContentDescription(description)
+                .setImageUrl(Uri.parse(contentData.pictureUrl))
+                .build();
+
+        shareDialog.show(content);
+
 
     }
 
