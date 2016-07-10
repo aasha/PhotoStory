@@ -665,7 +665,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                         }
                         else
-                            Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG);
+                            Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -683,7 +683,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                 mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                             }
                             else
-                                Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG);
+                                Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG).show();
 
                         }
                     });
@@ -703,24 +703,25 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                     mListener.stopStoryTimer(cd.id);
                                     mListener.showCategoryStories(category.categoryId ,category.categoryName, cd.id );
                                 }
-                                else
-                                    Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG);
+                                else if(!mListener.isCategoryViewOpen() || isProfileContent)
+                                    Toast.makeText(mContext,"You can access categories only from your home screen",Toast.LENGTH_LONG).show();
                             }
                         });
-
                     }
                 }
                 }
-                if(!isProfileContent)
+
                 mProfileImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(mContext,cd.personDetails.id+"",Toast.LENGTH_SHORT).show();
 
-                        if(!mListener.isCategoryViewOpen()){
+                        if(!mListener.isCategoryViewOpen() && !isProfileContent){
                             mListener.stopStoryTimer(cd.id);
                             navigateToUserProfile(cd);
                         }
+                        else
+                            Toast.makeText(mContext,"You can access expert's profile only from your home screen",Toast.LENGTH_LONG).show();
                     }
                 });
               /*  mTextName.setOnClickListener(new View.OnClickListener() {
@@ -1871,7 +1872,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
         whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name
                 +"_\n\n"+mContentData.pictureDescription + "Check out our website www.pixtory.in");
-        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name+"_\n\n"+data);
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name+"_\n\n"+data + "\n\n"+AppConstants.PLAY_STORE_LINK+AppConstants.SOCIAL_MEDIA_WHATSAPP_SHARE+
+                " to know more.");
         whatsappIntent.setPackage(Whatsapp_Package_name);
 
 
