@@ -23,6 +23,7 @@ import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.retrofit.GetWallPaperResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
@@ -75,42 +76,12 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
         }
 
     }
-    }
 
 
 
-        public void setWallPaper(final Context mContext , String imgUrl) {
-            Target target;
-            Picasso.with(mContext).load(imgUrl).into(target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                WallpaperManager myWallpaperManager
-                        = WallpaperManager.getInstance(mContext.getApplicationContext());
-                try {
-                    myWallpaperManager.setBitmap(bitmap);
-//                    Toast.makeText(mContext.getApplicationContext(),"Hurray!! Pixtory updated your wallpaper",Toast.LENGTH_SHORT).show();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWallpaper_Set")
-                    .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                    .build());
-                } catch (IOException e) {
-//                    Toast.makeText(mContext.getApplicationContext(),"Oops we couldn't set your wallpaper",Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-//                Toast.makeText(mContext,"Bitmap Loading Failed, Couldn't change your wallpaper",Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
-        }
-
+     public void setWallPaper(final Context mContext , String imgUrl) {
+         Picasso.with(mContext).load(imgUrl).into(App.mWallpaperTarget);
+     }
 
     public void setCachedWallpaper(){
 

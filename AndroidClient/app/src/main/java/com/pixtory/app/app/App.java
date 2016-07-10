@@ -84,7 +84,7 @@ public class App extends Application implements AppConstants {
         }
     };
 
-    private static Target mWallpaperTarget;
+    public static Target mWallpaperTarget;
 
     public  static boolean isLoginRequired;
     private static Map<String,String> mOriginalIndices = new HashMap<String, String>();
@@ -133,6 +133,32 @@ public class App extends Application implements AppConstants {
         built.setIndicatorsEnabled(false);
         built.setLoggingEnabled(false);
         Picasso.setSingletonInstance(built);
+
+        mWallpaperTarget = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                WallpaperManager myWallpaperManager
+                        = WallpaperManager.getInstance(getApplicationContext());
+                try {
+                    myWallpaperManager.setBitmap(bitmap);
+                    Toast.makeText(getApplicationContext(), "Hurray!! Pixtory updated your wallpaper", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    Toast.makeText(getApplicationContext(), "Oops we couldn't set your wallpaper", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Toast.makeText(getApplicationContext(), "Bitmap Loadig Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
 
     }
 

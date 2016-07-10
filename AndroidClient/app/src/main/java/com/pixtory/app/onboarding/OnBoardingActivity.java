@@ -91,7 +91,6 @@ public class OnBoardingActivity  extends FragmentActivity {
             }
         });
 
-
         TextView skipLogin = (TextView) findViewById(R.id.skipLogin);
         skipLogin.setPaintFlags(skipLogin.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         skipLogin.setOnClickListener(new View.OnClickListener() {

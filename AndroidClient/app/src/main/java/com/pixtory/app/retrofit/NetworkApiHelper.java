@@ -342,4 +342,26 @@ public class NetworkApiHelper {
     }
 
 
+    public void shareContent(int userId , int contentId, final NetworkApiCallback cb) {
+        ShareContentRequest req = new ShareContentRequest();
+        req.userId = userId;
+        req.contentId = contentId;
+
+        sAPI.shareContent(req, new Callback<ShareContentIdResponse>() {
+            @Override
+            public void success(ShareContentIdResponse shareContentIdResponse, Response response) {
+                if (shareContentIdResponse.success == true)
+                    cb.success(shareContentIdResponse, response);
+                else
+                    cb.failure(shareContentIdResponse);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+    }
+
+
 }

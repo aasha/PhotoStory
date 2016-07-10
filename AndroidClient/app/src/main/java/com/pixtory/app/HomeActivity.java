@@ -483,6 +483,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         shareDialog = new ShareDialog(this);
 
+
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -545,22 +546,11 @@ public class HomeActivity extends AppCompatActivity implements
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 4);
         calendar.set(Calendar.MINUTE, 30);
-//        calendar.setTime(new Date());
-
-
-//        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                AlarmManager.INTERVAL_HALF_HOUR,
-//                AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
-
-        //repeat alarm in 1 day 1000*60*60*24
-//        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                1000*60*2, mPendingIntent);
 
         //Alarm set for 6 hours
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000*60*60*6, mPendingIntent);
-
-        Log.i("Alarm","setAlarmManagerToSetWallPaper called");
+        Log.i("Alarm","armManagerToSetWallPaper called");
 
     }
 
@@ -1763,7 +1753,7 @@ public class HomeActivity extends AppCompatActivity implements
         description = description.replace("<b>","").replace("</b>","").replace("<i>","").replace("</i>","").replace("<p>","\n").replace("</p>","").replace("<br>","").replace("</br>","");
 
         ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentUrl(Uri.parse("www.pixtory.in"))
+                .setContentUrl(Uri.parse("http://pixtory.in/share/mail.html?id="+contentData.id))
                 .setContentTitle(contentData.pictureSummary)
                 .setContentDescription(description)
                 .setImageUrl(Uri.parse(contentData.pictureUrl))
@@ -1830,33 +1820,7 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     public void setWallPaper(final Context mContext , String imgUrl) {
-
-        Target target;
-
-        Picasso.with(mContext).load(imgUrl).into( target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                WallpaperManager myWallpaperManager
-                        = WallpaperManager.getInstance(mContext.getApplicationContext());
-                try {
-                    myWallpaperManager.setBitmap(bitmap);
-                    Toast.makeText(mContext.getApplicationContext(), "Hurray!! Pixtory updated your wallpaper", Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    Toast.makeText(mContext.getApplicationContext(), "Oops we couldn't set your wallpaper", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(mContext, "Bitmap Loadig Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
+        Picasso.with(mContext).load(imgUrl).into( App.mWallpaperTarget);
     }
 
 

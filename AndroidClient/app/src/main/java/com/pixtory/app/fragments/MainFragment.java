@@ -85,6 +85,7 @@ import com.pixtory.app.retrofit.BaseResponse;
 import com.pixtory.app.retrofit.GetCommentDetailsResponse;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
+import com.pixtory.app.retrofit.ShareContentIdResponse;
 import com.pixtory.app.userprofile.UserProfileActivity;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
@@ -1601,8 +1602,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             @Override
             public void run() {
 
-
-
         ImageRequest imageRequest = ImageRequestBuilder
                 .newBuilderWithSource(Uri.parse(mContentData.pictureUrl))
                 .setRequestPriority(Priority.HIGH)
@@ -1692,7 +1691,28 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             if (sharingAppList.get(item).equals("Whatsapp")) {
                                 shareOnWassapp(contentUri);
                             } else if (sharingAppList.get(item).equals("Facebook")) {
-                                mListener.showShareDialog(mContentData);
+
+                                NetworkApiHelper.getInstance().shareContent(Integer.parseInt(Utils.getUserId(mContext)),
+                                        mContentData.id, new NetworkApiCallback<ShareContentIdResponse>() {
+
+
+                                            @Override
+                                            public void success(ShareContentIdResponse shareContentIdResponse, Response response) {
+                                                mContentData.id = shareContentIdResponse.sharedContentId;
+                                                mListener.showShareDialog(mContentData);
+
+                                            }
+
+                                            @Override
+                                            public void failure(ShareContentIdResponse shareContentIdResponse) {
+
+                                            }
+
+                                            @Override
+                                            public void networkFailure(RetrofitError error) {
+
+                                            }
+                                        });
                             }
 //                            else if (sharingAppList.get(item).equals("Instagram")) {
 //                                shareOnInstagram(contentUri);

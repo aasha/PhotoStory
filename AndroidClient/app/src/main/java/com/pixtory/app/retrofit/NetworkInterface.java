@@ -47,4 +47,7 @@ public interface NetworkInterface {
     @POST("/getContentByCategory")
     void getContentByCategory(@Body GetContentByCategoryRequest req, Callback<GetMainFeedResponse> cb);
 
+    @POST("/shareContent")
+    void shareContent(@Body ShareContentRequest req, Callback<ShareContentIdResponse> cb);
+
 }

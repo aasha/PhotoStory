@@ -10,9 +10,9 @@ import retrofit.client.OkClient;
  */
 public class RetrofitManager {
 
-//    private static final String PUBLIC_URL = "http://ec2-52-207-219-87.compute-1.amazonaws.com:4055";
+    private static final String PUBLIC_URL = "http://ec2-52-207-219-87.compute-1.amazonaws.com:4055";
 //private static final String PUBLIC_URL = "http://10.14.125.134:4055";
-    private static final String PUBLIC_URL = "http://prod-pixtory-backend-532155455.ap-south-1.elb.amazonaws.com:80";
+//    private static final String PUBLIC_URL = "http://prod-pixtory-backend-532155455.ap-south-1.elb.amazonaws.com:80";
 
 
     private static final String APP_URL = PUBLIC_URL;
