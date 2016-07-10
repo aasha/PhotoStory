@@ -1701,7 +1701,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                                             @Override
                                             public void success(ShareContentIdResponse shareContentIdResponse, Response response) {
                                                 mContentData.id = shareContentIdResponse.sharedContentId;
-                                                mListener.showShareDialog(mContentData);
+                                                if(mListener!=null)
+                                                    mListener.showShareDialog(mContentData);
 
                                             }
 
