@@ -513,13 +513,13 @@ public class HomeActivity extends AppCompatActivity implements
         setWallpaperNow(AppConstants.SET_WALLPAPER);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-//        calendar.set(Calendar.HOUR_OF_DAY, 4);
-//        calendar.set(Calendar.MINUTE, 30);
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 4);
+        calendar.set(Calendar.MINUTE, 30);
         calendar.setTime(new Date());
 
         //Alarm set for 6 hours
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*5, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*6, mPendingIntent);
         Log.i("Alarm","armManagerToSetWallPaper called");
 
     }
@@ -763,7 +763,6 @@ public class HomeActivity extends AppCompatActivity implements
                 } else {
                     Toast.makeText(HomeActivity.this, "No Person content data!", Toast.LENGTH_SHORT).show();
                 }
-
                 if (o.userDetails!=null){
                     App.setPersonInfo(o.userDetails);
                 }else {
