@@ -289,16 +289,36 @@
                 android:paddingBottom="10dp"
                 android:visibility="gone"/>
 
-            <ToggleButton
-                android:layout_width="115dp"
+
+            <LinearLayout
+                android:layout_width="118dp"
                 android:layout_height="32dp"
                 android:layout_gravity="bottom|center"
                 android:layout_marginBottom="210dp"
-                android:textOff=""
-                android:textOn=""
-                android:background="@drawable/wallpaper_toggle_selector"
-                android:id="@+id/toggle_button"
-                android:checked="false"/>
+                android:layout_weight="2"
+                android:orientation="horizontal">
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="0dp"
+                    android:background="@drawable/no_off"
+                    android:id="@+id/daily_wallpaper_no"
+                    android:orientation="horizontal">
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="0dp"
+                    android:background="@drawable/yes_on"
+                    android:id="@+id/dailywallpaper_yes">
+
+                </FrameLayout>
+
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"

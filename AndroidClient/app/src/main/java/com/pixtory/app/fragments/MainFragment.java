@@ -660,7 +660,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                             Category category = cd.categoryNameList.get(0);
                             Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-//                            mListener.stopStoryTimer(cd.id);
+                            mListener.stopStoryTimer(cd.id);
                             mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                         }
                         else
@@ -678,7 +678,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             if(!mListener.isCategoryViewOpen() && !isProfileContent) {
                                 Category category = cd.categoryNameList.get(1);
                                 Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-//                                mListener.stopStoryTimer(cd.id);
+                                mListener.stopStoryTimer(cd.id);
                                 mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                             }
                             else
@@ -1122,7 +1122,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         sendAmplitudeLog(appEventBuilder);
                         Log.i(TAG,"MF_Picture_StoryView_Amplitude");
                         PreviousEvent = MF_Picture_StoryView;
-//                        mListener.startStoryTimer(mContentData.id);
+                        mListener.startStoryTimer(mContentData.id);
                         }
                         isPixtorySwipeUp=false;
 
@@ -1797,6 +1797,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             // Here you can perform any post-execute tasks, for example remove the
             // progress bar (if you set one).
             Toast.makeText(mContext,"Hooray! Wallpaper set!",Toast.LENGTH_SHORT).show();
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWallpaper_Set")
+                .put(AppConstants.USER_ID,Utils.getUserId(mContext))
+                .build());
             Log.d(TAG, "New wallpaper set");
         }
 

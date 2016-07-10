@@ -10,20 +10,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInstaller;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -46,7 +43,6 @@ import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -57,7 +53,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.amplitude.api.Amplitude;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -66,17 +61,11 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
 import com.facebook.datasource.DataSubscriber;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.common.Priority;
 import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.network.connectionclass.ConnectionClassManager;
@@ -84,10 +73,7 @@ import com.facebook.network.connectionclass.ConnectionQuality;
 import com.facebook.network.connectionclass.DeviceBandwidthSampler;
 
 import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -120,15 +106,10 @@ import com.squareup.picasso.Target;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -238,6 +219,12 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Bind(R.id.backButton)
     LinearLayout backButton;
+
+    @Bind(R.id.dailywallpaper_yes)
+    FrameLayout dailyWallpaperYes;
+
+    @Bind(R.id.daily_wallpaper_no)
+    FrameLayout dailyWallpaperNo;
 
 
     private int categoryDataSize;
@@ -419,7 +406,7 @@ public class HomeActivity extends AppCompatActivity implements
         mSwipeUpText2 = (TextView)findViewById(R.id.swipe_up_text_2);
 
         mLongTapText = (TextView)findViewById(R.id.long_tap_text);
-        mToggleButton = (ToggleButton)findViewById(R.id.toggle_button);
+       // mToggleButton = (ToggleButton)findViewById(R.id.toggle_button);
 
         mWallpaperTopText = (TextView)findViewById(R.id.wallpaper_top_text);
 
@@ -1484,7 +1471,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     private  void prepareWallpaperCoachmark(boolean isCalledFromMenuOptions){
 
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         boolean isOpted = sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
         boolean isShownBefore = sharedPreferences.getBoolean("Is_Shown_Before",false);
         if(!isShownBefore && !isCalledFromMenuOptions){
@@ -1499,12 +1486,70 @@ public class HomeActivity extends AppCompatActivity implements
 
         if(isOpted){
             mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
-            mToggleButton.setChecked(true);
+          //  mToggleButton.setChecked(true);
+            dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_on));
+            dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_off));
         }else{
             mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
-            mToggleButton.setChecked(false);
+            //mToggleButton.setChecked(false);
+            dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_off));
+            dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_on));
         }
 
+
+        dailyWallpaperYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
+                    dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_on));
+                    dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_off));
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+
+                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
+                    setAlarmManagerToSetWallPaper();
+                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
+                    Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWallpaperCoachMark.setVisibility(View.INVISIBLE);
+                            mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
+                        }
+                    },500);
+                }
+
+            }
+        });
+
+        dailyWallpaperNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
+                    dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_off));
+                    dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_on));
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
+                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                            .build());
+                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
+                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
+
+                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
+                    cancelAlarm();
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWallpaperCoachMark.setVisibility(View.INVISIBLE);
+                            mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
+                        }
+                    },500);
+                }
+            }
+        });
+/*
         mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -1532,11 +1577,10 @@ public class HomeActivity extends AppCompatActivity implements
 
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
-                }
-                mWallpaperCoachMark.setVisibility(View.INVISIBLE);
-                mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
-            }
-        });
+                }*/
+
+
+
     }
 
     private boolean isFirstTimeOpen(){
