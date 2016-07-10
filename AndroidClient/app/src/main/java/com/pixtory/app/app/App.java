@@ -100,7 +100,7 @@ public class App extends Application implements AppConstants {
 
         isLoginRequired = true;
 
-        Crittercism.initialize(getApplicationContext(), "67496ab9c7094339adf79c54d369ccc900555300");
+        Crittercism.initialize(getApplicationContext(), "39c3ed69599d7c0cd175f7e8a7b38a01");
 
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(getApplicationContext())
                 .setDownsampleEnabled(true)
@@ -304,8 +304,10 @@ public class App extends Application implements AppConstants {
     }
 
     public static int getOriginalIndex(int contentId){
-        if(mOriginalIndices!=null)
-            return Integer.parseInt(mOriginalIndices.get(contentId+""));
+        if(mOriginalIndices!=null) {
+            if(mOriginalIndices.get(contentId + "") == null)
+                return Integer.parseInt(mOriginalIndices.get(contentId + ""));
+        }
         return 0;
     }
 }
