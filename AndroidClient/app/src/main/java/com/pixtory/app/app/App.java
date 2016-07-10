@@ -19,6 +19,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
+import com.pixtory.app.utils.AmplitudeLog;
+import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -142,6 +144,9 @@ public class App extends Application implements AppConstants {
                 try {
                     myWallpaperManager.setBitmap(bitmap);
                     Toast.makeText(getApplicationContext(), "Hurray!! Pixtory updated your wallpaper", Toast.LENGTH_SHORT).show();
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_Device_EveryDay_Wallpaper_Set")
+                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                        .build());
                 } catch (IOException e) {
                     Toast.makeText(getApplicationContext(), "Oops we couldn't set your wallpaper", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();

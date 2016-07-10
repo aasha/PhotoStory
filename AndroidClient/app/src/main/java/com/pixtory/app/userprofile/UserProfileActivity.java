@@ -236,13 +236,13 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     @Override
     protected void onStop() {
         super.onStop();
-//        stopStoryTimer(pixtoryId);
+        stopStoryTimer(pixtoryId);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        stopStoryTimer(pixtoryId);
+        stopStoryTimer(pixtoryId);
     }
 
     @Override

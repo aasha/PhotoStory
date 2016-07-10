@@ -1534,8 +1534,14 @@ public class HomeActivity extends AppCompatActivity implements
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
                 }
-                mWallpaperCoachMark.setVisibility(View.INVISIBLE);
-                mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWallpaperCoachMark.setVisibility(View.INVISIBLE);
+                        mWallpaperCoachMarkBlurBg.setVisibility(View.GONE);
+                    }
+                },500);
             }
         });
     }
