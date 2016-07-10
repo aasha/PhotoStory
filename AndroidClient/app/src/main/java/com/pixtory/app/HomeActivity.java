@@ -242,17 +242,18 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        isFirstTimeOpen();
+        if(isFirstTimeOpen())
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( "App_FirstOpen")
+                    .put("TIMESTAMP", System.currentTimeMillis() + "")
+                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                    .build());
 
         if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
 
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
-                .put("TIMESTAMP", System.currentTimeMillis() + "")
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .build());
+
 
         setContentView(R.layout.activity_home);
 
