@@ -217,24 +217,24 @@ public class UserProfileActivity extends FragmentActivity implements UserProfile
     @Override
     protected void onStop() {
         super.onStop();
-        stopStoryTimer(pixtoryId);
+//        stopStoryTimer(pixtoryId);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        stopStoryTimer(pixtoryId);
+//        stopStoryTimer(pixtoryId);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AmplitudeLog.endSession();
+//        AmplitudeLog.endSession();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AmplitudeLog.startSession();
+//        AmplitudeLog.startSession();
     }
 }

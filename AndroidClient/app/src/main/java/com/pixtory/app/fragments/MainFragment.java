@@ -349,7 +349,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     e.printStackTrace();
                 }
             }
-
         }
 
         mSoftBarHeight = getSoftbuttonsbarHeight();
@@ -661,7 +660,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
                             Category category = cd.categoryNameList.get(0);
                             Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-                            mListener.stopStoryTimer(cd.id);
+//                            mListener.stopStoryTimer(cd.id);
                             mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                         }
                         else
@@ -679,7 +678,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             if(!mListener.isCategoryViewOpen() && !isProfileContent) {
                                 Category category = cd.categoryNameList.get(1);
                                 Toast.makeText(mContext, category.categoryName, Toast.LENGTH_SHORT).show();
-                                mListener.stopStoryTimer(cd.id);
+//                                mListener.stopStoryTimer(cd.id);
                                 mListener.showCategoryStories(category.categoryId ,category.categoryName,cd.id );
                             }
                             else
@@ -1123,7 +1122,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         sendAmplitudeLog(appEventBuilder);
                         Log.i(TAG,"MF_Picture_StoryView_Amplitude");
                         PreviousEvent = MF_Picture_StoryView;
-                        mListener.startStoryTimer(mContentData.id);
+//                        mListener.startStoryTimer(mContentData.id);
                         }
                         isPixtorySwipeUp=false;
 
@@ -1146,7 +1145,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                             sendAmplitudeLog(appEventBuilder);
                             PreviousEvent = ST_Story_PictureView;
                             Log.i(TAG,"ST_Story_PictureView_Amplitude");
-                            mListener.stopStoryTimer(mContentData.id);
+//                            mListener.stopStoryTimer(mContentData.id);
                         }
                         if(!isSwipeUpArrowShown){
                             swipeUpArrow.setVisibility(View.VISIBLE);

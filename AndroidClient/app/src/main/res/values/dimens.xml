@@ -21,7 +21,7 @@
     <dimen name="skip_login_font">9sp</dimen>
 
     <dimen name="image_layout_height">280dp</dimen>
-    <dimen name="image_layout_padding_top">145dp</dimen>
+    <dimen name="image_layout_padding_top">170dp</dimen>
     <dimen name="story_min_height">380dp</dimen>
 
     <dimen name="post_comment_btn_height">60dp</dimen>
