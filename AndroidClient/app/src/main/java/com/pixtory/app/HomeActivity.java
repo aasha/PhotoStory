@@ -1505,7 +1505,7 @@ public class HomeActivity extends AppCompatActivity implements
                 if(!sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
                     dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_on));
                     dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_off));
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperConfirm_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
 
@@ -1532,7 +1532,7 @@ public class HomeActivity extends AppCompatActivity implements
                 if(sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
                     dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_off));
                     dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_on));
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperCancel_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));

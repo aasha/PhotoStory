@@ -1,7 +1,11 @@
 package com.pixtory.app.utils;
 
 
+import android.os.Bundle;
+
 import com.amplitude.api.Amplitude;
+import com.pixtory.app.app.App;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -10,12 +14,15 @@ public class AmplitudeLog {
 
     public static void logEvent(AppEvent ev) {
         Amplitude.getInstance().logEvent(ev.label, ev.properties);
+        App.getmFirebaseAnalytics().logEvent(ev.label,ev.params);
     }
 
     private static class AppEvent {
         JSONObject properties = null;
         String label = null;
+        Bundle params = null;
     }
+
 
     public static void sendUserInfo(String userId){
         Amplitude.getInstance().setUserId(userId);
@@ -35,10 +42,12 @@ public class AmplitudeLog {
             appEvent = new AppEvent();
             appEvent.label = label;
             data = new HashMap<String, String>();
+            appEvent.params = new Bundle();
         }
 
         public AppEventBuilder put(String key, String value) {
             data.put(key, value);
+            appEvent.params.putString(key, value);
             return this;
         }
 
