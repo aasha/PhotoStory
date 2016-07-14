@@ -243,11 +243,7 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(isFirstTimeOpen())
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( "App_FirstOpen")
-                    .put("TIMESTAMP", System.currentTimeMillis() + "")
-                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                    .build());
+        isFirstTimeOpen();
 
         if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
@@ -1591,6 +1587,10 @@ public class HomeActivity extends AppCompatActivity implements
         if(firstRun){
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(Is_First_Run,false);
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( "App_FirstOpen")
+                    .put("TIMESTAMP", System.currentTimeMillis() + "")
+                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
+                    .build());
             editor.commit();
         }
         return firstRun;

@@ -123,7 +123,7 @@ public class App extends Application implements AppConstants {
 //        GoogleAnalytics.getInstance(this).getLogger()
 //                .setLogLevel(Logger.LogLevel.VERBOSE);
         Log.d("Amplitude", "Amplitude init");
-        Amplitude.getInstance().initialize(this, "39c3ed69599d7c0cd175f7e8a7b38a01s").enableForegroundTracking(this);
+        Amplitude.getInstance().initialize(this, "7c63201294234fbe66c73d36c4ae206c").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
 
         /**Enabling disk caching for Picasso**/
@@ -181,7 +181,7 @@ public class App extends Application implements AppConstants {
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Toast.makeText(getApplicationContext(), "Bitmap Loadig Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Bitmap Loading Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -197,7 +197,8 @@ public class App extends Application implements AppConstants {
     synchronized public Tracker getDefaultTracker() {
         if (mTracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+
+            // To enable debug logging use: adb shell set prop log.tag.GAv4 DEBUG
             mTracker = analytics.newTracker("UA-73056382-1");
 
            mTracker.setReferrer("referrer");
