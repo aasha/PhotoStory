@@ -21,8 +21,13 @@ import app.viewpagerindicator.CirclePageIndicator;
 import com.facebook.*;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Logger;
+import com.google.android.gms.analytics.Tracker;
 import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
+import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.retrofit.NetworkApiHelper;
 import com.pixtory.app.retrofit.NetworkApiCallback;
@@ -53,6 +58,8 @@ public class OnBoardingActivity  extends FragmentActivity {
     final static String SCREEN_NAME = "Onboard";
     final static String OB_Card_Swipe = "OB_Card_Swipe";
 
+    Tracker mTracker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,17 @@ public class OnBoardingActivity  extends FragmentActivity {
         callbackManager = CallbackManager.Factory.create();
 
         printSHA();
+
+        //Get Default Tracker
+        GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
+
+        App application = (App) getApplication();
+        mTracker = application.getDefaultTracker();
+
+        mTracker.setScreenName("Test Track");
+
+        // Send a screen view.
+        mTracker.send(new HitBuilders.AppViewBuilder().build());
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -108,7 +126,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         Toast.makeText(OnBoardingActivity.this, "FB Login Success!", Toast.LENGTH_SHORT).show();
-                        onFacebookLoginSuccess();
+                        onFacebookLoginSuccess(loginResult);
                     }
 
                     @Override
@@ -157,12 +175,14 @@ public class OnBoardingActivity  extends FragmentActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void onFacebookLoginSuccess() {
-        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+    private void onFacebookLoginSuccess(LoginResult loginResult) {
+        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
 
             @Override
             public void onCompleted(JSONObject user, GraphResponse response) {
                 if (user != null) {
+                    Profile profile = Profile.getCurrentProfile();
+
                     final String fbId = user.optString("id");
                     final String name = user.optString("name");
                     final String email = user.optString("email");
@@ -215,6 +235,9 @@ public class OnBoardingActivity  extends FragmentActivity {
                 }
             }
         });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "name,birthday,email,gender");
+        request.setParameters(parameters);
         request.executeAsync();
     }
 

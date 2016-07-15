@@ -382,7 +382,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         Log.d(TAG, "onCreateView is called for index = " + mContentIndex);
         ButterKnife.bind(this, mRootView);
 
-        getView();
+//        getView();
 
 //        storyBackClick = (LinearLayout)mRootView.findViewById(R.id.story_back_click);
 //        storyBackImg = (ImageView)mRootView.findViewById(R.id.story_back_img);
@@ -992,8 +992,9 @@ public class MainFragment extends Fragment implements ScrollViewListener{
 
     private boolean modifyScreenHeight(int offset) {
 
-        imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
-        mImageMain.setLayoutParams(imgViewLayoutParams);
+//        imgViewLayoutParams.height = (mImageExtendedHeight) -offset;
+//        mImageMain.setLayoutParams(imgViewLayoutParams);
+        mImageMain.setTranslationY((-1.0f)*(offset/2));
 
         if(offset > mBottomScreenHt ){
             showCommentsShareLayout(true);
@@ -1088,7 +1089,8 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             isSwipeUpArrowShown=true;
         }
 
-        mListener.showMenuIcon(true);
+        if(mListener!=null)
+            mListener.showMenuIcon(true);
     }
 
     public void setUpHalfScreen(){
@@ -1158,34 +1160,6 @@ public class MainFragment extends Fragment implements ScrollViewListener{
             });
         }
 
-    }
-
-    private void animateContent(View view , final boolean showContent , int fromY , int toY,int duration){
-
-        ObjectAnimator transAnimation= ObjectAnimator.ofFloat(view ,"translationY" , fromY, toY);
-        transAnimation.setDuration(duration);//set duration
-        transAnimation.start();//start animation
-
-        transAnimation.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                if(showContent){
-                    mTextExpert.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
     }
 
     /**

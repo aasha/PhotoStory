@@ -58,7 +58,7 @@ public interface AppConstants {
 
 
     final static List<String> mFBPermissions = Arrays.asList("public_profile",
-            "email", "user_about_me");
+            "email","user_birthday");
 
     final static String PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.pixtory.app&referrer=";
 

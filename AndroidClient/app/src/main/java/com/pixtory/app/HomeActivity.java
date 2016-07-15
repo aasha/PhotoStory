@@ -241,7 +241,6 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
         isFirstTimeOpen();
 
@@ -389,6 +388,8 @@ public class HomeActivity extends AppCompatActivity implements
                 //Log.d(TAG, "onPageScrollStateChanged = "+state);
             }
         });
+        super.onCreate(savedInstanceState);
+
 
         setUpNavigationDrawer();
         //Binding coachmark overlays
@@ -1171,6 +1172,8 @@ public class HomeActivity extends AppCompatActivity implements
                             Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
                             intent.putExtra("USER_ID",Utils.getUserId(HomeActivity.this));
                             intent.putExtra("PERSON_ID",Utils.getUserId(HomeActivity.this));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
                             startActivity(intent);
 
                         }else{

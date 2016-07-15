@@ -343,8 +343,8 @@ public class UserProfileFragment extends Fragment {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
                  .put("USER_ID",mUserId+"")
                 .build());
-                mActivity.onBackPressed();
-//                mActivity.finish();
+//                mActivity.onBackPressed();
+                mActivity.finish();
             }});
 
         mBackClick.setOnClickListener(new View.OnClickListener() {
@@ -353,8 +353,8 @@ public class UserProfileFragment extends Fragment {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("Profile_Back_Click")
                         .put("USER_ID",mUserId+"")
                         .build());
-                mActivity.onBackPressed();
-//                mActivity.finish();
+//                mActivity.onBackPressed();
+                mActivity.finish();
 
             }});
 
