@@ -1506,7 +1506,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_SingleWallpaperConfirm_Click")
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWallpaperConfirm_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")
@@ -1520,7 +1520,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_SingleWallpaperCancel_Click")
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWallpaperCancel_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")

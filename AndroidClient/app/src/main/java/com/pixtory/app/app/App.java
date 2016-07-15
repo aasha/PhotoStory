@@ -17,6 +17,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.pixtory.app.model.ContentData;
 import com.pixtory.app.model.PersonInfo;
 import com.pixtory.app.utils.AmplitudeLog;
@@ -72,6 +73,8 @@ public class App extends Application implements AppConstants {
 
     private static String dailyWallpaperUrl;
 
+    private static FirebaseAnalytics mFirebaseAnalytics;
+
     private static Map<String,PersonInfo> mProfileCache = new LinkedHashMap<String, PersonInfo>(MAX_CAPACITY+1,0.75F,true){
         @Override
         protected boolean removeEldestEntry(Entry<String, PersonInfo> eldest) {
@@ -125,6 +128,9 @@ public class App extends Application implements AppConstants {
         Log.d("Amplitude", "Amplitude init");
         Amplitude.getInstance().initialize(this, "7c63201294234fbe66c73d36c4ae206c").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
+
+        //Initialise Firebase instance
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         /**Enabling disk caching for Picasso**/
         Picasso.Builder builder = new Picasso.Builder(this);
@@ -310,4 +316,6 @@ public class App extends Application implements AppConstants {
         }
         return 0;
     }
+
+    public static FirebaseAnalytics getmFirebaseAnalytics(){return mFirebaseAnalytics;}
 }
