@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "46207295900",
-    "project_id": "pixtory-1352"
+    "firebase_url": "https://pixtory-1352.firebaseio.com",
+    "project_id": "pixtory-1352",
+    "storage_bucket": "pixtory-1352.appspot.com"
   },
   "client": [
     {
@@ -11,7 +13,16 @@
           "package_name": "com.pixtory.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "46207295900-g30v4as8igt13bk3bkupdbqu8maqu5n5.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "46207295900-pil70l4610sak2e3ltf1tcikio706or1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyADbSsib9YXD3f1djucVJLOX6mlGBR9qI0"
@@ -29,7 +40,7 @@
           "other_platform_oauth_client": []
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

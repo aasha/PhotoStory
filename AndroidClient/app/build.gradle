@@ -7,7 +7,7 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+
 
 repositories {
     jcenter()
@@ -21,8 +21,8 @@ android {
         applicationId "com.pixtory.app"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 11 //increment with every release
-        versionName "beta_1.0" //increment with every release
+        versionCode 12 //increment with every release
+        versionName "beta_1.1_testing" //increment with every release
     }
 
     dexOptions {
@@ -30,8 +30,15 @@ android {
         javaMaxHeapSize "4g"
     }
     buildTypes {
+
+        debug{
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
         }
     }
 }
@@ -59,13 +66,28 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.1.0'
     compile 'com.android.support:design:23.4.0'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.3'
-    compile 'com.google.android.gms:play-services-gcm:9.0.0'
     compile 'com.android.support:multidex:1.0.0'
-    compile 'com.google.android.gms:play-services-analytics:9.0.0'
     compile 'com.crittercism:crittercism-android-agent:+'
     compile 'com.facebook.network.connectionclass:connectionclass:1.0.1'
     compile 'com.amplitude:android-sdk:2.5.0'
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
 
+
+    //Adding GooglePlayServices and Firebase
+    compile 'com.google.android.gms:play-services-analytics:9.2.1'
+    compile 'com.google.android.gms:play-services-gcm:9.2.1'
+    compile 'com.google.firebase:firebase-core:9.2.1'
+    compile 'com.google.firebase:firebase-crash:9.2.1'
+    compile 'com.google.firebase:firebase-messaging:9.2.1'
+    compile 'com.google.firebase:firebase-invites:9.2.1'
+
+
+
+
+
 }
+
+apply plugin: 'com.google.gms.google-services'
+
+

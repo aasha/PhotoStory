@@ -101,14 +101,18 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     private void sendNotification(String message, String image) {
 
-        Bitmap b = null;
+        Bitmap bitmap = null;
         try {
             URL url = new URL(image);
-            b = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+
+        NotificationCompat.BigPictureStyle notiStyle = new NotificationCompat.BigPictureStyle();
+        notiStyle.setSummaryText(message);
+        notiStyle.bigPicture(bitmap);
 
         //RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout);
 
@@ -116,18 +120,16 @@ public class MyGcmListenerService extends GcmListenerService {
                 .setSmallIcon(R.drawable.pixtory_icon)
                 .setContentTitle("Pixtory")
                 .setContentText(message)
+                .setPriority(1)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setStyle(notiStyle)
                 .setAutoCancel(true);
-        if(b!=null)
-            notificationBuilder.setLargeIcon(b);
+
+        if(bitmap!=null)
+            notificationBuilder.setLargeIcon(bitmap);
         else
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.splash_bg));
-       /* if(b!=null)
-            remoteViews.setImageViewBitmap(R.id.notification_image,b);
-        remoteViews.setTextViewText(R.id.notification_message,message);*/
-        //.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pixtory))
-//        if (b != null)
-//            notificationBuilder.setStyle(new NotificationCompat.().bigPicture(b));
-
 
         notificationBuilder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =

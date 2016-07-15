@@ -2,6 +2,7 @@ package com.pixtory.app.onboarding;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 
 import android.content.pm.PackageInfo;
@@ -9,6 +10,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -25,6 +28,13 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.firebase.crash.FirebaseCrash;
 import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
 import com.pixtory.app.app.App;
@@ -84,9 +94,14 @@ public class OnBoardingActivity  extends FragmentActivity {
         // Send a screen view.
         mTracker.send(new HitBuilders.AppViewBuilder().build());
 
+        //For testing Firebase crash reports
+//        FirebaseCrash.report(new Exception("My first Android non-fatal error - Proguard Error"));
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+
+        getDeepLinkData();
 
 //        User will be directed to Main Feed page is already loggedIn
         if (redirectIfLoggedIn()) {
@@ -121,6 +136,9 @@ public class OnBoardingActivity  extends FragmentActivity {
             }
         });
 
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("APP_DOWNLOAD")
+                .build());
+
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -148,6 +166,8 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                     }
                 });
+
+
     }
 
     @Override
@@ -192,8 +212,11 @@ public class OnBoardingActivity  extends FragmentActivity {
                     mProgressDialog.setTitle("Fetching pixtories for you");
                     mProgressDialog.show();
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Success)
-                            .put("NAME", name)
+                            .put("FbName", name)
                             .put("FBID", fbId)
+                            .put("FbEmail",email)
+                            .put("FbDob",user.optString("birthday"))
+                            .put("FbGender",user.optString("gender"))
                             .build());
                     NetworkApiHelper.getInstance().registerUser(name, email, imgUrl,fbId,new NetworkApiCallback<RegisterResponse>() {
                         @Override
@@ -337,6 +360,63 @@ public class OnBoardingActivity  extends FragmentActivity {
         } catch (NoSuchAlgorithmException e) {
 
         }
+    }
+
+    private GoogleApiClient mGoogleApiClient;
+
+    private void getDeepLinkData(){
+
+        String deviceId = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        // Build GoogleApiClient with AppInvite API for receiving deep links
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener(){
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                    }
+                })
+                .addApi(AppInvite.API)
+                .build();
+        Log.d(TAG,"getDeepLinkData is called");
+
+
+        // Check if this app was launched from a deep link. Setting autoLaunchDeepLink to true
+        // would automatically launch the deep link if one is found.
+        boolean autoLaunchDeepLink = false;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+                .setResultCallback(
+                        new ResultCallback<AppInviteInvitationResult>() {
+                            @Override
+                            public void onResult(@NonNull AppInviteInvitationResult result) {
+                                if (result.getStatus().isSuccess()) {
+                                    // Extract deep link from Intent
+                                    Intent intent = result.getInvitationIntent();
+                                    String deepLink = AppInviteReferral.getDeepLink(intent);
+                                    Log.d(TAG,"Launched from deep link::"+deepLink);
+                                    Log.d(TAG,"utm_source::"+intent.getData().getQueryParameter("utm_source"));
+                                    Log.d(TAG,"utm_medium::"+intent.getData().getQueryParameter("utm_medium"));
+                                    Log.d(TAG,"utm_campaign::"+intent.getData().getQueryParameter("utm_campaign"));
+
+
+                                    // Handle the deep link. For example, open the linked
+                                    // content, or apply promotional credit to the user's
+                                    // account.
+
+                                    // ...
+
+                                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.INVITE_LINK_CLICKED)
+                                            .put("SOURCE",intent.getData().getQueryParameter("utm_source"))
+                                            .put("MEDIUM",intent.getData().getQueryParameter("utm_medium"))
+                                            .put("CAMPAIGN",intent.getData().getQueryParameter("utm_campaign"))
+                                            .build());
+                                } else {
+                                    Log.d(TAG, "getInvitation: no deep link found.");
+                                }
+                            }
+                        });
+
     }
 
 
