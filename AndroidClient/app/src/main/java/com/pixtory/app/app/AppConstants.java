@@ -48,7 +48,9 @@ public interface AppConstants {
     final static String OB_FBLogin_Fail = "OB_FBLogin_Fail";
     final static String OB_Register_Success = "OB_Register_Success";
     final static String OB_Register_Failure = "OB_Register_Failure";
-        final static String INVITE_LINK_CLICKED = "INVITE_LINK_CLICKED";
+    final static String INVITE_LINK_CLICKED = "INVITE_LINK_CLICKED";
+    final static String IS_WALLPAPER_SET_FOR_TODAY = "IS_WALLPAPER_SET_FOR_TODAY";
+    final static String TAG_TASK_ONEOFF_LOG = "TAG_TASK_ONEOFF_LOG";
 
     static final int SHOW_PIC_STORY = 88;
     static final int SHOW_PIC_COMMENTS = 89;

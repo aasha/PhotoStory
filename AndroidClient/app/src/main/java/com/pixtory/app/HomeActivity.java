@@ -504,8 +504,12 @@ public class HomeActivity extends AppCompatActivity implements
         calendar.set(Calendar.MINUTE, 30);
         calendar.setTime(new Date());
 
-        //Alarm set for 6 hours
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*6, mPendingIntent);
+        int alarm_interval = 1000*60*60*24;
+        Utils.updateShreadPrefs(HomeActivity.this,
+                                AppConstants.IS_WALLPAPER_SET_FOR_TODAY,
+                                "false");
+        //Alarm set for 24 hours
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),alarm_interval , mPendingIntent);
         Log.i("Alarm","armManagerToSetWallPaper called");
 
     }

@@ -143,7 +143,7 @@ public class Utils {
         editor.putBoolean(AppConstants.IS_DISCLAIMER_SHOWN, true);
                 editor.apply(); // commit changes
     }
-    private static void updateShreadPrefs(Context context, String key, String val) {
+    public static void updateShreadPrefs(Context context, String key, String val) {
         SharedPreferences mSharedPrefs = context.getSharedPreferences(
                 AppConstants.APP_PREFS, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
