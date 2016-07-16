@@ -306,6 +306,11 @@ public class App extends Application implements AppConstants {
             Collections.reverse(sublist);
             mCData.subList(0,startPos+1).clear();
             mCData.addAll(sublist);
+        }else if(mCData!=null&&mCData.size()>30&&startPos==0){
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()));
+            Collections.reverse(sublist);
+            mCData.clear();
+            mCData.addAll(sublist);
         }
     }
 
