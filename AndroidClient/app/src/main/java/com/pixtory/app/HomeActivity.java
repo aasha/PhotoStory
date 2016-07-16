@@ -128,6 +128,8 @@ public class HomeActivity extends AppCompatActivity implements
     private static String Is_First_Run = "FirstRun";
     private static String Swipe_Count = "SwipeCount";
     private static String Page_Index = "View_Pager_Index";
+    private static String New_Content_Index = "New_Content_Index";
+    private static String Todays_Last_Seen_Index = "Todays_Last_Seen_Index";
     private final static String TAG = HomeActivity.class.getName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public ProgressDialog mProgress = null;
@@ -537,6 +539,7 @@ public class HomeActivity extends AppCompatActivity implements
                         int startPos = sharedPreferences.getInt(Page_Index,0);
 
                         App.shuffleContentData(startPos);
+                        //App.reorderContentData();
                         Utils.deleteOldVideos(o.contentList);
 
                         ImageDownloadManager imageDownloadManager =
@@ -1504,7 +1507,7 @@ public class HomeActivity extends AppCompatActivity implements
                 if(!sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
                     dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_on));
                     dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_off));
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperConfirm_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DailyWpConfirm_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
 
@@ -1533,7 +1536,7 @@ public class HomeActivity extends AppCompatActivity implements
                 if(sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
                     dailyWallpaperYes.setBackground(getResources().getDrawable(R.drawable.yes_off));
                     dailyWallpaperNo.setBackground(getResources().getDrawable(R.drawable.no_on));
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_EverydayWallaperCancel_Click")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DailyWpCancel_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));

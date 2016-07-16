@@ -148,7 +148,7 @@ public class App extends Application implements AppConstants {
                 try {
                     myWallpaperManager.setBitmap(bitmap);
                     Toast.makeText(getApplicationContext(), "Hurray!! Pixtory updated your wallpaper", Toast.LENGTH_SHORT).show();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWallpaper_Set")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWp_Set")
                         .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
                         .build());
                 } catch (IOException e) {
@@ -302,20 +302,38 @@ public class App extends Application implements AppConstants {
 
     public static void shuffleContentData(int startPos){
         if(mCData!=null&&startPos<mCData.size()&&startPos>0){
-            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos));
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos+1));
             Collections.reverse(sublist);
-            mCData.subList(0,startPos).clear();
+            mCData.subList(0,startPos+1).clear();
             mCData.addAll(sublist);
+        }else if(mCData!=null&&mCData.size()>30&&startPos==0){
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()-10));
+            Collections.reverse(sublist);
+            mCData.subList(0,mCData.size()-10).clear();
+            mCData.addAll(sublist);
+        }
+    }
+
+    public static void reorderContentData(){
+        if(mCData!=null){
+            if(mCData.size()>30){
+                int size = mCData.size();
+                ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,size-10));
+                Collections.reverse(sublist);
+                mCData.subList(0,size-10).clear();
+                mCData.addAll(sublist);
+            }
         }
     }
 
     public static int getOriginalIndex(int contentId){
         if(mOriginalIndices!=null) {
-            if(mOriginalIndices.get(contentId + "") == null)
+            if(mOriginalIndices.get(contentId + "") != null)
                 return Integer.parseInt(mOriginalIndices.get(contentId + ""));
         }
         return 0;
     }
 
     public static FirebaseAnalytics getmFirebaseAnalytics(){return mFirebaseAnalytics;}
+
 }

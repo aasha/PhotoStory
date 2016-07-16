@@ -459,7 +459,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         mWallpaperSettingsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_Wallpaper_Click")
+                AmplitudeLog.AppEventBuilder appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_WpIcon_Click")
                         .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                         .put("PIXTORY_ID",mContentData.id+"");
 
@@ -1506,7 +1506,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperYes.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWallpaperConfirm_Click")
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWpConfirm_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")
@@ -1520,7 +1520,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         wallpaperNo.setOnClickListener(new TextView.OnClickListener(){
             @Override
             public void onClick(View v) {
-                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWallpaperCancel_Click")
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_SingleWpCancel_Click")
                         .put(AppConstants.USER_ID, Utils.getUserId(mContext))
                         .put("PIXTORY_ID", mContentData.id + "")
                         .put("POSITION_ID", mContentIndex + "")
@@ -1794,7 +1794,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                 AmplitudeLog.AppEventBuilder appEventBuilder;
                 switch (item.getItemId()){
                     case R.id.wallpaper_overflow_set:showWallpaperAlert();
-                        appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_SetThisWallpaper_Click")
+                        appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_SingleWp_Click")
                                 .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                 .put("PIXTORY_ID",mContentData.id+"");
                         sendAmplitudeLog(appEventBuilder);
@@ -1802,7 +1802,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         return true;
 
                     case  R.id.wallpaper_overflow_set_today:showWallpaperAlert();
-                        appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_SetThisTodayWallpaper_Click")
+                        appEventBuilder = new AmplitudeLog.AppEventBuilder("MF_SingleOverDailyWp_Click")
                                 .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                                 .put("PIXTORY_ID",mContentData.id+"");
                         sendAmplitudeLog(appEventBuilder);
@@ -1810,7 +1810,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                         return true;
 
                     case R.id.wallpaper_overflow_daily:mListener.showWallPaperCoachMark();
-                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_EverdayWallpaper_Click")
+                        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_DailyWp_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(mContext))
                             .put("PIXTOY_ID",mContentData.id+"")
                             .build());
