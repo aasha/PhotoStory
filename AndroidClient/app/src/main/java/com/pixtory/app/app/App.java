@@ -148,7 +148,7 @@ public class App extends Application implements AppConstants {
                 try {
                     myWallpaperManager.setBitmap(bitmap);
                     Toast.makeText(getApplicationContext(), "Hurray!! Pixtory updated your wallpaper", Toast.LENGTH_SHORT).show();
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWallpaper_Set")
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWp_Set")
                         .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
                         .build());
                 } catch (IOException e) {
@@ -307,9 +307,9 @@ public class App extends Application implements AppConstants {
             mCData.subList(0,startPos+1).clear();
             mCData.addAll(sublist);
         }else if(mCData!=null&&mCData.size()>30&&startPos==0){
-            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()));
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()-10));
             Collections.reverse(sublist);
-            mCData.clear();
+            mCData.subList(0,mCData.size()-10).clear();
             mCData.addAll(sublist);
         }
     }
@@ -335,4 +335,5 @@ public class App extends Application implements AppConstants {
     }
 
     public static FirebaseAnalytics getmFirebaseAnalytics(){return mFirebaseAnalytics;}
+
 }
