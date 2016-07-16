@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
@@ -25,6 +27,8 @@ import retrofit.client.Response;
 public class WallpaperChangeService extends GcmTaskService {
 
     private static String TAG = WallpaperChangeService.class.getName();
+    private GcmNetworkManager mGcmNetworkManager;
+
 
     @Override
     public int onRunTask(TaskParams taskParams) {
@@ -60,13 +64,13 @@ public class WallpaperChangeService extends GcmTaskService {
                 @Override
                 public void failure(GetWallPaperResponse getWallPaperResponse) {
                     Log.i(TAG,"failure->"+getWallPaperResponse.errorMessage);
-
+//                    setJobSchedulerToSetWallpaper(getApplicationContext());
                 }
 
                 @Override
                 public void networkFailure(RetrofitError error) {
                     Log.i(TAG,"networkFailure->"+error.toString());
-
+//                    setJobSchedulerToSetWallpaper(getApplicationContext());
                 }
             });
         }
@@ -75,5 +79,21 @@ public class WallpaperChangeService extends GcmTaskService {
     public void setWallPaper(final Context mContext , String imgUrl) {
         Picasso.with(mContext).load(imgUrl).into(App.mDailyWallpaperTarget);
 
+    }
+
+    private void setJobSchedulerToSetWallpaper(Context ctx){
+        if(mGcmNetworkManager==null)
+            mGcmNetworkManager = GcmNetworkManager.getInstance(ctx);
+
+        Task task = new OneoffTask.Builder()
+                .setService(WallpaperChangeService.class)
+                .setExecutionWindow(1000*60, 1000*60*60*9) // 45 seconds to nine hours
+                .setTag(AppConstants.TAG_TASK_REPEAT)
+                .setUpdateCurrent(true)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setRequiresCharging(false)
+                .build();
+
+        mGcmNetworkManager.schedule(task);
     }
 }

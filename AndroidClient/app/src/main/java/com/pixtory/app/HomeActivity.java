@@ -499,15 +499,11 @@ public class HomeActivity extends AppCompatActivity implements
         setWallpaperNow(AppConstants.SET_WALLPAPER);
 
         Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 4);
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 7);
         calendar.set(Calendar.MINUTE, 30);
-        calendar.setTime(new Date());
 
-        int alarm_interval = 1000*60*60*24;
-        Utils.updateShreadPrefs(HomeActivity.this,
-                                AppConstants.IS_WALLPAPER_SET_FOR_TODAY,
-                                "false");
+        int alarm_interval = 1000*60*60*12;
         //Alarm set for 24 hours
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),alarm_interval , mPendingIntent);
         Log.i("Alarm","armManagerToSetWallPaper called");
@@ -1513,6 +1509,8 @@ public class HomeActivity extends AppCompatActivity implements
                             .build());
 
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
+                    sharedPreferences.edit().putBoolean("is_today_wallpaper_set",false).apply();
+
                     setAlarmManagerToSetWallPaper();
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
                     Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
@@ -1860,7 +1858,7 @@ public class HomeActivity extends AppCompatActivity implements
         NetworkApiHelper.getInstance().getWallPaper(Integer.parseInt(Utils.getUserId(this)),  new NetworkApiCallback<GetWallPaperResponse>() {
             @Override
             public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
-                Log.i(TAG,"wallpaper URL is--"+getWallPaperResponse.wallPaper);
+                Log.i(TAG,"setWallpaperNow() wallpaper is set URL is--"+getWallPaperResponse.wallPaper);
                 if(wallpaper_action == AppConstants.SET_WALLPAPER)
                     setWallPaper(HomeActivity.this , getWallPaperResponse.wallPaper);
 
@@ -1868,12 +1866,12 @@ public class HomeActivity extends AppCompatActivity implements
 
             @Override
             public void failure(GetWallPaperResponse getWallPaperResponse) {
-
+                Log.i(TAG,"setWallpaperNow() failure "+getWallPaperResponse.errorMessage);
             }
 
             @Override
             public void networkFailure(RetrofitError error) {
-
+                Log.i(TAG,"setWallpaperNow() networkFailure "+error.getMessage());
             }
 
         });

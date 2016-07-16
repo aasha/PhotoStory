@@ -6,6 +6,7 @@ import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -47,48 +48,58 @@ import service.WallpaperChangeService;
 /**
  * Created by training3 on 25/06/2016 AD.
  */
+
 public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
     private String TAG = WallpaperChangeAlarmReceiver.class.getName();
     private GcmNetworkManager mGcmNetworkManager;
+    private Context context;
 
 
     @Override
     public void onReceive(final Context mContext, final Intent intent) {
-        Log.i("Alarm","WallpaperChangeAlarmReceiver onRecieve Called");
 
-        if(Utils.isNotEmpty(Utils.getUserId(mContext))) {
+        if(isHourAM()){
+            Log.i("Alarm","WallpaperChangeAlarmReceiver onRecieve Called");
+            context = mContext;
 
-            int user_id = Integer.parseInt(Utils.getUserId(mContext));
-
-            NetworkApiHelper.getInstance().getWallPaper(user_id, new NetworkApiCallback<GetWallPaperResponse>() {
-                @Override
-                public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
-                    Log.i(TAG, "wallpaper URL is--" + getWallPaperResponse.wallPaper);
-                    setWallPaper(mContext, getWallPaperResponse.wallPaper);
-                    Utils.updateShreadPrefs(mContext,
-                            AppConstants.IS_WALLPAPER_SET_FOR_TODAY,
-                            "true");
-
-                }
-
-                @Override
-                public void failure(GetWallPaperResponse getWallPaperResponse) {
-                    setJobSchedulerToSetWallpaper(mContext);
-                    Log.i(TAG,"failure->"+getWallPaperResponse.errorMessage);
+            SharedPreferences mSharedPrefs = mContext.getSharedPreferences(
+                    AppConstants.APP_PREFS, 0);
 
 
-                }
+            if(Utils.isNotEmpty(Utils.getUserId(mContext)) &&
+                    !mSharedPrefs.getBoolean("is_today_wallpaper_set",false)) {
 
-                @Override
-                public void networkFailure(RetrofitError error) {
+                int user_id = Integer.parseInt(Utils.getUserId(mContext));
 
-                    setJobSchedulerToSetWallpaper(mContext);
-                    Log.i(TAG,"networkFailure->"+error.toString());
+                NetworkApiHelper.getInstance().getWallPaper(user_id, new NetworkApiCallback<GetWallPaperResponse>() {
+                    @Override
+                    public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
+                        Log.i(TAG, "Wallpaper URL is--" + getWallPaperResponse.wallPaper);
 
+                        setWallPaper(mContext, getWallPaperResponse.wallPaper);
+                        updateSharedPref(true);
 
-                }
-            });
+                    }
+
+                    @Override
+                    public void failure(GetWallPaperResponse getWallPaperResponse) {
+    //                    setJobSchedulerToSetWallpaper(mContext);
+                        Log.i(TAG, "failure->" + getWallPaperResponse.errorMessage);
+                        updateSharedPref(false);
+
+                    }
+
+                    @Override
+                    public void networkFailure(RetrofitError error) {
+    //                    setJobSchedulerToSetWallpaper(mContext);
+                        Log.i(TAG, "networkFailure->" + error.toString());
+                        updateSharedPref(false);
+                    }
+                });
+             }
+        }else{
+            updateSharedPref(false);
         }
 
     }
@@ -100,7 +111,7 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
         Task task = new OneoffTask.Builder()
                 .setService(WallpaperChangeService.class)
-                .setExecutionWindow(1000*60*15, 1000*60*60*9) // 15 mins to nine hours
+                .setExecutionWindow(0, 1000*60*60*9) // 45 seconds to nine hours
                 .setTag(AppConstants.TAG_TASK_ONEOFF_LOG)
                 .setUpdateCurrent(false)
                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
@@ -116,8 +127,23 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
      }
 
-    public void setCachedWallpaper(){
+    public void updateSharedPref(boolean bool){
+        SharedPreferences mSharedPrefs = context.getSharedPreferences(
+                AppConstants.APP_PREFS, 0);
+        mSharedPrefs.edit().putBoolean("is_today_wallpaper_set",bool).apply();
+    }
+
+    public boolean isHourAM(){
+        int mHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+
+        if(mHour<12){
+            return true;
+        }
+
+        return false;
 
     }
+
+
 
 }

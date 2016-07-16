@@ -51,6 +51,7 @@ public interface AppConstants {
     final static String INVITE_LINK_CLICKED = "INVITE_LINK_CLICKED";
     final static String IS_WALLPAPER_SET_FOR_TODAY = "IS_WALLPAPER_SET_FOR_TODAY";
     final static String TAG_TASK_ONEOFF_LOG = "TAG_TASK_ONEOFF_LOG";
+    final static String TAG_TASK_REPEAT = "TAG_TASK_REPEAT";
 
     static final int SHOW_PIC_STORY = 88;
     static final int SHOW_PIC_COMMENTS = 89;
