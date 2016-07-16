@@ -302,16 +302,16 @@ public class App extends Application implements AppConstants {
 
     public static void shuffleContentData(int startPos){
         if(mCData!=null&&startPos<mCData.size()&&startPos>0){
-            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos));
+            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos+1));
             Collections.reverse(sublist);
-            mCData.subList(0,startPos).clear();
+            mCData.subList(0,startPos+1).clear();
             mCData.addAll(sublist);
         }
     }
 
     public static int getOriginalIndex(int contentId){
         if(mOriginalIndices!=null) {
-            if(mOriginalIndices.get(contentId + "") == null)
+            if(mOriginalIndices.get(contentId + "") != null)
                 return Integer.parseInt(mOriginalIndices.get(contentId + ""));
         }
         return 0;
