@@ -536,7 +536,8 @@ public class HomeActivity extends AppCompatActivity implements
                         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                         int startPos = sharedPreferences.getInt(Page_Index,0);
 
-                        App.shuffleContentData(startPos);
+                        //App.shuffleContentData(startPos);
+                        App.reorderContentData();
                         Utils.deleteOldVideos(o.contentList);
 
                         ImageDownloadManager imageDownloadManager =

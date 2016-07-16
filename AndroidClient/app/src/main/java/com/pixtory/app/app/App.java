@@ -314,6 +314,18 @@ public class App extends Application implements AppConstants {
         }
     }
 
+    public static void reorderContentData(){
+        if(mCData!=null){
+            if(mCData.size()>30){
+                int size = mCData.size();
+                ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,size-10));
+                Collections.reverse(sublist);
+                mCData.subList(0,size-10).clear();
+                mCData.addAll(sublist);
+            }
+        }
+    }
+
     public static int getOriginalIndex(int contentId){
         if(mOriginalIndices!=null) {
             if(mOriginalIndices.get(contentId + "") != null)
