@@ -66,13 +66,15 @@ public interface AppConstants {
 
     final static String PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.pixtory.app&referrer=";
 
-    final static int PRE_LAUNCH_EMAIL = 88;
+    final static String INVITE_WHATSAPP_LINK = "https://n7e3g.app.goo.gl/Siao";
+    final static String INVITE_EMAIL_LINK = "https://n7e3g.app.goo.gl/7BOF";
+    final static String INVITE_FACEBOOK_LINK = "https://n7e3g.app.goo.gl/yhnF";
     final static int WHATSAPP_INVITE = 89;
     final static int FB_INVITE = 90;
     final static int EMAIL_INVITE = 91;
     final static int SOCIAL_MEDIA_FACEBOOK_SHARE = 92;
     final static int SOCIAL_MEDIA_INSTAGRAM_SHARE = 93;
-    final static int SOCIAL_MEDIA_WHATSAPP_SHARE = 94;
+    final static String SCM_WHATSAPP_SHARE = "https://n7e3g.app.goo.gl/Z8OJ";
     final static int ORGANIC_PLAYSTORE = 95;
     final static int WEBSITE_TO_PLAYSTORE = 96;
 

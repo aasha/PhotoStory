@@ -240,6 +240,7 @@ public class HomeActivity extends AppCompatActivity implements
     private boolean isTimerStarted;
     private int pixtoryId;
     private long storyTimeInSecs;
+    SharedPreferences sharedPreferences_app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -273,6 +274,12 @@ public class HomeActivity extends AppCompatActivity implements
 
         mLoadingText.setVisibility(View.VISIBLE);
         mOuterContainer.setVisibility(View.GONE);
+
+        //Fix to be changed later
+        sharedPreferences_app =
+                getApplicationContext().getSharedPreferences(AppConstants.APP_PREFS, 0);
+
+        //
 
         prepareFeed();
 
@@ -318,6 +325,7 @@ public class HomeActivity extends AppCompatActivity implements
                     previousPage = mCurrentFragmentPosition;
                 mCurrentFragmentPosition = position;
                 SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+
                 int lastIndex = sharedPreferences.getInt(Page_Index,0);
                 int currentIndex = App.getOriginalIndex(App.getContentData().get(mCurrentFragmentPosition).id);
                 if(currentIndex>lastIndex)
@@ -1261,7 +1269,17 @@ public class HomeActivity extends AppCompatActivity implements
                     intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
                     intent.setAction(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called Pixtory, a platform for stunning fullscreen images and the stories behind them. I think you should check it out! Download it on the Play Store or go to \n\nwww.pixtory.in to know more.");
+
+                    String invite_link;
+                    if(packageName.contains("com.facebook.katana"))
+                        invite_link = AppConstants.INVITE_FACEBOOK_LINK;
+                    else
+                        invite_link = AppConstants.INVITE_EMAIL_LINK;
+
+                    intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called Pixtory, " +
+                            "a platform for stunning fullscreen images and the stories behind them. " +
+                            "I think you should check it out! " +
+                            "Download it on the Play Store or go to \n\n" +invite_link +" to know more.");
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);
@@ -1272,8 +1290,8 @@ public class HomeActivity extends AppCompatActivity implements
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called *Pixtory*, a platform for stunning fullscreen images and the stories behind them. I think you should check it" +
                             " out! Download it on the Play Store \n\n"
-                            +AppConstants.PLAY_STORE_LINK+AppConstants.SOCIAL_MEDIA_WHATSAPP_SHARE+
-                            " to know more.");
+                            +AppConstants.INVITE_WHATSAPP_LINK+
+                            "  to know more.");
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);
@@ -1511,8 +1529,9 @@ public class HomeActivity extends AppCompatActivity implements
                             .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                             .build());
 
+                    sharedPreferences_app.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                    sharedPreferences.edit().putBoolean("is_today_wallpaper_set",false).apply();
+                    sharedPreferences_app.edit().putBoolean("is_today_wallpaper_set",false).apply();
 
                     setAlarmManagerToSetWallPaper();
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
@@ -1542,6 +1561,7 @@ public class HomeActivity extends AppCompatActivity implements
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
                     Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
 
+                    sharedPreferences_app.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     cancelAlarm();
                     final Handler handler = new Handler();

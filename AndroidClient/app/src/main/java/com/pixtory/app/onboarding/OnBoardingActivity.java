@@ -279,6 +279,7 @@ public class OnBoardingActivity  extends FragmentActivity {
         String userId = Utils.getUserId(OnBoardingActivity.this);
 
         if (null != userId && !userId.isEmpty()) {
+            AmplitudeLog.sendUserInfo(userId);
             gotoNextScreen(userId);
             return true;
         }

@@ -1812,7 +1812,7 @@ public class MainFragment extends Fragment implements ScrollViewListener{
                     case R.id.wallpaper_overflow_daily:mListener.showWallPaperCoachMark();
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("MF_DailyWp_Click")
                             .put(AppConstants.USER_ID,Utils.getUserId(mContext))
-                            .put("PIXTOY_ID",mContentData.id+"")
+                            .put("PIXTORY_ID",mContentData.id+"")
                             .build());
                         popupMenu.dismiss();
                         return true;
@@ -1847,11 +1847,10 @@ public class MainFragment extends Fragment implements ScrollViewListener{
         whatsappIntent.setDataAndType(contentUri, getActivity().getContentResolver().getType(contentUri));
         whatsappIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
         whatsappIntent.putExtra(android.content.Intent.EXTRA_TEXT, mContext.getPackageName());
-        SpannableString str = new SpannableString("<a href='www.pixtory.in'>Checkout our app</a>");
-        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name
-                +"_\n\n"+mContentData.pictureDescription + "Check out our website www.pixtory.in");
-        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name+"_\n\n"+data + "\n\n"+AppConstants.PLAY_STORE_LINK+AppConstants.SOCIAL_MEDIA_WHATSAPP_SHARE+
-                " to know more.");
+        SpannableString str = new SpannableString("For more such stories\n"+"Checkout our app  "+AppConstants.SCM_WHATSAPP_SHARE);
+//        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name
+//                +"_\n\n"+mContentData.pictureDescription + "Check out our website www.pixtory.in");
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT,"*"+mContentData.name+"*\nBy _"+mContentData.personDetails.name+"_\n\n"+data + "\n\n"+str);
         whatsappIntent.setPackage(Whatsapp_Package_name);
 
 

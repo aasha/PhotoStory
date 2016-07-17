@@ -47,6 +47,8 @@ import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -107,11 +109,18 @@ public class MyGcmListenerService extends GcmListenerService {
         SharedPreferences mSharedPrefs = getApplicationContext().getSharedPreferences(
                 AppConstants.APP_PREFS, 0);
 
+        getApplicationContext().getSharedPreferences(
+                AppConstants.APP_PREFS, Context.MODE_PRIVATE);
+
+
+        if( Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 4){
+            updateSharedPref(false);
+        }
+
         Log.i(TAG,"Opted_for_daily_wallpaper::"+mSharedPrefs.getBoolean("Opt_for_daily_wallpaper",false));
         Log.i(TAG,"is daily wallpaper set for today"+ mSharedPrefs.getBoolean("is_today_wallpaper_set",false));
 
         if(mSharedPrefs.getBoolean("Opt_for_daily_wallpaper",false) && !mSharedPrefs.getBoolean("is_today_wallpaper_set",true)){
-            Log.i(TAG,"changeWallpaper method called");
             changeWallPaper();
         }
 
@@ -181,7 +190,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
     private void changeWallPaper(){
 
-        Log.i("Alarm","WallpaperChangeAlarmReceiver onRecieve Called");
+        Log.i(TAG,"changeWallpaper method called");
 
         if(Utils.isNotEmpty(Utils.getUserId(getApplicationContext()))) {
 
