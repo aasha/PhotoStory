@@ -200,6 +200,8 @@ public class HomeActivity extends AppCompatActivity implements
     private TextView mWallpaperTopText;
     private TextView mSwipeLeftText;
 
+    private boolean isNotification;
+
     @Bind(R.id.whole_frame)
     FrameLayout mOuterContainer;
 
@@ -246,8 +248,8 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
 
         isFirstTimeOpen();
-
-        if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
+        isNotification = getIntent().getBooleanExtra("NOTIFICATION_CLICK",false);
+        if(isNotification)
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
@@ -546,7 +548,7 @@ public class HomeActivity extends AppCompatActivity implements
                         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                         int startPos = sharedPreferences.getInt(Page_Index,0);
 
-                        App.shuffleContentData(startPos);
+                        App.shuffleContentData(startPos,isNotification);
                         //App.reorderContentData();
                         Utils.deleteOldVideos(o.contentList);
 

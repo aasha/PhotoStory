@@ -31,6 +31,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitationResult;
 import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -55,6 +56,18 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+
+
 
 public class OnBoardingActivity  extends FragmentActivity {
     //
@@ -68,7 +81,12 @@ public class OnBoardingActivity  extends FragmentActivity {
     final static String SCREEN_NAME = "Onboard";
     final static String OB_Card_Swipe = "OB_Card_Swipe";
 
+    private static final int RC_SIGN_IN = 9001;
+
+
     Tracker mTracker;
+
+    private GoogleApiClient mGoogleApiClient;
 
 
     @Override
@@ -82,6 +100,23 @@ public class OnBoardingActivity  extends FragmentActivity {
         callbackManager = CallbackManager.Factory.create();
 
         printSHA();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        // Build GoogleApiClient with AppInvite API for receiving deep links
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener(){
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                    }
+                })
+                .addApi(AppInvite.API)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
 
         //Get Default Tracker
         GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
@@ -114,6 +149,7 @@ public class OnBoardingActivity  extends FragmentActivity {
         mProgressDialog.setCanceledOnTouchOutside(false);
 
         LinearLayout imageViewFb = (LinearLayout) findViewById(R.id.fb_sign_btn);
+        LinearLayout googleLogin = (LinearLayout)findViewById(R.id.google_plus_sign_btn);
 
         imageViewFb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +159,14 @@ public class OnBoardingActivity  extends FragmentActivity {
                 LoginManager.getInstance().logInWithReadPermissions(OnBoardingActivity.this, AppConstants.mFBPermissions);
             }
         });
+
+        googleLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startGoogleSignIn();
+            }
+        });
+
 
         TextView skipLogin = (TextView) findViewById(R.id.skipLogin);
         skipLogin.setPaintFlags(skipLogin.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -192,7 +236,12 @@ public class OnBoardingActivity  extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+        else
+            callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     private void onFacebookLoginSuccess(LoginResult loginResult) {
@@ -363,25 +412,15 @@ public class OnBoardingActivity  extends FragmentActivity {
         }
     }
 
-    private GoogleApiClient mGoogleApiClient;
+
 
     private void getDeepLinkData(){
 
         String deviceId = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        // Build GoogleApiClient with AppInvite API for receiving deep links
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener(){
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-                    }
-                })
-                .addApi(AppInvite.API)
-                .build();
         Log.d(TAG,"getDeepLinkData is called");
-
 
         // Check if this app was launched from a deep link. Setting autoLaunchDeepLink to true
         // would automatically launch the deep link if one is found.
@@ -420,5 +459,80 @@ public class OnBoardingActivity  extends FragmentActivity {
 
     }
 
+    // [START handleSignInResult]
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            String name = acct.getDisplayName();
+            String email = acct.getEmail();
+            String imageUrl = acct.getPhotoUrl().toString();
+
+           // registerGoogleAccount(name,email,imageUrl);
+            Toast.makeText(this,name+"-"+email+"-"+imageUrl,Toast.LENGTH_LONG).show();
+
+        } else {
+            // Signed out, show unauthenticated UI.
+            Toast.makeText(this,result.toString(),Toast.LENGTH_LONG).show();
+            Log.i(TAG,result.getStatus()+" GOOGLE STATUS CODE");
+        }
+    }
+    // [END handleSignInResult]
+
+    // [START signIn]
+    private void startGoogleSignIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+    // [END signIn]
+
+    private void registerGoogleAccount(final String name, String email, String imageUrl){
+        NetworkApiHelper.getInstance().registerUser(name, email, imageUrl,null,new NetworkApiCallback<RegisterResponse>() {
+            @Override
+            public void success(RegisterResponse regResp, Response response) {
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+                Utils.putUserId(OnBoardingActivity.this, regResp.userId);
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Success)
+//                        .build());
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Success)
+                        .put("USER_ID", regResp.userId)
+                        .build());
+                Utils.putUserName(OnBoardingActivity.this, name);
+
+                AmplitudeLog.sendUserInfo(regResp.userId);
+                gotoNextScreen(regResp.userId);
+            }
+
+            @Override
+            public void failure(RegisterResponse error) {
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
+//                        .build());
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
+                        .put("MESSAGE", error.errorMessage)
+                        .build());
+                Toast.makeText(OnBoardingActivity.this, "Username is taken. Please insert a new username", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void networkFailure(RetrofitError error) {
+
+                if (mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
+//                        .build());
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
+                        .put("MESSAGE", error.getMessage())
+                        .build());
+                Toast.makeText(OnBoardingActivity.this, "Please check your internet connection", Toast.LENGTH_LONG).show();
+
+            }
+        });
+    }
 
 }

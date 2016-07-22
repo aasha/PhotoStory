@@ -57,10 +57,14 @@ public class AmplitudeLog {
                 for (String key : data.keySet()) {
                     labelBuilder.put(key, data.get(key));
                 }
+                if(App.getAppContext()!=null)
+                    labelBuilder.put("USER_NAME",Utils.getUserName(App.getAppContext()));
                 appEvent.properties = labelBuilder;
             }catch (Exception e){
                 e.printStackTrace();
             }
+            if(App.getAppContext()!=null)
+                appEvent.params.putString("USER_NAME",Utils.getUserName(App.getAppContext()));
             return appEvent;
         }
     }

@@ -95,12 +95,14 @@ public class App extends Application implements AppConstants {
     private static Map<String,String> mOriginalIndices = new HashMap<String, String>();
     private static Map<String,String> mOriginalCategoryIndices = new HashMap<String, String>();
 
+    private static Context mContext;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-
+        mContext = getApplicationContext();
         isLoginRequired = true;
 
         Crittercism.initialize(getApplicationContext(), "67496ab9c7094339adf79c54d369ccc900555300");
@@ -300,17 +302,39 @@ public class App extends Application implements AppConstants {
     }
 
 
-    public static void shuffleContentData(int startPos){
-        if(mCData!=null&&startPos<mCData.size()&&startPos>0){
-            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos+1));
-            Collections.reverse(sublist);
-            mCData.subList(0,startPos+1).clear();
-            mCData.addAll(sublist);
-        }else if(mCData!=null&&mCData.size()>30&&startPos==0){
-            ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()-10));
-            Collections.reverse(sublist);
-            mCData.subList(0,mCData.size()-10).clear();
-            mCData.addAll(sublist);
+    public static void shuffleContentData(int startPos, boolean isPushNotification){
+        if(isPushNotification && mCData!=null && mCData.size()>30){
+            if(startPos<mCData.size()-10&&startPos>0){
+                ContentData firstData = mCData.get(mCData.size()-10);
+                ArrayList<ContentData> tmpList= new ArrayList<ContentData>();
+                tmpList.add(firstData);
+                ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos+1));
+                Collections.reverse(sublist);
+                mCData.subList(0,startPos+1).clear();
+                mCData.remove(firstData);
+                mCData.addAll(sublist);
+                tmpList.addAll(mCData);
+                mCData.clear();
+                mCData.addAll(tmpList);
+            }else{
+                ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()-10));
+                Collections.reverse(sublist);
+                mCData.subList(0,mCData.size()-10).clear();
+                mCData.addAll(sublist);
+            }
+        }
+        else if(!isPushNotification && mCData!=null){
+            if(startPos<mCData.size()&&startPos>0){
+                ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,startPos+1));
+                Collections.reverse(sublist);
+                mCData.subList(0,startPos+1).clear();
+                mCData.addAll(sublist);
+            }else if(mCData.size()>30&&startPos==0){
+                ArrayList<ContentData> sublist = new ArrayList<ContentData>(mCData.subList(0,mCData.size()-10));
+                Collections.reverse(sublist);
+                mCData.subList(0,mCData.size()-10).clear();
+                mCData.addAll(sublist);
+            }
         }
     }
 
@@ -335,5 +359,7 @@ public class App extends Application implements AppConstants {
     }
 
     public static FirebaseAnalytics getmFirebaseAnalytics(){return mFirebaseAnalytics;}
+
+    public static Context getAppContext(){return mContext;}
 
 }

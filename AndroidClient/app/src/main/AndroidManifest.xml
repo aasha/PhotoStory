@@ -24,6 +24,10 @@
 
     <uses-permission android:name="com.pixtory.app.permission.C2D_MESSAGE" />
 
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
     <uses-feature android:name="android.hardware.camera.flash" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
