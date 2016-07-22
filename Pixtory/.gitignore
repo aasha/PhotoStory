@@ -1,0 +1,23 @@
+# Project Files #
+#################
+.idea
+*.ipr
+*.iml
+.settings
+.project
+.classpath
+.gradle
+local.properties
+build/
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
