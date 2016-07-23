@@ -73,7 +73,9 @@ dependencies {
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
 
+    //Dependencies for google login
     compile 'com.google.android.gms:play-services-auth:9.2.1'
+    compile 'com.google.android.gms:play-services-plus:9.2.1'
 
     //Adding GooglePlayServices and Firebase
     compile 'com.google.android.gms:play-services-analytics:9.2.1'

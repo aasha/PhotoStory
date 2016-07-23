@@ -33,8 +33,12 @@ import com.google.android.gms.appinvite.AppInviteInvitationResult;
 import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 import com.google.firebase.crash.FirebaseCrash;
 import com.pixtory.app.HomeActivity;
 import com.pixtory.app.R;
@@ -103,6 +107,9 @@ public class OnBoardingActivity  extends FragmentActivity {
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestScopes(new Scope(Scopes.PLUS_LOGIN))
+                .requestScopes(new Scope(Scopes.PLUS_ME))
+                .requestProfile()
                 .build();
 
         // Build GoogleApiClient with AppInvite API for receiving deep links
@@ -115,6 +122,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                 })
                 .addApi(AppInvite.API)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addApi(Plus.API)
                 .build();
 
 
@@ -163,6 +171,10 @@ public class OnBoardingActivity  extends FragmentActivity {
         googleLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mProgressDialog.setMessage("Please wait");
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("OB_GoogleLogin_Click")
+                        .build());
+                mProgressDialog.show();
                 startGoogleSignIn();
             }
         });
@@ -236,12 +248,14 @@ public class OnBoardingActivity  extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(mProgressDialog!=null && mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            handleGoogleSignInResult(result);
         }
-        else
-            callbackManager.onActivityResult(requestCode, resultCode, data);
+
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     private void onFacebookLoginSuccess(LoginResult loginResult) {
@@ -459,35 +473,65 @@ public class OnBoardingActivity  extends FragmentActivity {
 
     }
 
-    // [START handleSignInResult]
-    private void handleSignInResult(GoogleSignInResult result) {
+    //START handleSignInResult
+    private void handleGoogleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
+
             GoogleSignInAccount acct = result.getSignInAccount();
             String name = acct.getDisplayName();
             String email = acct.getEmail();
             String imageUrl = acct.getPhotoUrl().toString();
 
-           // registerGoogleAccount(name,email,imageUrl);
-            Toast.makeText(this,name+"-"+email+"-"+imageUrl,Toast.LENGTH_LONG).show();
+            // Google + profile info
+            Person person  = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+            Log.i(TAG, "--------------------------------");
+            Log.i(TAG, "Display Name: " + person.getDisplayName());
+            Log.i(TAG, "Gender: " + person.getGender());
+            Log.i(TAG, "AboutMe: " + person.getAboutMe());
+            Log.i(TAG, "Birthday: " + person.getBirthday());
+            Log.i(TAG, "Current Location: " + person.getCurrentLocation());
+            Log.i(TAG, "Language: " + person.getLanguage());
+            Log.i(TAG, "GOOGLE_PLUS_PROFILE : " + person.toString());
+
+            String gender = person.getGender()==0?"MALE":"FEMALE";
+            String ageRange = person.getAgeRange().toString();
+
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("OB_GoogleLogin_Success")
+                    .put("GOOGLE_NAME",name)
+                    .put("GOOGLE_MAIL",email)
+                    .put("GOOGLE_GENDER",gender)
+                    .put("GOOGLE_AGE",ageRange)
+                    .build());
+
+            Utils.putFbId(OnBoardingActivity.this, "dummyFbId");
+            Utils.putEmail(OnBoardingActivity.this, email);
+            Utils.putUserName(OnBoardingActivity.this, name);
+            Utils.putUserImage(OnBoardingActivity.this, imageUrl);
+
+            registerGoogleAccount(name,email,imageUrl);
+            Log.i(TAG,"Google plus details - "+name+" - "+email+" - "+imageUrl);
 
         } else {
             // Signed out, show unauthenticated UI.
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("OB_GoogleLogin_Failed")
+                    .put("STATUS_CODE",result.getStatus()+"")
+                    .build());
             Toast.makeText(this,result.toString(),Toast.LENGTH_LONG).show();
-            Log.i(TAG,result.getStatus()+" GOOGLE STATUS CODE");
+            Log.i(TAG,"GOOGLE STATUS CODE: "+result.getStatus());
         }
     }
-    // [END handleSignInResult]
 
-    // [START signIn]
+
+    // START Google signIn
     private void startGoogleSignIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-    // [END signIn]
 
-    private void registerGoogleAccount(final String name, String email, String imageUrl){
+
+    private void registerGoogleAccount(final String name, final String email,final String imageUrl){
         NetworkApiHelper.getInstance().registerUser(name, email, imageUrl,null,new NetworkApiCallback<RegisterResponse>() {
             @Override
             public void success(RegisterResponse regResp, Response response) {
@@ -495,12 +539,10 @@ public class OnBoardingActivity  extends FragmentActivity {
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
                 Utils.putUserId(OnBoardingActivity.this, regResp.userId);
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Success)
-//                        .build());
+
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Success)
                         .put("USER_ID", regResp.userId)
                         .build());
-                Utils.putUserName(OnBoardingActivity.this, name);
 
                 AmplitudeLog.sendUserInfo(regResp.userId);
                 gotoNextScreen(regResp.userId);
@@ -511,8 +553,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
-//                        .build());
+
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                         .put("MESSAGE", error.errorMessage)
                         .build());
@@ -524,8 +565,7 @@ public class OnBoardingActivity  extends FragmentActivity {
 
                 if (mProgressDialog.isShowing())
                     mProgressDialog.dismiss();
-//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(OB_UsernameLogin_Fail)
-//                        .build());
+
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_Register_Failure)
                         .put("MESSAGE", error.getMessage())
                         .build());
