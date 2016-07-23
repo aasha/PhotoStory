@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
                 android:textColor="@color/white"
-                android:text="Connect with Google    "
+                android:text="Connect with Google     "
                 android:textAlignment="center"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="8dp"
