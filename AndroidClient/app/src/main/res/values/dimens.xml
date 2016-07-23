@@ -10,4 +10,28 @@
     <dimen name="showcase_radius_outer">60dp</dimen>
     <dimen name="card_insets">8dp</dimen>
 
+    <dimen name="fb_signin_btn_font">32sp</dimen>
+    <dimen name="fb_signin_btn_height">70dp</dimen>
+    <dimen name="fb_icon_margin">4dp</dimen>
+    <dimen name="fb_signin_btn_width">405dp</dimen>
+
+    <dimen name="fb_btn_icon_height">18dp</dimen>
+    <dimen name="fb_btn_icon_width">38.67dp</dimen>
+    <dimen name="pixtory_subheading_font">13sp</dimen>
+    <dimen name="skip_login_font">9sp</dimen>
+
+    <dimen name="image_layout_height">280dp</dimen>
+    <dimen name="image_layout_padding_top">170dp</dimen>
+    <dimen name="story_min_height">380dp</dimen>
+
+    <dimen name="post_comment_btn_height">60dp</dimen>
+    <dimen name="image_detail_width">240dp</dimen>
+
+    <dimen name="story_layout_min_height">700dp</dimen>
+    <dimen name="comment_min_height">320dp</dimen>
+
+    <dimen name="back_btn_height">28dp</dimen>
+    <dimen name="back_btn_width">28dp</dimen>
+
+
 </resources>

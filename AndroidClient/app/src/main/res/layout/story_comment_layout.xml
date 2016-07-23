@@ -1,0 +1,126 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:background="#fff"
+    android:orientation="vertical"
+    android:visibility="visible">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        android:id="@+id/story_detail">
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:text="Steve Johnson"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/grey_3"
+        android:textSize="10dp"
+        android:id="@+id/txtPlace"/>
+    <TextView android:layout_width="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:textSize="12dp"
+        android:fontFamily="sans-serif"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPlace"
+        android:text="Travel Enthusiast"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/app_blue"
+        android:textAllCaps="true"
+        android:id="@+id/txtDesc"/>
+
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separator_color"
+            android:id="@+id/separator"
+            android:layout_below="@+id/txtDesc"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/closeBtn"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/blue_cross"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/postBtn_ll"
+        android:layout_below="@+id/story_detail">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:visibility="visible"
+            android:id="@+id/comments_layout"
+            android:layout_height="@dimen/story_layout_min_height">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:id="@+id/comment_img"
+            android:src="@drawable/comment"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="5dp"
+            android:layout_height="20dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="1"
+            android:textAllCaps="true"
+            android:id="@+id/tvCount"
+            android:layout_alignBottom="@+id/comment_img"
+            android:layout_toRightOf="@+id/comment_img"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/grey_1"
+
+            android:fontFamily="sans-serif-light"
+             />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:textSize="15dp"
+            android:text="comments"
+            android:id="@+id/comment_text"
+            android:textAllCaps="true"
+            android:layout_alignBottom="@+id/comment_img"
+            android:layout_toRightOf="@+id/tvCount"
+            android:layout_marginLeft="4dp"
+            android:fontFamily="sans-serif"
+            />
+
+        <android.support.v7.widget.RecyclerView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/commentsList"
+           android:layout_below="@+id/comment_img"
+           android:layout_marginLeft="20dp"
+           android:layout_marginRight="20dp"
+            android:layout_marginBottom="45dp">
+
+       </android.support.v7.widget.RecyclerView>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/loading_comments"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="Loading Comments..."/>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,46 +1,73 @@
 {
   "project_info": {
-    "project_id": "photostory-9ff3c",
-    "project_number": "1032488455191",
-    "name": "PhotoStory"
+    "project_number": "46207295900",
+    "firebase_url": "https://pixtory-1352.firebaseio.com",
+    "project_id": "pixtory-1352",
+    "storage_bucket": "pixtory-1352.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1032488455191:android:deb34e40d9adc7bd",
-        "client_id": "android:com.photostory.app",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:46207295900:android:9a126d00c4ca4f8b",
         "android_client_info": {
-          "package_name": "com.photostory.app",
-          "certificate_hash": []
+          "package_name": "com.pixtory.app"
         }
       },
-      "oauth_client": [],
-      "api_key": [],
+      "oauth_client": [
+        {
+          "client_id": "46207295900-ltqa5tl6r8rb12q4vc360avb6qcpuf0j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pixtory.app",
+            "certificate_hash": "19CCBA448C76F234F2CF7E0697A4AF20DDA69185"
+          }
+        },
+        {
+          "client_id": "46207295900-r1qbe7q0tkmu6iks6ade8ipi8230jpbd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pixtory.app",
+            "certificate_hash": "1AEAEC37E8180DDE28B16C6F99DD363ECC09B643"
+          }
+        },
+        {
+          "client_id": "46207295900-bfefuuluo2ta4edq45k6lov9402c1l3n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pixtory.app",
+            "certificate_hash": "BA8E263C15451A0CB9C9FF46C348AC4956D5F036"
+          }
+        },
+        {
+          "client_id": "46207295900-g30v4as8igt13bk3bkupdbqu8maqu5n5.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "46207295900-pil70l4610sak2e3ltf1tcikio706or1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADbSsib9YXD3f1djucVJLOX6mlGBR9qI0"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 2,
           "analytics_property": {
-            "tracking_id": "UA-76640678-1"
+            "tracking_id": "UA-80782200-1"
           }
-        },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
         },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
         },
-        "google_signin_service": {
-          "status": 1
-        },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

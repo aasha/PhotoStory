@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="story_content">33.33sp</dimen>
+    <dimen name="fb_signin_btn_font">16sp</dimen>
+    <dimen name="fb_signin_btn_height">35dp</dimen>
+    <dimen name="fb_signin_btn_width">210dp</dimen>
+    <dimen name="fb_btn_icon_height">16dp</dimen>
+    <dimen name="fb_btn_icon_width">30dp</dimen>
+    <dimen name="fb_icon_margin">1dp</dimen>
+
+    <dimen name="pixtory_subheading_font">26sp</dimen>
+    <dimen name="skip_login_font">24sp</dimen>
+    <dimen name="card_name_font">20sp</dimen>
+
+    <dimen name="image_detail_width">210dp</dimen>
+    <dimen name="image_layout_height">220dp</dimen>
+    <dimen name="story_layout_min_height">300dp</dimen>
+    <dimen name="image_layout_padding_top">95dp</dimen>
+    <dimen name="story_min_height">200dp</dimen>
+
+    <dimen name="story_nestedscrollview_height">400dp</dimen>
+
+    <dimen name="comment_min_height">275dp</dimen>
+
+
+
+</resources>

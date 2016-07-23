@@ -1,107 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pixtory.app" >
+    package="com.pixtory.app">
+
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <!-- required for setIsSyncable -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- For recording -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!--For GCM-->
+    <!-- For GCM -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <permission
-            android:name="com.pixtory.app.permission.C2D_MESSAGE"
-            android:protectionLevel="signature" />
+        android:name="com.pixtory.app.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.pixtory.app.permission.C2D_MESSAGE" />
+
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <uses-feature android:name="android.hardware.camera.flash" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
-            android:name="android.hardware.camera.front"
-            android:required="false" />
+        android:name="android.hardware.camera.front"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.FLASHLIGHT" />
 
     <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <application
-            android:name=".app.App"
-            android:hardwareAccelerated="true"
-            android:icon="@drawable/pixtory"
-            android:label="@string/app_name"
-            android:largeHeap="true"
-            android:supportsRtl="true"
-            android:theme="@style/AppTheme" >
-
+        android:name=".app.App"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/pixtory_beta_icon"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:supportsRtl="true"
+        android:allowBackup="false"
+        android:theme="@style/AppTheme.Launcher">
         <activity
-                android:name=".onboarding.OnBoardingActivity"
-                android:icon="@drawable/pixtory"
-                android:label="OnBoardingActivity"
-                android:screenOrientation="portrait">
-
-
-        </activity>
-        <activity
-                android:name=".HomeActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+            android:name=".onboarding.OnBoardingActivity"
+            android:icon="@drawable/pixtory_beta_icon"
+            android:label="Pixtory"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="pixtory.in" android:scheme="http"/>
+                <data android:host="pixtory.in" android:scheme="https"/>
             </intent-filter>
         </activity>
         <activity
-                android:name=".WebviewActivity"
-                android:label="@string/title_activity_webview"
-                android:screenOrientation="portrait"
-                android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name=".HomeActivity"
+            android:screenOrientation="portrait"
+            android:persistent="true"
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
+        <activity
+            android:name=".userprofile.UserProfileActivity"
+            android:icon="@drawable/pixtory_beta_icon"
+            android:label="UserProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
 
         <receiver
-                android:name="com.google.android.gms.gcm.GcmReceiver"
-                android:exported="true"
-                android:permission="com.google.android.c2dm.permission.SEND">
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="gcm.play.android.samples.com.gcmquickstart" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".WallpaperChangeAlarmReceiver" />
 
         <service
-                android:name=".pushnotification.MyGcmListenerService"
-                android:exported="false">
+            android:name=".pushnotification.MyGcmListenerService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-                android:name=".pushnotification.MyInstanceIDListenerService"
-                android:exported="false">
+            android:name=".pushnotification.MyInstanceIDListenerService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
         <service
-                android:name=".pushnotification.RegistrationIntentService"
-                android:exported="false"></service>
+            android:name=".pushnotification.RegistrationIntentService"
+            android:exported="false" />
 
         <meta-data
-                android:name="com.facebook.sdk.ApplicationId"
-                android:value="@string/app_id" />
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
 
         <activity
-                android:name="com.facebook.FacebookActivity"
-                android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-                android:label="@string/app_name"
-                android:screenOrientation="portrait"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.pixtory.app.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider1207785742565519"
+            android:exported="true" />
+
+        <receiver
+            android:name=".WallpaperNetworkRetryReceiver"
+            android:enabled="false"
+            android:exported="false"></receiver>
+
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+
+        <receiver android:name=".recievers.InstallReferrerReciever"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="service.WallpaperChangeService"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
 
     </application>
 

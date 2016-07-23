@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp"
+    >
+
+    <com.pixtory.app.views.CircularImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/avatarImg"
+        android:src="@drawable/profile_icon_3"
+        android:layout_marginRight="10dp"/>
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:layout_toRightOf="@+id/avatarImg"
+        android:text="Steve Johnson"
+        android:textSize="10sp"
+        android:textColor="#31aef5"
+        android:id="@+id/txtName"/>
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/avatarImg"
+        android:layout_below="@+id/txtName"
+        android:text="Travel Enthusiast"
+        android:fontFamily="sans-serif-light"
+        android:textAllCaps="true"
+        android:textColor="@color/grey_3"
+        android:textSize="9sp"
+        android:id="@+id/txtDesc"/>
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:fontFamily="sans-serif-light"
+        android:text="07 Apr"
+        android:textSize="9sp"
+        android:textColor="@color/grey_3"
+        android:id="@+id/txtDate"
+        />
+
+    <TextView android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Abc"
+        android:maxLines="4"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="left"
+        android:id="@+id/txtComment"
+        android:layout_below="@+id/txtDesc"
+        android:layout_toRightOf="@+id/avatarImg"
+        android:layout_toEndOf="@+id/avatarImg"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/grey_2"
+        android:textSize="15sp"
+        android:fontFamily="sans-serif-light"
+        android:lineSpacingExtra="4sp"/>
+
+    <View android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:id="@+id/separator"
+        android:layout_marginLeft="50dp"
+        android:layout_below="@+id/txtComment"
+        android:layout_alignRight="@+id/txtDate"
+        android:layout_alignEnd="@+id/txtComment" />
+
+</RelativeLayout>

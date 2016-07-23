@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:id="@+id/dialog_layout"
+android:background="#eeffffff"
+android:visibility="visible">
+
+<TextView
+    android:layout_width="274dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top|center"
+    android:layout_marginTop="33dp"
+    android:text="@string/swipe_up_coach_mark_text"
+    android:textColor="@color/black"
+    android:textAlignment="center"
+    android:paddingTop="30dp"
+    android:paddingBottom="30dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:textSize="22sp"
+    android:fontFamily="sans-serif-light"
+    android:id="@+id/swipe_up_text_top"
+    android:lineSpacingExtra="5dp"/>
+<ImageView
+    android:layout_width="60dp"
+    android:layout_height="205dp"
+    android:layout_gravity="top|center"
+    android:layout_marginTop="160dp"
+    android:src="@drawable/swipe_up_hand_icon"/>
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:textColor="@color/black"
+    android:paddingBottom="30dp"
+    android:textSize="17sp"
+    android:fontFamily="sans-serif-regular"
+    android:paddingTop="20dp"
+    android:text="@string/swipe_up_coach_mark_text_2"
+    android:textAlignment="center"
+    android:paddingRight="20dp"
+    android:paddingLeft="20dp"
+    android:id="@+id/swipe_up_text_bottom"
+    android:layout_marginBottom="70dp"
+    android:lineSpacingExtra="3dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:textAlignment="center"
+        android:padding="15dp"
+        android:text="Okay, Got it!"
+        android:background="@drawable/yes_no_selector_coachmark"
+        android:textSize="18sp"
+        android:fontFamily="sans-serif-light"
+        android:id="@+id/swipe_up_coachmark_close"
+        android:textColor="@color/black"/>
+
+</FrameLayout>

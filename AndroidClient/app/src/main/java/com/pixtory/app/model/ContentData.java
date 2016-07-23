@@ -13,10 +13,28 @@ public class ContentData {
     public int likeCount = 0;
     public String place = null;
     public String date = null;
-    public String pictureDescription = null;
+    public String pictureDescription = "";
+    public String pictureSummary = "";
+    public boolean editorsPick = false;
     public String pictureFirstPara = null;
     public boolean likedByUser = false;
     public PersonInfo personDetails = null;
     public List<CommentData> commentList = null;
+    public List<Category> categoryNameList = null;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof ContentData)) {
+            return false;
+        }
+
+        ContentData c = (ContentData) o;
+        if(c.id==this.id)
+            return true;
+        return false;
+    }
 }

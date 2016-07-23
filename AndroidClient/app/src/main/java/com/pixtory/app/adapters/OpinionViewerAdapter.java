@@ -45,20 +45,21 @@ public class OpinionViewerAdapter extends PagerAdapter {
             int index = position % 4;
             MainFragment hf = null;
             if (mFragmentPool.get(index) == null) {
-                hf = MainFragment.newInstance(position);
+                hf = MainFragment.newInstance(position,false);
                 mFragmentPool.put(index, hf);
             } else {
                 hf = mFragmentPool.get(index);
                 //hf.initForContentIndex(position);
                 Bundle args = new Bundle();
                 args.putInt(MainFragment.ARG_PARAM1, position);
+                args.putBoolean(MainFragment.ARG_PARAM4,false);
                 hf.setArguments(args);
             }
 
 
             return hf;
         }catch (Exception e){
-            return MainFragment.newInstance(0);
+            return MainFragment.newInstance(0,false);
         }
     }
 
@@ -70,6 +71,11 @@ public class OpinionViewerAdapter extends PagerAdapter {
     public void setData(ArrayList<ContentData> contentList) {
         mData = contentList;
         notifyDataSetChanged();
+    }
+
+    public void clearData(){
+        if(mData!=null)
+            mData.clear();
     }
 
     @Override

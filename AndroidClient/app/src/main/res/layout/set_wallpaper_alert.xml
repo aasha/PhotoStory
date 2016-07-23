@@ -1,0 +1,74 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:text="Set this Pixtory as your phone's wallpaper?"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:paddingTop="15dp"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:contentDescription="@string/app_name"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-light"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey_4"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/yes_no_selector"
+            android:id="@+id/wallpaper_no_2"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:textColor="@color/gray"
+                android:text="Cancel"
+                android:textSize="20sp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:fontFamily="sans-serif-light"/>
+        </FrameLayout>
+
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/grey_4"/>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/yes_no_selector"
+            android:id="@+id/wallpaper_yes_2">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="33dp"
+                android:textSize="20sp"
+                android:textColor="@color/app_blue"
+                android:text="Yes!"
+                android:layout_gravity="center_vertical|center_horizontal"/>
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

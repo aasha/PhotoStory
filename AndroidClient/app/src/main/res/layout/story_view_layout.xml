@@ -1,87 +1,174 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_weight="1"
-    android:background="#FFF"
     android:visibility="visible"
-                android:paddingTop="20dp">
+    android:background="@color/white">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:paddingTop="15dp"
+        android:layout_height="match_parent">
 
     <com.pixtory.app.views.CircularImageView
-            android:layout_width="50dp"
-                     android:layout_height="50dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:id="@+id/imgProfile"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="25dp"
+        android:layout_marginBottom="12dp"/>
     <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/imgProfile"
-              android:layout_marginTop="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="7dp"
             android:text="Steve Johnson"
-            android:textColor="#31aef5"
-            android:id="@+id/txtName"/>
-    <TextView android:layout_width="wrap_content"
+            android:textColor="@color/grey_2"
+            android:textSize="13dp"
+            android:id="@+id/txtName"
+        android:textStyle="bold"/>
+    <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="7dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginRight="0dp"
+                android:textSize="11dp"
+                android:layout_gravity="left"
+                android:maxLines="1"
+                android:ellipsize="end"
               android:layout_height="wrap_content"
               android:layout_toRightOf="@+id/imgProfile"
               android:layout_below="@+id/txtName"
-              android:text="Travel Enthusiast"
-              android:layout_marginTop="3dp"
-              android:textAllCaps="true"
-            android:id="@+id/txtDesc"/>
+              android:text="Tagged in"
+            android:textColor="@color/grey_3"
+            android:id="@+id/txtDesc"
+            android:visibility="gone"/>
+        <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:paddingTop="3dp"
+            android:layout_marginRight="0dp"
+            android:textSize="11dp"
+            android:layout_gravity="left"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtDesc"
+            android:layout_below="@+id/txtName"
+            android:text="Travel,"
+            android:textColor="@color/app_blue"
+            android:textAllCaps="false"
+            android:id="@+id/category_1"
+            android:visibility="gone"
+            android:paddingBottom="12dp"/>
 
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="07 Apr"
-            android:textColor="#31aef5"
-            android:id="@+id/txtDate"
-            android:layout_marginRight="20dp"/>
-    <View android:layout_width="match_parent"
-          android:layout_height="1dp"
-            android:background="#31aef5"
+        <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="3dp"
+            android:layout_marginRight="0dp"
+            android:textSize="11dp"
+            android:layout_gravity="left"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/category_1"
+            android:layout_below="@+id/txtName"
+            android:text="&#038;"
+            android:textColor="@color/grey_3"
+            android:textAllCaps="false"
+            android:id="@+id/separator_1"
+            android:visibility="gone"/>
+
+        <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="3dp"
+            android:layout_marginRight="0dp"
+            android:textSize="11dp"
+            android:layout_gravity="left"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/separator_1"
+            android:layout_below="@+id/txtName"
+            android:text="Travel"
+            android:textColor="@color/app_blue"
+            android:textAllCaps="false"
+            android:id="@+id/category_2"
+            android:visibility="gone"
+            android:paddingBottom="12dp"/>
+
+        <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="0dp"
+            android:textSize="11dp"
+            android:layout_gravity="left"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/category_2"
+            android:layout_below="@+id/txtName"
+            android:text="&#038;"
+            android:textColor="@color/grey_3"
+            android:textAllCaps="true"
+            android:id="@+id/separator_2"
+            android:visibility="gone"/>
+
+        <com.pixtory.app.views.RobotoLightTextView
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="3dp"
+            android:layout_marginRight="10dp"
+            android:textSize="11dp"
+            android:layout_gravity="left"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/separator_2"
+            android:layout_below="@+id/txtName"
+            android:text="Travel"
+            android:textColor="@color/app_blue"
+            android:textAllCaps="false"
+            android:id="@+id/category_3"
+            android:visibility="gone"
+            android:paddingBottom="12dp"/>
+
+
+        <View android:layout_width="match_parent"
+          android:layout_height="0.67dp"
+            android:background="@color/separator_color"
             android:id="@+id/separator"
             android:layout_below="@+id/imgProfile"
-            android:layout_marginTop="10dp"
-          android:layout_marginLeft="20dp"
-          android:layout_marginRight="20dp"/>
+          android:layout_marginLeft="25dp"
+        android:layout_marginTop="0dp"
+          android:layout_marginRight="25dp"/>
 
-    <ScrollView android:layout_width="match_parent"
-                android:layout_height="match_parent"
-            android:layout_below="@+id/separator"
-                android:fillViewport="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="40dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-            android:id="@+id/layout_story">
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                android:orientation="vertical">
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="Abc"
-                      android:textStyle="bold"
-                      android:id="@+id/txtMainPara"
-                    />
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="Abc"
-                      android:id="@+id/txtDetailsPara"
-                    />
-        </LinearLayout>
+            <com.pixtory.app.views.DroidSerifTextView
+                android:layout_width="match_parent"
+                android:layout_gravity="start"
+                android:layout_below="@+id/separator"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey_1"
+                android:textSize="17dp"
+                android:paddingLeft="35dp"
+                android:paddingRight="35dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="60dp"
+                android:lineSpacingExtra="7sp"
+                android:minHeight="@dimen/story_min_height"
+                android:text="fknvlenfk"
+                app:fontName="DroidSerif.ttf"
+                android:scaleX="1.08"
+                android:id="@+id/txtDetailsPara"/>
+                <!--android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. when an unknown printer took a galley of type and scrambled it to make a type specimen book Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book-->
+                <!--when an unknown printer took a galley of type and scrambled it to make a type specimen when an unknown printer took a galley of type and scrambled it to make a type specimen book unknown printer took a galley of type and when an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type-->
+                <!--specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen bookscrambled it to make a type specimen book-->
+                <!--when an unknown printer took a galley of type and scrambled it to make a type specimen unknown printer took a galley of type and scrambled it to make a type specimen bookwhen an unknown printer took a galley of type and scrambled it to make a type specimen book"-->
 
-    </ScrollView>
+    </RelativeLayout>
 
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
-        <Button android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/btnComment"
-                android:text="Comment"/>
-        <Button android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:id="@+id/btnShare"
-                android:text="Share"/>
-    </LinearLayout>
 </RelativeLayout>
