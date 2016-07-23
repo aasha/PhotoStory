@@ -1,10 +1,12 @@
 package com.pixtory.app;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.util.Log;
 
@@ -100,9 +102,18 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
                 });
             } else {
                 //if device is not connected to network register connection change listener
-                appContext.registerReceiver(
-                        new ConnectivityChangeReceiver(),
-                        new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+//                appContext.registerReceiver(
+//                        new ConnectivityChangeReceiver(),
+//                        new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+                //Enabling Connection Change Listener
+                ComponentName receiver = new ComponentName(appContext, ConnectivityChangeReceiver.class);
+                PackageManager pm = appContext.getPackageManager();
+
+                pm.setComponentEnabledSetting(receiver,
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                        PackageManager.DONT_KILL_APP);
+
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_ALARM_ONRECIEVE_NETWORK_NOT_CONNECTED")
                         .put(AppConstants.USER_ID, "" + user_id)
                         .build());

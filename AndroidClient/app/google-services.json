@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "46207295900-ltqa5tl6r8rb12q4vc360avb6qcpuf0j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pixtory.app",
+            "certificate_hash": "19CCBA448C76F234F2CF7E0697A4AF20DDA69185"
+          }
+        },
+        {
+          "client_id": "46207295900-r1qbe7q0tkmu6iks6ade8ipi8230jpbd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pixtory.app",
+            "certificate_hash": "1AEAEC37E8180DDE28B16C6F99DD363ECC09B643"
+          }
+        },
+        {
+          "client_id": "46207295900-bfefuuluo2ta4edq45k6lov9402c1l3n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pixtory.app",
+            "certificate_hash": "BA8E263C15451A0CB9C9FF46C348AC4956D5F036"
+          }
+        },
+        {
           "client_id": "46207295900-g30v4as8igt13bk3bkupdbqu8maqu5n5.apps.googleusercontent.com",
           "client_type": 3
         },

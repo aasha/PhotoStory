@@ -201,6 +201,8 @@ public class HomeActivity extends AppCompatActivity implements
     private TextView mWallpaperTopText;
     private TextView mSwipeLeftText;
 
+    private boolean isNotification;
+
     @Bind(R.id.whole_frame)
     FrameLayout mOuterContainer;
 
@@ -247,11 +249,13 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
 
 //        isFirstTimeOpen();
-
-        if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
+        isNotification = getIntent().getBooleanExtra("NOTIFICATION_CLICK",false);
+        if(isNotification)
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
+
+
 
         setContentView(R.layout.activity_home);
 
@@ -277,6 +281,8 @@ public class HomeActivity extends AppCompatActivity implements
         //Fix to be changed later
         sharedPreferences_app =
                 getApplicationContext().getSharedPreferences(AppConstants.APP_PREFS, 0);
+
+        //
 
         prepareFeed();
 
@@ -355,8 +361,6 @@ public class HomeActivity extends AppCompatActivity implements
             public void onPageScrollStateChanged(int state) {
                 //Log.d(TAG, "onPageScrollStateChanged = "+state);
             }
-
-
         });
 
 
@@ -398,6 +402,7 @@ public class HomeActivity extends AppCompatActivity implements
             }
         });
         super.onCreate(savedInstanceState);
+
 
         setUpNavigationDrawer();
         //Binding coachmark overlays
@@ -505,10 +510,6 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void setAlarmManagerToSetWallPaper(){
 
-        mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-
-        mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
-        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
         mainFragment = getCurrentFragment();
 
         setWallpaperNow(AppConstants.SET_WALLPAPER);
@@ -553,7 +554,7 @@ public class HomeActivity extends AppCompatActivity implements
                         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                         int startPos = sharedPreferences.getInt(Page_Index,0);
 
-                        App.shuffleContentData(startPos);
+                        App.shuffleContentData(startPos,isNotification);
                         //App.reorderContentData();
                         Utils.deleteOldVideos(o.contentList);
 
@@ -712,6 +713,10 @@ public class HomeActivity extends AppCompatActivity implements
         super.onStart();
         Log.i(TAG, "home activity on Start");
 
+        mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+
+        mWallpaperReceiverIntent = new Intent(HomeActivity.this, WallpaperChangeAlarmReceiver.class);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, mWallpaperReceiverIntent, 0);
     }
 
     @Override
@@ -1565,6 +1570,7 @@ public class HomeActivity extends AppCompatActivity implements
 
                     sharedPreferences_app.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
+
                     cancelAlarm();
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {

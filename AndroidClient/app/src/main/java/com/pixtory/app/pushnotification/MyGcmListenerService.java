@@ -48,7 +48,7 @@ import java.util.Calendar;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import service.WallpaperChangeIntentService;
+
 
 public class MyGcmListenerService extends GcmListenerService {
 

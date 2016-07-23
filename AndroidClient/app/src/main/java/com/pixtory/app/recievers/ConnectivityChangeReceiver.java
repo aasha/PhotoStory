@@ -1,8 +1,10 @@
 package com.pixtory.app.recievers;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -34,11 +36,12 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
                 .put(AppConstants.USER_ID,""+Utils.getUserId(context))
                 .build());
 
+        Context appContext = context.getApplicationContext();
 
         if(cm.getActiveNetworkInfo()!=null) {
             String s = "device is = "+cm.getActiveNetworkInfo().isConnected() +"and network is= "+cm.getActiveNetworkInfo().getTypeName();
             Log.i(TAG ,"isconnected= " +s);
-            Toast.makeText(context.getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            Toast.makeText(appContext, s, Toast.LENGTH_SHORT).show();
 
             long timeDiff = App.getTimeDiffFromLastWallPaperSet(context.getApplicationContext());
             if(timeDiff > 1000*60*60*12)
@@ -56,6 +59,13 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
                     .put(AppConstants.USER_ID,""+Utils.getUserId(context))
                     .build());
         }
+
+        //Disabling Connection Change Listener
+        ComponentName receiver = new ComponentName(appContext, ConnectivityChangeReceiver.class);
+        PackageManager pm = appContext.getPackageManager();
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
 
     }
 

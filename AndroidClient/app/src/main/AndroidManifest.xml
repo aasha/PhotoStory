@@ -24,6 +24,18 @@
 
     <uses-permission android:name="com.pixtory.app.permission.C2D_MESSAGE" />
 
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <uses-feature android:name="android.hardware.camera.flash" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -126,13 +138,12 @@
 
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
 
-        <service android:name="service.WallpaperChangeIntentService"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+        <receiver android:name=".recievers.ConnectivityChangeReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
-        </service>
+        </receiver>
 
     </application>
 
