@@ -478,12 +478,14 @@ public class OnBoardingActivity  extends FragmentActivity {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-
+            String name="",email="",imageUrl="";
             GoogleSignInAccount acct = result.getSignInAccount();
-            String name = acct.getDisplayName();
-            String email = acct.getEmail();
-            String imageUrl = acct.getPhotoUrl().toString();
-
+            if(acct!=null) {
+                name = acct.getDisplayName();
+                email = acct.getEmail();
+                if (acct.getPhotoUrl() != null)
+                    imageUrl = acct.getPhotoUrl().toString();
+            }
             // Google + profile info
             Person person  = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
             Log.i(TAG, "--------------------------------");
