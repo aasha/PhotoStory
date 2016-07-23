@@ -516,10 +516,12 @@ public class OnBoardingActivity  extends FragmentActivity {
         } else {
             // Signed out, show unauthenticated UI.
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("OB_GoogleLogin_Failed")
-                    .put("STATUS_CODE",result.getStatus()+"")
+                    .put("STATUS_CODE",result.getStatus().getStatusCode()+"")
+                    .put("STATUS_RESOLUTION",result.getStatus().getResolution()+"")
+                    .put("STATUS_MESSAGE",result.getStatus().getStatusMessage()+"")
                     .build());
-            Toast.makeText(this,result.toString(),Toast.LENGTH_LONG).show();
-            Log.i(TAG,"GOOGLE STATUS CODE: "+result.getStatus());
+            Toast.makeText(this,"Sorry, unable to login to Google.Please check your network connection or try again later. Status message - "+result.getStatus().getStatusMessage(),Toast.LENGTH_LONG).show();
+            Log.i(TAG,"GOOGLE STATUS CODE: "+result.getStatus().getStatusCode());
         }
     }
 
