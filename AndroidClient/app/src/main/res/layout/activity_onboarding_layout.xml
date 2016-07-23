@@ -59,7 +59,7 @@
             android:layout_width="31dp"
             android:layout_height="31dp"
             android:scaleType="centerInside"
-            android:background="@drawable/fb_btn_bg"
+            android:background="@drawable/google_plus_icon"
             android:layout_gravity="center_vertical"/>
         <FrameLayout
             android:layout_width="wrap_content"
@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
                 android:textColor="@color/white"
-                android:text="Connect with Google    "
+                android:text="Connect with Google     "
                 android:textAlignment="center"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="8dp"

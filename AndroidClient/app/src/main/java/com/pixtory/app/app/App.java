@@ -376,9 +376,6 @@ public class App extends Application implements AppConstants {
 
     public static FirebaseAnalytics getmFirebaseAnalytics(){return mFirebaseAnalytics;}
 
-    public static Context getAppContext(){return mContext;}
-
-
     public static boolean isAppUpdated() {
         return isAppUpdated;
     }
@@ -398,5 +395,7 @@ public class App extends Application implements AppConstants {
 
     }
 
+
+    public static Context getAppContext(){return mContext;}
 
 }

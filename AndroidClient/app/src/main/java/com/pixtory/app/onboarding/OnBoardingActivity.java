@@ -90,12 +90,11 @@ public class OnBoardingActivity  extends FragmentActivity {
 
     private static final int RC_SIGN_IN = 9001;
 
-
     private static final String User_App_Entry = "User_App_Entry";
+
     Tracker mTracker;
 
     private GoogleApiClient mGoogleApiClient;
-
     SharedPreferences sharePref;
 
 
