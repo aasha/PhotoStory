@@ -21,8 +21,8 @@ android {
         applicationId "com.pixtory.app"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 13 //increment with every release
-        versionName "pre_launch_test_apk" //increment with every release
+        versionCode 16 //increment with every release
+        versionName "pre_launch_v_2.0" //increment with every release
     }
 
     dexOptions {

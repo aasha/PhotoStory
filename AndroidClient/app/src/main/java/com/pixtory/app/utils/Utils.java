@@ -119,6 +119,15 @@ public class Utils {
         return false;
     }
 
+    public static boolean isNetworkConnected(Context ctx){
+        ConnectivityManager connManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+
+        boolean isConnected = networkInfo != null && networkInfo.isConnected();
+
+        return isConnected;
+    }
+
     public static void setInstallTime(Context context) {
         Utils.updateShreadPrefs(context, AppConstants.INSTALL_TIME, System.currentTimeMillis() + "");
     }

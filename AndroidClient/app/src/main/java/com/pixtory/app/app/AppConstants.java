@@ -53,13 +53,14 @@ public interface AppConstants {
     final static String TAG_TASK_ONEOFF_LOG = "TAG_TASK_ONEOFF_LOG";
     final static String TAG_TASK_REPEAT = "TAG_TASK_REPEAT";
 
+    final static String WALLPAPER_SET_TIME = "wallpaper_set_last_time";
     static final int SHOW_PIC_STORY = 88;
     static final int SHOW_PIC_COMMENTS = 89;
 
     static final int SET_WALLPAPER = 0;
     static final int CACHE_WALLPAPER_IMAGE = 1;
 
-
+    final static String CURRENT_VERSION_CODE = "current_version_code";
 
     final static List<String> mFBPermissions = Arrays.asList("public_profile",
             "email","user_birthday");

@@ -18,18 +18,15 @@ package com.pixtory.app.pushnotification;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -48,17 +45,17 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 import java.util.Calendar;
-import java.util.Date;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import service.WallpaperChangeService;
+import service.WallpaperChangeIntentService;
 
 public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
     private static final String SCREEN_NAME = "Notification";
     private static final String App_Notification_Shown = "NF_Notification_Shown";
+    private static final String Silent_Notification_Shown = "Silent_Notification_Shown";
 
     PendingIntent pendingIntent ;
 
@@ -85,13 +82,6 @@ public class MyGcmListenerService extends GcmListenerService {
         pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-
-        if (from.startsWith("/topics/")) {
-            // message received from some topic.
-        } else {
-            // normal downstream message.
-        }
-
         // [START_EXCLUDE]
         /**
          * Production applications would usually process the message here.
@@ -104,31 +94,42 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message, image , isWallpaperNotification);
 
         SharedPreferences mSharedPrefs = getApplicationContext().getSharedPreferences(
                 AppConstants.APP_PREFS, 0);
 
-        getApplicationContext().getSharedPreferences(
-                AppConstants.APP_PREFS, Context.MODE_PRIVATE);
-
-
-        if( Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 4){
-            updateSharedPref(false);
-        }
 
         Log.i(TAG,"Opted_for_daily_wallpaper::"+mSharedPrefs.getBoolean("Opt_for_daily_wallpaper",false));
         Log.i(TAG,"is daily wallpaper set for today"+ mSharedPrefs.getBoolean("is_today_wallpaper_set",false));
 
-        if(mSharedPrefs.getBoolean("Opt_for_daily_wallpaper",false) && !mSharedPrefs.getBoolean("is_today_wallpaper_set",true)){
-            changeWallPaper();
+
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_LISTENER_CALLED")
+                .put(AppConstants.USER_ID,Utils.getUserId(getApplicationContext()))
+                .build());
+
+        sendNotification(message, image , isWallpaperNotification);
+
+        if(mSharedPrefs.getBoolean("Opt_for_daily_wallpaper",false)){
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_LISTENER_USER_OPTED_FOR_DAILY_WP")
+                    .put(AppConstants.USER_ID,Utils.getUserId(getApplicationContext()))
+                    .build());
+//                && !mSharedPrefs.getBoolean("is_today_wallpaper_set",true)){
+            long timeDiff = App.getTimeDiffFromLastWallPaperSet(getApplicationContext());
+            if(timeDiff > 1000*60*60*12) {
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_CHANGE_WALLPAPER_METHOD_CALLED")
+                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                        .put("TIME_DIFF",""+timeDiff)
+                        .build());
+                changeWallPaper();
+            }else{
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_CHANGE_WALLPAPER_METHOD_NOT_CALLED")
+                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                        .put("TIME_DIFF",""+timeDiff)
+                        .build());
+            }
+
         }
 
-        // [END_EXCLUDE]
-//        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(MODE_PRIVATE);
-
-//        if()
-//        changeWallPaper();
     }
     // [END receive_message]
 
@@ -145,8 +146,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.i(TAG,"show Notification ="+showNotification);
         if(showNotification){
             Log.i(TAG,"notification shown");
-
-            Bitmap bitmap = null;
+            Bitmap bitmap =  null;
                 try {
                     URL url = new URL(image);
                     bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
@@ -158,8 +158,6 @@ public class MyGcmListenerService extends GcmListenerService {
                 NotificationCompat.BigPictureStyle notiStyle = new NotificationCompat.BigPictureStyle();
                 notiStyle.setSummaryText(message);
                 notiStyle.bigPicture(bitmap);
-
-                //RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification_layout);
 
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.pixtory_icon)
@@ -183,6 +181,10 @@ public class MyGcmListenerService extends GcmListenerService {
                         .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
                         .build());
                 notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        }else{
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(Silent_Notification_Shown)
+                    .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                    .build());
         }
 
 
@@ -194,66 +196,42 @@ public class MyGcmListenerService extends GcmListenerService {
 
         if(Utils.isNotEmpty(Utils.getUserId(getApplicationContext()))) {
 
-
             int user_id = Integer.parseInt(Utils.getUserId(getApplicationContext()));
 
             NetworkApiHelper.getInstance().getWallPaper(user_id, new NetworkApiCallback<GetWallPaperResponse>() {
                 @Override
                 public void success(GetWallPaperResponse getWallPaperResponse, Response response) {
                     Log.i(TAG, "wallpaper URL is--" + getWallPaperResponse.wallPaper);
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_SETWALLPAPER_RESPONSE_SUCCESS")
+                            .put("WALLPAPER_URL",getWallPaperResponse.wallPaper)
+                            .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                            .build());
                     setWallPaper(getApplicationContext(), getWallPaperResponse.wallPaper);
-                    updateSharedPref(true);
-
                 }
 
                 @Override
                 public void failure(GetWallPaperResponse getWallPaperResponse) {
-//                    setJobSchedulerToSetWallpaper(getApplicationContext());
                     Log.i(TAG,"failure->"+getWallPaperResponse.errorMessage);
-                    SharedPreferences mSharedPrefs = getApplicationContext().getSharedPreferences(
-                            AppConstants.APP_PREFS, 0);
-                    updateSharedPref(false);
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_SETWALLPAPER_FAILED")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                            .put("ERROR",getWallPaperResponse.errorMessage)
+                            .build());
+
                 }
 
                 @Override
                 public void networkFailure(RetrofitError error) {
-//                    setJobSchedulerToSetWallpaper(getApplicationContext());
                     Log.i(TAG,"networkFailure->"+error.toString());
-                    SharedPreferences mSharedPrefs = getApplicationContext().getSharedPreferences(
-                            AppConstants.APP_PREFS, 0);
-                    updateSharedPref(false);
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_SETWALLPAPER_FAILED_NETWORK_NOTCONNECTED")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                            .build());
                 }
             });
         }
 
     }
 
-    private GcmNetworkManager mGcmNetworkManager;
     public void setWallPaper(final Context mContext , String imgUrl) {
         Picasso.with(mContext).load(imgUrl).into(App.mDailyWallpaperTarget);
-
     }
-
-    private void setJobSchedulerToSetWallpaper(Context ctx){
-        if(mGcmNetworkManager==null)
-            mGcmNetworkManager = GcmNetworkManager.getInstance(ctx);
-
-        Task task = new OneoffTask.Builder()
-                .setService(WallpaperChangeService.class)
-                .setExecutionWindow(1000*45, 1000*60*60*9) // 45 seconds to nine hours
-                .setTag(AppConstants.TAG_TASK_ONEOFF_LOG)
-                .setUpdateCurrent(false)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setRequiresCharging(false)
-                .build();
-
-        mGcmNetworkManager.schedule(task);
-    }
-
-    public void updateSharedPref(boolean bool){
-        SharedPreferences mSharedPrefs = getApplicationContext().getSharedPreferences(
-                AppConstants.APP_PREFS, 0);
-        mSharedPrefs.edit().putBoolean("is_today_wallpaper_set",bool).apply();
-    }
-
 }

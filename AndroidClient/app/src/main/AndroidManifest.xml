@@ -24,14 +24,6 @@
 
     <uses-permission android:name="com.pixtory.app.permission.C2D_MESSAGE" />
 
-    <uses-feature android:name="android.hardware.camera.flash" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature
-        android:name="android.hardware.camera.front"
-        android:required="false" />
-
-    <uses-permission android:name="android.permission.FLASHLIGHT" />
-
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -132,21 +124,9 @@
             android:authorities="com.facebook.app.FacebookContentProvider1207785742565519"
             android:exported="true" />
 
-        <receiver
-            android:name=".WallpaperNetworkRetryReceiver"
-            android:enabled="false"
-            android:exported="false"></receiver>
-
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
 
-        <receiver android:name=".recievers.InstallReferrerReciever"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name="service.WallpaperChangeService"
+        <service android:name="service.WallpaperChangeIntentService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>

@@ -3,6 +3,7 @@ package com.pixtory.app.app;
 import android.app.Application;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.multidex.MultiDex;
@@ -28,6 +29,7 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +64,8 @@ public class App extends Application implements AppConstants {
     private static ArrayList<ContentData> mProfileContentData;
 
     private static int MAX_CAPACITY = 10;
+
+    private static boolean isAppUpdated;
 
     public static String getDailyWallpaperUrl() {
         return dailyWallpaperUrl;
@@ -126,7 +130,7 @@ public class App extends Application implements AppConstants {
 //        GoogleAnalytics.getInstance(this).getLogger()
 //                .setLogLevel(Logger.LogLevel.VERBOSE);
         Log.d("Amplitude", "Amplitude init");
-        Amplitude.getInstance().initialize(this, "7c63201294234fbe66c73d36c4ae206c").enableForegroundTracking(this);
+        Amplitude.getInstance().initialize(this, "e3fa07e67cacb39e001d8b1417f8619d").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
 
         //Initialise Firebase instance
@@ -160,12 +164,16 @@ public class App extends Application implements AppConstants {
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
                 Toast.makeText(getApplicationContext(), "Bitmap Loadig Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
-
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWp_Bitmap_Loading_Failed")
+                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                        .build());
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_DeviceWp_onPrepareLoad")
+//                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+//                        .build());
             }
         };
         mDailyWallpaperTarget = new Target() {
@@ -179,8 +187,16 @@ public class App extends Application implements AppConstants {
                     AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_Device_EveryDay_Wallpaper_Set")
                             .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
                             .build());
+                    SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(
+                            AppConstants.APP_PREFS, 0);
+                    sharedPrefs.edit().putLong(AppConstants.WALLPAPER_SET_TIME, Calendar.getInstance().getTimeInMillis()).apply();
+                    Log.i("currents set time-" , ""+sharedPrefs.getLong(AppConstants.WALLPAPER_SET_TIME,0));
                 } catch (IOException e) {
                     Toast.makeText(getApplicationContext(), "Oops we couldn't set your wallpaper", Toast.LENGTH_SHORT).show();
+                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_Device_EveryDay_Wallpaper_Exception")
+                            .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                            .put("Exception",e.getMessage())
+                            .build());
                     e.printStackTrace();
                 }
             }
@@ -188,12 +204,16 @@ public class App extends Application implements AppConstants {
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
                 Toast.makeText(getApplicationContext(), "Bitmap Loading Failed, Couldn't change your wallpaper", Toast.LENGTH_SHORT).show();
-
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_Device_EveryDay_Wallpaper_BitMapLoadFailed")
+                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+                        .build());
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+//                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_Device_EveryDay_Wallpaper_OnPrepareLoad")
+//                        .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
+//                        .build());
             }
         };
 
@@ -335,5 +355,26 @@ public class App extends Application implements AppConstants {
     }
 
     public static FirebaseAnalytics getmFirebaseAnalytics(){return mFirebaseAnalytics;}
+
+
+    public static boolean isAppUpdated() {
+        return isAppUpdated;
+    }
+
+    public static void setIsAppUpdated(boolean isAppUpdated) {
+        App.isAppUpdated = isAppUpdated;
+    }
+
+    public static long getTimeDiffFromLastWallPaperSet(Context context) {
+        SharedPreferences mSharedPrefs = context.getSharedPreferences(
+                AppConstants.APP_PREFS, 0);
+
+        long last_time = mSharedPrefs.getLong(AppConstants.WALLPAPER_SET_TIME, 0);
+        long current_time = Calendar.getInstance().getTimeInMillis();
+
+        return (current_time - last_time);
+
+    }
+
 
 }

@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -67,8 +68,10 @@ public class OnBoardingActivity  extends FragmentActivity {
     //Analytics
     final static String SCREEN_NAME = "Onboard";
     final static String OB_Card_Swipe = "OB_Card_Swipe";
-
+    private static final String User_App_Entry = "User_App_Entry";
     Tracker mTracker;
+
+    SharedPreferences sharePref;
 
 
     @Override
@@ -81,7 +84,7 @@ public class OnBoardingActivity  extends FragmentActivity {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
-        printSHA();
+//        printSHA();
 
         //Get Default Tracker
         GoogleAnalytics.getInstance(this).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
@@ -94,17 +97,30 @@ public class OnBoardingActivity  extends FragmentActivity {
         // Send a screen view.
         mTracker.send(new HitBuilders.AppViewBuilder().build());
 
-        //For testing Firebase crash reports
-//        FirebaseCrash.report(new Exception("My first Android non-fatal error - Proguard Error"));
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
         getDeepLinkData();
+        sharePref = getApplicationContext().getSharedPreferences(
+                AppConstants.APP_PREFS, 0);
+
+        if(sharePref.getBoolean("is_first_app_open",true)){
+            sharePref.edit().putBoolean("is_first_app_open",false).apply();
+
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( "OB_AppFirstOpen")
+                    .put("TIMESTAMP", System.currentTimeMillis() + "")
+                    .build());
+        }
+
+        isAppUpdated();
 
 //        User will be directed to Main Feed page is already loggedIn
         if (redirectIfLoggedIn()) {
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(User_App_Entry)
+                    .put("TIMESTAMP", System.currentTimeMillis() + "")
+                    .put(AppConstants.USER_ID, Utils.getUserId(OnBoardingActivity.this))
+                    .build());
             return;
         }
 
@@ -136,8 +152,6 @@ public class OnBoardingActivity  extends FragmentActivity {
             }
         });
 
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("APP_DOWNLOAD")
-                .build());
 
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
@@ -232,7 +246,10 @@ public class OnBoardingActivity  extends FragmentActivity {
                             Utils.putUserName(OnBoardingActivity.this, name);
                             Utils.putUserImage(OnBoardingActivity.this, imgUrl);
                             AmplitudeLog.sendUserInfo(regResp.userId);
-
+                            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(User_App_Entry)
+                                    .put("TIMESTAMP", System.currentTimeMillis() + "")
+                                    .put(AppConstants.USER_ID, regResp.userId)
+                                    .build());
                             gotoNextScreen(regResp.userId);
                         }
 
@@ -392,6 +409,7 @@ public class OnBoardingActivity  extends FragmentActivity {
                             @Override
                             public void onResult(@NonNull AppInviteInvitationResult result) {
                                 if (result.getStatus().isSuccess()) {
+                                    Log.d(TAG, "deep link found");
                                     // Extract deep link from Intent
                                     Intent intent = result.getInvitationIntent();
                                     String deepLink = AppInviteReferral.getDeepLink(intent);
@@ -417,6 +435,28 @@ public class OnBoardingActivity  extends FragmentActivity {
                                 }
                             }
                         });
+
+    }
+
+    private void isAppUpdated(){
+
+        try{
+            int versionCode = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
+
+            if(sharePref.getInt("current_version_code",0) != versionCode){
+                sharePref.edit().putInt("current_version_code", versionCode).apply();
+                App.setIsAppUpdated(true);
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("APP_UPDATED")
+                        .put(AppConstants.USER_ID, Utils.getUserId(OnBoardingActivity.this))
+                        .put("VERSION",""+versionCode)
+                        .build());
+                //TODO Pass update event to Amplitude
+            }else{
+                App.setIsAppUpdated(false);
+            }
+        }catch (PackageManager.NameNotFoundException e){
+            Log.i(TAG,e.getMessage());
+        }
 
     }
 

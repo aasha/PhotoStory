@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -155,7 +156,7 @@ public class HomeActivity extends AppCompatActivity implements
     public static final String OPT_FOR_DAILY_WALLPAPER = "Opt_for_daily_wallpaper";
     private static final String MF_Bandwidth_Changed = "MF_Bandwidth_Changed";
 
-    private static final String User_App_Entry = "User_App_Entry";
+//    private static final String User_App_Entry = "User_App_Entry";
     private static final String User_App_Exit = "User_App_Exit";
 
     //Push notification
@@ -245,14 +246,12 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        isFirstTimeOpen();
+//        isFirstTimeOpen();
 
         if(getIntent().getBooleanExtra("NOTIFICATION_CLICK",false))
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("NF_Notification_Clicked")
                     .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
                     .build());
-
-
 
         setContentView(R.layout.activity_home);
 
@@ -278,8 +277,6 @@ public class HomeActivity extends AppCompatActivity implements
         //Fix to be changed later
         sharedPreferences_app =
                 getApplicationContext().getSharedPreferences(AppConstants.APP_PREFS, 0);
-
-        //
 
         prepareFeed();
 
@@ -358,6 +355,8 @@ public class HomeActivity extends AppCompatActivity implements
             public void onPageScrollStateChanged(int state) {
                 //Log.d(TAG, "onPageScrollStateChanged = "+state);
             }
+
+
         });
 
 
@@ -400,7 +399,6 @@ public class HomeActivity extends AppCompatActivity implements
         });
         super.onCreate(savedInstanceState);
 
-
         setUpNavigationDrawer();
         //Binding coachmark overlays
         mWallpaperCoachMarkBlurBg = (ImageView)findViewById(R.id.blur_layer);
@@ -415,8 +413,6 @@ public class HomeActivity extends AppCompatActivity implements
         mSwipeUpText2 = (TextView)findViewById(R.id.swipe_up_text_2);
 
         mLongTapText = (TextView)findViewById(R.id.long_tap_text);
-       // mToggleButton = (ToggleButton)findViewById(R.id.toggle_button);
-
         mWallpaperTopText = (TextView)findViewById(R.id.wallpaper_top_text);
 
         String swipeText1 = "<b>Swipe up</b> for the <b>Story</b> behind the picture.";
@@ -449,14 +445,12 @@ public class HomeActivity extends AppCompatActivity implements
 
         shareDialog = new ShareDialog(this);
 
-
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         Toast.makeText(HomeActivity.this, "FB Login Success!", Toast.LENGTH_SHORT).show();
                         onFacebookLoginSuccess();
-
                     }
 
                     @Override
@@ -472,7 +466,6 @@ public class HomeActivity extends AppCompatActivity implements
                         AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder(AppConstants.OB_FBLogin_Fail)
                                 .put("MESSAGE", exception.getMessage() + "")
                                 .build());
-
                         closeDialog();
                         Toast.makeText(HomeActivity.this, "Sorry, unable to login to facebook.Please check your network connection or try again later.(" + exception.getMessage() + ")", Toast.LENGTH_LONG).show();
 
@@ -490,12 +483,24 @@ public class HomeActivity extends AppCompatActivity implements
                 .build());
             }
         });
+
+
+        if(isFirstOpenAfterUpdate()){
+            boolean hasOptedForWallpaper = sharedPreferences_app.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)
+                                                || getPreferences(MODE_PRIVATE).getBoolean(OPT_FOR_DAILY_WALLPAPER,false);
+            if(hasOptedForWallpaper) {
+
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_ALARM_RESET_AFTER_APP_UPDATE")
+                        .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                        .build());
+                setAlarmManagerToSetWallPaper();
+            }
+        }
     }
 
     @Override
     public void onResume(){
         super.onResume();
-
     }
 
     public void setAlarmManagerToSetWallPaper(){
@@ -509,15 +514,17 @@ public class HomeActivity extends AppCompatActivity implements
         setWallpaperNow(AppConstants.SET_WALLPAPER);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 7);
         calendar.set(Calendar.MINUTE, 30);
 
-        int alarm_interval = 1000*60*60*12;
+        int alarm_interval = 1000*60*60*24;
         //Alarm set for 24 hours
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),alarm_interval , mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), alarm_interval , mPendingIntent);
         Log.i("Alarm","armManagerToSetWallPaper called");
 
+        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_ALARM_INITIALIZED_ON_CLICK_OF_DAILY_WP_YES")
+                .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                .build());
     }
 
     public void cancelAlarm(){
@@ -704,10 +711,7 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "home activity on Start");
-        AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( User_App_Entry)
-                .put("TIMESTAMP", System.currentTimeMillis() + "")
-                .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                .build());
+
     }
 
     @Override
@@ -1279,7 +1283,7 @@ public class HomeActivity extends AppCompatActivity implements
                     intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called Pixtory, " +
                             "a platform for stunning fullscreen images and the stories behind them. " +
                             "I think you should check it out! " +
-                            "Download it on the Play Store or go to \n\n" +invite_link +" to know more.");
+                            "Download it on the Play Store or go to \n\n" +invite_link);
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);
@@ -1290,8 +1294,7 @@ public class HomeActivity extends AppCompatActivity implements
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, "Hey, I've been using this new app called *Pixtory*, a platform for stunning fullscreen images and the stories behind them. I think you should check it" +
                             " out! Download it on the Play Store \n\n"
-                            +AppConstants.INVITE_WHATSAPP_LINK+
-                            "  to know more.");
+                            +AppConstants.INVITE_WHATSAPP_LINK);
                     intent.putExtra(Intent.EXTRA_SUBJECT, "App Invitation");
                     intent.setPackage(packageName);
                     targetInviteIntents.add(intent);
@@ -1531,7 +1534,6 @@ public class HomeActivity extends AppCompatActivity implements
 
                     sharedPreferences_app.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                    sharedPreferences_app.edit().putBoolean("is_today_wallpaper_set",false).apply();
 
                     setAlarmManagerToSetWallPaper();
                     mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
@@ -1575,54 +1577,8 @@ public class HomeActivity extends AppCompatActivity implements
                 }
             }
         });
-/*
-        mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-
-                Log.i(TAG,"Toggle button state changed");
-                if(isChecked && !sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false)){
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperConfirm_Click")
-                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .build());
-
-                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,true).apply();
-                    setAlarmManagerToSetWallPaper();
-                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_changed_text));
-                    Toast.makeText(HomeActivity.this,"A new wallpaper will be set on your phone every morning. We're sure you'll love them!",Toast.LENGTH_LONG).show();
-
-                }
-                else if(!isChecked && sharedPreferences.getBoolean(OPT_FOR_DAILY_WALLPAPER,false))
-                {
-                    AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("WP_HB_EverydayWallaperCancel_Click")
-                            .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
-                            .build());
-                    mWallpaperCoachMarkText.setText(getResources().getString(R.string.wallpaper_text));
-                    Toast.makeText(HomeActivity.this,"You can switch on the daily wallpapers anytime from the menu",Toast.LENGTH_LONG).show();
-
-                    sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
-                    cancelAlarm();
-                }*/
-
-
-
     }
 
-    private boolean isFirstTimeOpen(){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-        boolean firstRun = sharedPreferences.getBoolean(Is_First_Run,true);
-        if(firstRun){
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(Is_First_Run,false);
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( "App_FirstOpen")
-                    .put("TIMESTAMP", System.currentTimeMillis() + "")
-                    .put(AppConstants.USER_ID, Utils.getUserId(HomeActivity.this))
-                    .build());
-            editor.commit();
-        }
-        return firstRun;
-    }
 
     private void preFetchImages(final int index){
 
@@ -1936,6 +1892,33 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         stopStoryTimer(pixtoryId);
+    }
+
+
+    private boolean isFirstOpenAfterUpdate(){
+
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        try{
+            int versionCode = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
+
+            if(sharedPreferences.getInt("current_version_code",0) != versionCode){
+                sharedPreferences.edit().putInt("current_version_code", versionCode).apply();
+
+                AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_PREPARE_FEED_CALLED_FIRST_TIME_AFTER_APP_UPDATE")
+                        .put(AppConstants.USER_ID,Utils.getUserId(HomeActivity.this))
+                        .build());
+
+                return true;
+
+                //TODO Pass update event to Amplitude
+            }else{
+                return false;
+            }
+        }catch (PackageManager.NameNotFoundException e){
+            Log.i(TAG,e.getMessage());
+        }
+
+        return false;
     }
 }
 
