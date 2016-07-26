@@ -132,7 +132,7 @@ public class App extends Application implements AppConstants {
 //        GoogleAnalytics.getInstance(this).getLogger()
 //                .setLogLevel(Logger.LogLevel.VERBOSE);
         Log.d("Amplitude", "Amplitude init");
-        Amplitude.getInstance().initialize(this, "3087d9e1160a88db40ac2f0f448844be").enableForegroundTracking(this);
+        Amplitude.getInstance().initialize(this, "782ef6a852ddda731d79ec2c5bc453a9").enableForegroundTracking(this);
         Amplitude.getInstance().trackSessionEvents(true);
 
         //Initialise Firebase instance

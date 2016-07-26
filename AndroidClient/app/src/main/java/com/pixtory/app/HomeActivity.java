@@ -1570,6 +1570,7 @@ public class HomeActivity extends AppCompatActivity implements
 
                     sharedPreferences_app.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
                     sharedPreferences.edit().putBoolean(OPT_FOR_DAILY_WALLPAPER,false).apply();
+                    sharedPreferences_app.edit().putLong(AppConstants.WALLPAPER_SET_TIME, 0).apply();
 
                     cancelAlarm();
                     final Handler handler = new Handler();

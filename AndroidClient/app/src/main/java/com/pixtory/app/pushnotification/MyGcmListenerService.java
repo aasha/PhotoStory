@@ -115,7 +115,7 @@ public class MyGcmListenerService extends GcmListenerService {
                     .build());
 //                && !mSharedPrefs.getBoolean("is_today_wallpaper_set",true)){
             long timeDiff = App.getTimeDiffFromLastWallPaperSet(getApplicationContext());
-            if(timeDiff > 1000*60*60*12) {
+            if(timeDiff > 1000*60*60*9) {
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_MYGCM_CHANGE_WALLPAPER_METHOD_CALLED")
                         .put(AppConstants.USER_ID, Utils.getUserId(getApplicationContext()))
                         .put("TIME_DIFF",""+timeDiff)

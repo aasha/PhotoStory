@@ -44,7 +44,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
             Toast.makeText(appContext, s, Toast.LENGTH_SHORT).show();
 
             long timeDiff = App.getTimeDiffFromLastWallPaperSet(context.getApplicationContext());
-            if(timeDiff > 1000*60*60*12)
+            if(timeDiff > 1000*60*60*9)
                 setWallpaper(context);
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_CONNEC_CHANGE_LISTENER_NETWORK_YES")
                     .put(AppConstants.USER_ID,""+Utils.getUserId(context))

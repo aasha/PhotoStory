@@ -8,14 +8,19 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.Task;
 import com.pixtory.app.app.App;
 import com.pixtory.app.app.AppConstants;
 import com.pixtory.app.recievers.ConnectivityChangeReceiver;
 import com.pixtory.app.retrofit.GetWallPaperResponse;
 import com.pixtory.app.retrofit.NetworkApiCallback;
 import com.pixtory.app.retrofit.NetworkApiHelper;
+import com.pixtory.app.service.WallpaperChangeService;
 import com.pixtory.app.utils.AmplitudeLog;
 import com.pixtory.app.utils.Utils;
 import com.squareup.picasso.Picasso;
@@ -45,9 +50,9 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
         long timeDiff = App.getTimeDiffFromLastWallPaperSet(appContext);
 
-        if(timeDiff > 1000*60*60*12) {
+        if(timeDiff > 1000*60*60*9) {
 
-            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_ALARM_ONRECIEVE_CHANGE_WP_CALLED_TIME_DIFF=")
+            AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_WP_ALARM_ONRECIEVE_CHANGE_WP_CALLED_TIME_DIFF")
                     .put(AppConstants.USER_ID, "" + !Utils.isNotEmpty(Utils.getUserId(mContext)))
                     .put("TIME_DIFF",""+timeDiff)
                     .build());
@@ -102,9 +107,6 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
                 });
             } else {
                 //if device is not connected to network register connection change listener
-//                appContext.registerReceiver(
-//                        new ConnectivityChangeReceiver(),
-//                        new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
                 //Enabling Connection Change Listener
                 ComponentName receiver = new ComponentName(appContext, ConnectivityChangeReceiver.class);
@@ -118,6 +120,8 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
                         .put(AppConstants.USER_ID, "" + user_id)
                         .build());
 
+//                scheduleJobToSetWallpaper(appContext);
+
             }
         }else{
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("DEBUG_ALARM_ONRECIEVE_CHANGE_WP_NOTCALLED")
@@ -130,6 +134,19 @@ public class WallpaperChangeAlarmReceiver extends BroadcastReceiver{
 
      public void setWallPaper(final Context mContext , String imgUrl) {
          Picasso.with(mContext).load(imgUrl).into(App.mDailyWallpaperTarget);
+     }
+
+     public void scheduleJobToSetWallpaper(Context context){
+         // Schedule a task to occur between five and 5 hours minutes from now:
+         OneoffTask wallpaperTask = new OneoffTask.Builder()
+                 .setService(WallpaperChangeService.class)
+                 .setExecutionWindow(0, 1000*60*60*5)
+                 .setTag("WALLPAPER_TASK")
+                 .setUpdateCurrent(true)
+                 .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                 .build();
+
+         GcmNetworkManager.getInstance(context).schedule(wallpaperTask);
      }
 
 }

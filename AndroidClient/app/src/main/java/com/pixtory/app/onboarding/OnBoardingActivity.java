@@ -156,9 +156,10 @@ public class OnBoardingActivity  extends FragmentActivity {
             AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder( "OB_AppFirstOpen")
                     .put("TIMESTAMP", System.currentTimeMillis() + "")
                     .build());
-        }
+        }else {
 
-        isAppUpdated();
+            isAppUpdated();
+        }
 
 //        User will be directed to Main Feed page is already loggedIn
         if (redirectIfLoggedIn()) {
@@ -555,13 +556,11 @@ public class OnBoardingActivity  extends FragmentActivity {
         }
     }
 
-
     // START Google signIn
     private void startGoogleSignIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-
 
     private void registerGoogleAccount(final String name, final String email,final String imageUrl){
         NetworkApiHelper.getInstance().registerUser(name, email, imageUrl,null,new NetworkApiCallback<RegisterResponse>() {
@@ -611,7 +610,7 @@ public class OnBoardingActivity  extends FragmentActivity {
         try{
             int versionCode = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
 
-            if(sharePref.getInt("current_version_code",0) != versionCode){
+            if((sharePref.getInt("current_version_code",0) != versionCode)){
                 sharePref.edit().putInt("current_version_code", versionCode).apply();
                 App.setIsAppUpdated(true);
                 AmplitudeLog.logEvent(new AmplitudeLog.AppEventBuilder("APP_UPDATED")
